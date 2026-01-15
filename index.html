@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホテル開発コスト & LCC統合シミュレーター</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --cell-border: #ddd;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { color: var(--primary-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; }
+
+        /* タブメニュー */
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            background: #eee;
+            border-radius: 5px 5px 0 0;
+            transition: 0.3s;
+        }
+        .tab-button.active { background: white; border-top: 3px solid var(--accent-color); font-weight: bold; }
+        .tab-content { display: none; padding: 20px; border: 1px solid #ddd; border-top: none; }
+        .tab-content.active { display: block; }
+
+        /* グリッド・テーブルスタイル */
+        .grid-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
+        .grid-table th, .grid-table td { border: 1px solid var(--cell-border); padding: 8px; text-align: right; }
+        .grid-table th { background-color: var(--secondary-color); color: white; text-align: center; }
+        .grid-table input { width: 100%; border: none; text-align: right; background: transparent; }
+        
+        /* 特定セクションの色付け */
+        .row-arch { background-color: #fff0f0; }
+        .row-hvac { background-color: #f0f8ff; }
+        .row-sanitary { background-color: #f0fff0; }
+        .row-electric { background-color: #fffff0; }
+        .row-total { background-color: #eee; font-weight: bold; }
+
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .summary-item span { display: block; font-size: 1.5em; font-weight: bold; color: #f1c40f; }
+
+        .chart-container { width: 100%; max-width: 600px; margin: 20px auto; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ホテル開発コスト & LCC統合シミュレーター</h1>
+
+    <div class="summary-box">
+        <div class="summary-item">総建設費 (再調達価格) <span id="summary-total-cost">0 円</span></div>
+        <div class="summary-item">㎡単価 <span id="summary-unit-price">0 円/㎡</span></div>
+        <div class="summary-item">75年間総LCC <span id="summary-lcc">0 円</span></div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab-button active" onclick="openTab(event, 'basic')">基本設定</div>
+        <div class="tab-button" onclick="openTab(event, 'rooms')">諸室詳細</div>
+        <div class="tab-button" onclick="openTab(event, 'master')">マスターデータ</div>
+        <div class="tab-button" onclick="openTab(event, 'lcc')">LCC分析</div>
+    </div>
+
+    <div id="basic" class="tab-content active">
+        <h3>物件基本情報</h3>
+        <label>延床面積 (㎡): <input type="number" id="base-area" value="1000" onchange="calculateAll()"></label><br><br>
+        <label>構造: 
+            <select id="base-structure" onchange="calculateAll()">
+                <option value="S">S造</option>
+                <option value="RC">RC造</option>
+                <option value="SRC">SRC造</option>
+            </select>
+        </label><br><br>
+        <label>グレード: 
+            <select id="base-grade" onchange="calculateAll()">
+                <option value="standard">スタンダード</option>
+                <option value="high">上質 (仕様1)</option>
+                <option value="luxury">高級 (仕様2)</option>
+                <option value="premium">最高級 (仕様3)</option>
+            </select>
+        </label>
+    </div>
+
+    <div id="rooms" class="tab-content">
+        <h3>各諸室・エリア積算</h3>
+        <table class="grid-table">
+            <thead>
+                <tr><th>項目</th><th>面積/数</th><th>単価(円)</th><th>小計(円)</th></tr>
+            </thead>
+            <tbody id="room-calc-body">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="lcc" class="tab-content">
+        <h3>75年間 ライフサイクルコスト予測</h3>
+        <div class="chart-container">
+            <canvas id="lccChart"></canvas>
+        </div>
+        <table class="grid-table" id="lcc-table">
+            <thead>
+                <tr>
+                    <th>工種</th><th>0-5年</th><th>6-10年</th><th>11-15年</th><th>...</th><th>計(100万円)</th>
+                </tr>
+            </thead>
+            <tbody id="lcc-body">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="master" class="tab-content">
+        <h3>設備・家具単価マスター</h3>
+        <p>※ 各種掛け率や労務単価の調整が可能です。</p>
+        <table class="grid-table">
+            <thead>
+                <tr><th>部材名</th><th>取付工数</th><th>労務単価</th><th>定価</th><th>掛け率</th><th>単価</th></tr>
+            </thead>
+            <tbody id="master-body">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // --- 初期データ ---
+    let state = {
+        area: 1000,
+        structure: 'S',
+        grade: 'standard',
+        miscRate: 0.15,
+        depreciationTable: [0.95, 0.85, 0.73, 0.62, 0.50, 0.39, 0.30, 0.20], // 10年毎簡易版
+    };
+
+    // --- タブ切り替え機能 ---
+    function openTab(evt, tabName) {
+        let contents = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
+        let buttons = document.getElementsByClassName("tab-button");
+        for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // --- 計算メインロジック ---
+    function calculateAll() {
+        state.area = parseFloat(document.getElementById('base-area').value) || 0;
+        state.grade = document.getElementById('base-grade').value;
+        
+        // 1. 建築単価の算出 (PythonのロジックをJSに移植)
+        let baseUnitPrice = 250000; // 仮の基準単価
+        if(state.grade === 'high') baseUnitPrice *= 1.1;
+        if(state.grade === 'luxury') baseUnitPrice *= 1.25;
+        if(state.grade === 'premium') baseUnitPrice *= 1.5;
+
+        let totalConstructionCost = baseUnitPrice * state.area;
+
+        // 2. 表示更新
+        document.getElementById('summary-total-cost').innerText = totalConstructionCost.toLocaleString() + " 円";
+        document.getElementById('summary-unit-price').innerText = (totalConstructionCost / state.area).toLocaleString() + " 円/㎡";
+
+        updateLccChart(totalConstructionCost);
+    }
+
+    // --- グラフ更新 (Chart.js) ---
+    let myChart;
+    function updateLccChart(constructionCost) {
+        const ctx = document.getElementById('lccChart').getContext('2d');
+        const repairCost = constructionCost * 0.8; // 75年間の修繕累計
+        const operationCost = constructionCost * 1.5; // 75年間の運営累計
+
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['初期建設費', '修繕更新費', '運用・エネルギー費'],
+                datasets: [{
+                    data: [constructionCost, repairCost, operationCost],
+                    backgroundColor: ['#3498db', '#e74c3c', '#2ecc71']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        document.getElementById('summary-lcc').innerText = (constructionCost + repairCost + operationCost).toLocaleString() + " 円";
+    }
+
+    // 初期実行
+    calculateAll();
+</script>
+</body>
+</html>
