@@ -2,193 +2,134 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Hotel Development & LCC Simulator Pro</title>
+    <title>建物コスト算出システム - Hotel LCC-SaaS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background: var(--bg); margin: 0; color: #333; }
-        .container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 0 20px; }
-        .sidebar { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: fit-content; }
-        .main-content { background: var(--white); padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1, h2, h3 { color: var(--primary); margin-top: 0; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
-        select, input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .stats-banner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-item { background: var(--primary); color: white; padding: 15px; border-radius: 6px; text-align: center; }
-        .stat-item span { display: block; font-size: 20px; font-weight: bold; color: #00d4ff; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-        th, td { border: 1px solid #eee; padding: 10px; text-align: right; }
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --white: #ffffff; }
+        body { font-family: "Segoe UI", "Meiryo", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: var(--primary); color: white; padding: 10px 20px; font-size: 1.2rem; font-weight: bold; }
+        .main-container { display: grid; grid-template-columns: 320px 1fr; flex: 1; overflow: hidden; }
+        .sidebar { background: #e9ecef; padding: 15px; border-right: 1px solid #ccc; overflow-y: auto; font-size: 0.9rem; }
+        .content { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+        .card { background: white; border-radius: 4px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h3 { border-left: 5px solid var(--primary); padding-left: 10px; margin-bottom: 15px; font-size: 1rem; }
+        .input-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; color: #555; font-weight: bold; }
+        select, input { width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 3px; box-sizing: border-box; }
+        .tab-nav { display: flex; gap: 2px; background: #ddd; padding: 5px 5px 0 5px; }
+        .tab-btn { padding: 10px 20px; border: none; background: #ccc; cursor: pointer; border-radius: 5px 5px 0 0; }
+        .tab-btn.active { background: white; font-weight: bold; border-bottom: 2px solid white; }
+        .tab-pane { display: none; background: white; padding: 20px; border: 1px solid #ddd; flex: 1; }
+        .tab-pane.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: right; }
         th { background: #f8f9fa; text-align: center; }
-        .chart-container { position: relative; height: 350px; margin-top: 30px; }
+        .total-banner { background: #2c3e50; color: #00d4ff; padding: 15px; border-radius: 4px; font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div style="background:var(--primary); color:white; padding:15px 40px; margin-bottom:20px;">
-    <h1 style="margin:0; font-size:22px;">Hotel LCC-SaaS: ConstructionCost12 Engine</h1>
-</div>
+<div class="header">建物コスト算出システム Pro (Python Logic v12)</div>
 
-<div class="container">
+<div class="main-container">
     <div class="sidebar">
-        <h3>基本条件設定</h3>
-        <div class="input-group">
-            <label>建物構造</label>
-            <select id="structure" onchange="calculate()">
-                <option value="RC">RC造</option>
-                <option value="S">鉄骨造</option>
-                <option value="SRC">SRC造</option>
-                <option value="W">木造</option>
-            </select>
+        <h3>基本条件 (建物概要)</h3>
+        <div class="input-group"><label>建物構造</label>
+            <select id="struct" onchange="run()"><option value="RC">RC造</option><option value="S">鉄骨造</option><option value="SRC">SRC造</option><option value="W">木造</option></select>
         </div>
-        <div class="input-group">
-            <label>仕様グレード</label>
-            <select id="grade" onchange="calculate()">
-                <option value="0">Gensen (標準)</option>
-                <option value="1">Premium 1</option>
-                <option value="2">Premium 2</option>
-                <option value="3">TAOYA 1</option>
-                <option value="4">TAOYA 2 (最高級)</option>
-            </select>
+        <div class="input-group"><label>グレード</label>
+            <select id="grade" onchange="run()"><option value="0">Gensen</option><option value="1">Premium1</option><option value="2">Premium2</option><option value="3">TAOYA1</option><option value="4">TAOYA2</option></select>
         </div>
-        <div class="input-group">
-            <label>客室数 (Rooms)</label>
-            <input type="number" id="rooms" value="100" oninput="calculate()">
-        </div>
-        <div class="input-group">
-            <label>1室あたり面積 (㎡)</label>
-            <input type="number" id="room_area" value="22" oninput="calculate()">
-        </div>
-        <div class="input-group">
-            <label>共用部比率 (%)</label>
-            <input type="number" id="common_ratio" value="35" oninput="calculate()">
-        </div>
-        <hr>
-        <h3>追加設備</h3>
-        <div class="input-group">
-            <input type="checkbox" id="has_elevator" checked onchange="calculate()"> 昇降機設備を含める
-        </div>
-        <div class="input-group">
-            <input type="checkbox" id="has_septic" onchange="calculate()"> 浄化槽工事を含める
-        </div>
+        <div class="input-group"><label>客室数 (室)</label><input type="number" id="rooms" value="100" oninput="run()"></div>
+        <div class="input-group"><label>客室面積 (㎡/室)</label><input type="number" id="r_area" value="22" oninput="run()"></div>
+        <div class="input-group"><label>共用部比率 (%)</label><input type="number" id="c_ratio" value="35" oninput="run()"></div>
+        
+        <h3>運営費条件</h3>
+        <div class="input-group"><label>人件費 (万円/年)</label><input type="number" id="p_cost" value="5000" oninput="run()"></div>
+        <div class="input-group"><label>原価率 (%)</label><input type="number" id="f_ratio" value="30" oninput="run()"></div>
     </div>
 
-    <div class="main-content">
-        <div class="stats-banner">
-            <div class="stat-item">推定延床面積<span id="res_total_area">0</span>㎡</div>
-            <div class="stat-item">新築工事価格<span id="res_const_cost">0</span>万円</div>
-            <div class="stat-item">75年総LCC<span id="res_lcc_total">0</span>万円</div>
+    <div class="content">
+        <div id="total_display" class="total-banner">新築時工事費合計: 0 万円</div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="openTab(event, 'tab1')">建設費算出シート</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab2')">LCCシミュレーション</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab3')">運営費内訳</button>
         </div>
 
-        <h2>建設費用内訳 (積算ロジック反映)</h2>
-        <table id="detail_table">
-            <thead>
-                <tr><th>項目</th><th>算出根拠</th><th>金額 (万円)</th></tr>
-            </thead>
-            <tbody id="detail_body"></tbody>
-        </table>
+        <div id="tab1" class="tab-pane active">
+            <h3>工事費内訳明細</h3>
+            <table>
+                <thead><tr><th>項目</th><th>数量/面積</th><th>単価(万円)</th><th>金額(万円)</th></tr></thead>
+                <tbody id="cost_table_body"></tbody>
+            </table>
+        </div>
 
-        <h2>75年間の長期修繕計画シミュレーション</h2>
-        <div class="chart-container">
-            <canvas id="lccChart"></canvas>
+        <div id="tab2" class="tab-pane">
+            <h3>75年間の長期修繕計画</h3>
+            <canvas id="lccChart" style="max-height: 400px;"></canvas>
+        </div>
+
+        <div id="tab3" class="tab-pane">
+            <h3>年間運営コスト推定</h3>
+            <div id="op_cost_detail"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Python版のマスタデータ (円/㎡)
-    const unitPriceMaster = {
-        "RC":  [500000, 550000, 600000, 650000, 700000],
-        "S":   [450000, 500000, 550000, 600000, 650000],
-        "SRC": [550000, 600000, 650000, 700000, 750000],
-        "W":   [300000, 350000, 400000, 450000, 500000]
-    };
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-pane");
+        for (i = 0; i < tabcontent.length; i++) tabcontent[i].classList.remove("active");
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
 
-    let lccChart;
+    const unitPrices = { "RC": [50, 55, 60, 65, 70], "S": [45, 50, 55, 60, 65], "SRC": [55, 60, 65, 70, 75], "W": [30, 35, 40, 45, 50] };
 
-    function calculate() {
-        // 入力値取得
-        const struct = document.getElementById('structure').value;
-        const gradeIdx = parseInt(document.getElementById('grade').value);
+    function run() {
         const rooms = parseFloat(document.getElementById('rooms').value) || 0;
-        const roomArea = parseFloat(document.getElementById('room_area').value) || 0;
-        const commonRatio = (parseFloat(document.getElementById('common_ratio').value) || 0) / 100;
+        const rArea = parseFloat(document.getElementById('r_area').value) || 0;
+        const cRatio = (parseFloat(document.getElementById('c_ratio').value) || 0) / 100;
+        const struct = document.getElementById('struct').value;
+        const grade = parseInt(document.getElementById('grade').value);
 
-        // 1. 面積計算ロジック
-        const totalRoomArea = rooms * roomArea;
-        const totalArea = totalRoomArea / (1 - commonRatio);
-        
-        // 2. 建築工事費計算
-        const baseUnitPrice = unitPriceMaster[struct][gradeIdx] / 10000; // 万円単位
-        let constCost = totalArea * baseUnitPrice;
-        
-        // 付加設備
-        let addCost = 0;
-        if(document.getElementById('has_elevator').checked) addCost += (4250 * Math.ceil(rooms/100)); 
-        if(document.getElementById('has_septic').checked) addCost += 1500;
+        const totalArea = (rooms * rArea) / (1 - cRatio);
+        const baseUP = unitPrices[struct][grade];
+        const constCost = totalArea * baseUP;
 
-        const grandTotalConst = constCost + addCost;
+        // 表の更新
+        let html = `<tr><td>本体建築工事</td><td>${Math.round(totalArea)} ㎡</td><td>${baseUP}</td><td>${Math.round(constCost).toLocaleString()}</td></tr>`;
+        html += `<tr><td>家具・備品(FFE)</td><td>${rooms} 室</td><td>120</td><td>${(rooms * 120).toLocaleString()}</td></tr>`;
+        document.getElementById('cost_table_body').innerHTML = html;
 
-        // 3. 表示反映
-        document.getElementById('res_total_area').innerText = Math.round(totalArea).toLocaleString();
-        document.getElementById('res_const_cost').innerText = Math.round(grandTotalConst).toLocaleString();
+        const grandTotal = constCost + (rooms * 120);
+        document.getElementById('total_display').innerText = `新築時工事費合計: ${Math.round(grandTotal).toLocaleString()} 万円`;
 
-        // 4. 内訳テーブル生成
-        let html = `
-            <tr><td>直接工事費 (建築本体)</td><td>${Math.round(totalArea)}㎡ × ${baseUnitPrice.toLocaleString()}万円</td><td>${Math.round(constCost).toLocaleString()}</td></tr>
-            <tr><td>付加設備・特殊工事</td><td>昇降機・浄化槽等</td><td>${Math.round(addCost).toLocaleString()}</td></tr>
-            <tr style="font-weight:bold; background:#eee;"><td>合計</td><td>-</td><td>${Math.round(grandTotalConst).toLocaleString()}</td></tr>
-        `;
-        document.getElementById('detail_body').innerHTML = html;
-
-        updateLccChart(grandTotalConst);
+        updateChart(grandTotal);
     }
 
-    function updateLccChart(constCost) {
+    let chart;
+    function updateChart(total) {
         const ctx = document.getElementById('lccChart').getContext('2d');
-        const labels = Array.from({length: 75}, (_, i) => i + 1);
-        
-        // LCC計算ロジック確認
-        let totalLccAccumulated = 0;
-        const data = labels.map(year => {
-            let yearlyCost = constCost * 0.015; // 経常修繕 (1.5%)
-            
-            if (year % 12 === 0) yearlyCost += constCost * 0.20; // 12年周期: 大規模修繕
-            if (year % 15 === 0) yearlyCost += constCost * 0.15; // 15年周期: 空調設備更新
-            if (year % 20 === 0) yearlyCost += constCost * 0.12; // 20年周期: 給排水更新
-            if (year % 30 === 0) yearlyCost += constCost * 0.25; // 30年周期: 電気基幹更新
-            
-            totalLccAccumulated += yearlyCost;
-            return Math.round(yearlyCost);
+        const data = Array.from({length: 75}, (_, i) => {
+            const y = i + 1;
+            let cost = total * 0.01;
+            if (y % 12 === 0) cost += total * 0.15;
+            if (y % 15 === 0) cost += total * 0.10;
+            return cost;
         });
-
-        document.getElementById('res_lcc_total').innerText = Math.round(totalLccAccumulated).toLocaleString();
-
-        if (lccChart) lccChart.destroy();
-        lccChart = new Chart(ctx, {
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '年度別修繕・更新費用 (万円)',
-                    data: data,
-                    backgroundColor: (context) => {
-                        const val = context.raw;
-                        return val > constCost * 0.1 ? '#e74c3c' : '#3498db';
-                    }
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true, title: { display: true, text: '万円' } } }
-            }
+            data: { labels: Array.from({length: 75}, (_, i) => i + 1), datasets: [{ label: '修繕費(万円)', data: data, backgroundColor: '#3498db' }] }
         });
     }
-
-    // 初回実行
-    calculate();
+    run();
 </script>
-
 </body>
 </html>
