@@ -148,7 +148,7 @@
         const ctx = document.getElementById('lccChart').getContext('2d');
         const labels = Array.from({length: 75}, (_, i) => i + 1);
         
-        // LCC計算ロジック
+        // LCC計算ロジック確認
         let totalLccAccumulated = 0;
         const data = labels.map(year => {
             let yearlyCost = constCost * 0.015; // 経常修繕 (1.5%)
