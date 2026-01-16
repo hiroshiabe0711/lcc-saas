@@ -63,7 +63,6 @@
         }
         .tab-pane.active { display: flex; }
 
-        /* コストサマリのレイアウト */
         .summary-layout {
             display: flex;
             width: 100%;
@@ -218,7 +217,6 @@
             margin-left: 10px;
         }
 
-        /* 物件管理スタイル */
         .property-card {
             border: 1px solid #ccc;
             padding: 15px;
@@ -328,7 +326,6 @@
 </div>
 
 <div class="main-content">
-    <!-- 物件管理 -->
     <div id="property" class="tab-pane">
         <div style="padding: 25px;">
             <div class="section-title">登録済み物件一覧</div>
@@ -339,6 +336,9 @@
                     <button class="btn btn-default" onclick="createNewProperty()">🆕 新規作成</button>
                     <button class="btn btn-success" onclick="saveProperty()">💾 保存</button>
                     <button class="btn btn-danger" onclick="deleteProperty()">🗑️ 削除</button>
+                    <button class="btn btn-primary" onclick="exportAllData()" style="margin-top: 15px;">📥 エクスポート</button>
+                    <button class="btn btn-default" onclick="document.getElementById('importFile').click()">📤 インポート</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllData(event)">
                 </div>
             </div>
 
@@ -362,7 +362,6 @@
         </div>
     </div>
 
-    <!-- コストサマリ -->
     <div id="cost_summary" class="tab-pane active">
         <div class="summary-layout">
             <div class="summary-left">
@@ -571,7 +570,6 @@
         </div>
     </div>
 
-    <!-- 他のタブ（温泉設備、レストラン等） -->
     <div id="onsen" class="tab-pane">
         <div style="padding: 20px;">
             <div class="section-title">温泉設備</div>
@@ -655,7 +653,6 @@
     let currentPropertyId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-        loadPropertiesFromStorage();
         updatePropertyList();
         setupEventListeners();
         updateTotalGuests();
@@ -673,12 +670,10 @@
     }
 
     function setupEventListeners() {
-        // 合計宿泊人数の自動計算
         ['room_japanese', 'room_japanese_western', 'room_japanese_bed', 'room_western'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateTotalGuests);
         });
 
-        // 日数差の自動計算
         document.getElementById('birth_date').addEventListener('change', calculateDateDiff);
         document.getElementById('completion_date').addEventListener('change', calculateDateDiff);
     }
@@ -708,19 +703,6 @@
 
     function calculateAll() {
         alert('全体コスト計算を実行します');
-        // ここに各タブの計算処理を実装
-    }
-
-    // 物件管理関数
-    function loadPropertiesFromStorage() {
-        const stored = localStorage.getItem('hotelLccProperties');
-        if (stored) {
-            properties = JSON.parse(stored);
-        }
-    }
-
-    function savePropertiesToStorage() {
-        localStorage.setItem('hotelLccProperties', JSON.stringify(properties));
     }
 
     function updatePropertyList() {
@@ -743,7 +725,6 @@
             data: {}
         };
         currentPropertyId = id;
-        savePropertiesToStorage();
         updatePropertyList();
         loadPropertyToForm(id);
         alert('新規物件を作成しました');
@@ -762,9 +743,8 @@
             data: gatherAllData()
         };
         
-        savePropertiesToStorage();
         updatePropertyList();
-        alert('保存しました');
+        alert('保存しました（永続化するにはエクスポートしてください）');
     }
 
     function loadProperty() {
@@ -788,15 +768,29 @@
         if (prop.data) {
             Object.keys(prop.data).forEach(key => {
                 const el = document.getElementById(key);
-                if (el) el.value = prop.data[key];
+                if (el) {
+                    if (el.type === 'checkbox') {
+                        el.checked = prop.data[key] === 'true' || prop.data[key] === true;
+                    } else {
+                        el.value = prop.data[key];
+                    }
+                }
             });
+            updateTotalGuests();
+            calculateDateDiff();
         }
     }
 
     function gatherAllData() {
         const data = {};
         document.querySelectorAll('input, select, textarea').forEach(el => {
-            if (el.id && el.id !== 'propertyList') data[el.id] = el.value;
+            if (el.id && el.id !== 'propertyList' && el.id !== 'importFile') {
+                if (el.type === 'checkbox') {
+                    data[el.id] = el.checked;
+                } else {
+                    data[el.id] = el.value;
+                }
+            }
         });
         return data;
     }
@@ -810,12 +804,57 @@
         }
         if (confirm('本当に削除しますか？')) {
             delete properties[id];
-            savePropertiesToStorage();
             updatePropertyList();
             currentPropertyId = null;
             alert('削除しました');
         }
     }
+
+    function exportAllData() {
+        const exportData = {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            properties: properties
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `建物コスト算出_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        alert('データをエクスポートしました');
+    }
+
+    function importAllData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importData = JSON.parse(e.target.result);
+                
+                if (importData.properties) {
+                    properties = importData.properties;
+                    updatePropertyList();
+                    alert(`データをインポートしました\n物件数: ${Object.keys(properties).length}`);
+                } else {
+                    alert('無効なデータ形式です');
+                }
+            } catch (error) {
+                alert('ファイルの読み込みに失敗しました: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+        
+        event.target.value = '';
+    }
 </script>
 
-</body
+</body>
+</html>
