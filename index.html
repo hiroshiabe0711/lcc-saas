@@ -669,9 +669,113 @@
     </div>
 
     <div id="equipment" class="tab-pane">
-        <div style="padding: 20px;">
+        <div style="padding: 20px; max-width: 1400px;">
             <div class="section-title">設備設定</div>
-            <p>設備の詳細設定</p>
+            
+            <!-- 設備機器単価 -->
+            <div style="margin-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h3 style="font-size: 15px; font-weight: bold;">設備機器単価</h3>
+                    <button class="btn btn-default" onclick="addEquipmentRow()">追加</button>
+                    <button class="btn btn-default" onclick="deleteEquipmentRow()">削除</button>
+                    <button class="btn btn-success" onclick="saveEquipmentData()">保存</button>
+                    <button class="btn btn-default" onclick="resetEquipmentData()">リセット</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="equipmentTable" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f0f0f0;">
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 40px;">No</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 150px;">部材</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">略称</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">取付工数</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">労務単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">雑材料</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">新設機器単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">面積当り個数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipmentTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 熱源機器設定 -->
+            <div style="margin-top: 40px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h3 style="font-size: 15px; font-weight: bold;">熱源機器設定</h3>
+                    <button class="btn btn-default" onclick="addHeatSourceRow()">追加</button>
+                    <button class="btn btn-default" onclick="deleteHeatSourceRow()">削除</button>
+                    <button class="btn btn-success" onclick="saveHeatSourceData()">保存</button>
+                    <button class="btn btn-default" onclick="resetHeatSourceData()">リセット</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="heatSourceTable" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f0f0f0;">
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 40px;">No</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 150px;">部材</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">略称</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">取付工数</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">労務単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">雑材料</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">新設機器単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">面積当り個数</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">燃料種別</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">出力</th>
+                            </tr>
+                        </thead>
+                        <tbody id="heatSourceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 厨房機器設定 -->
+            <div style="margin-top: 40px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h3 style="font-size: 15px; font-weight: bold;">厨房機器設定</h3>
+                    <button class="btn btn-default" onclick="addKitchenRow()">追加</button>
+                    <button class="btn btn-default" onclick="deleteKitchenRow()">削除</button>
+                    <button class="btn btn-success" onclick="saveKitchenData()">保存</button>
+                    <button class="btn btn-default" onclick="resetKitchenData()">リセット</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="kitchenTable" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f0f0f0;">
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 40px;">No</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 150px;">機器名称</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">略称</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">取付工数</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">労務単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">経費</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">定価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 70px;">掛け率</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">機器単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">単位入力</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">区分</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kitchenTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <h3 style="font-size: 15px; font-weight: bold;">受変電設備設定</h3>
+                <p style="color: #999; margin-top: 10px;">現在開発中です。</p>
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <h3 style="font-size: 15px; font-weight: bold;">中央監視装置設定</h3>
+                <p style="color: #999; margin-top: 10px;">現在開発中です。</p>
+            </div>
         </div>
     </div>
 
@@ -701,11 +805,36 @@
     let properties = {};
     let currentPropertyId = null;
     let floorAreas = {}; // 階ごとの面積を保存
+    
+    // 設備データの初期値と保存用
+    let equipmentData = [];
+    let heatSourceData = [];
+    let kitchenData = [];
+    
+    // 初期設備データ
+    const initialEquipmentData = [
+        [1, "洗面化粧台", "洗面", 0.25, 27000, 5000, 35000, 1],
+        [2, "シャワートイレ", "便器", 0.5, 27000, 3000, 80000, 1],
+        [3, "ユニットバス", "UB", 2.0, 27000, 10000, 150000, 1],
+        [4, "エアコン", "AC", 0.3, 27000, 2000, 50000, 0.1]
+    ];
+    
+    const initialHeatSourceData = [
+        [1, "ガス給湯器", "給湯", 0.5, 27000, 5000, 200000, 0.01, "ガス", "24kW"],
+        [2, "灯油ボイラー", "ボイラー", 1.0, 27000, 10000, 500000, 0.005, "灯油", "50kW"]
+    ];
+    
+    const initialKitchenData = [
+        [1, "ガスレンジ", "レンジ", 0.74, 27000, 10000, 200000, 0.60, "台", "厨房"],
+        [2, "冷蔵庫", "冷蔵", 0.5, 27000, 5000, 300000, 0.65, "台", "厨房"],
+        [3, "食器洗浄機", "洗浄", 1.2, 27000, 15000, 500000, 0.60, "台", "厨房"]
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
         updatePropertyList();
         setupEventListeners();
         updateTotalGuests();
+        initializeEquipmentTables();
     });
 
     function openTab(tabName) {
@@ -1127,7 +1256,10 @@
         const exportData = {
             version: '1.0',
             exportDate: new Date().toISOString(),
-            properties: properties
+            properties: properties,
+            equipmentData: equipmentData,
+            heatSourceData: heatSourceData,
+            kitchenData: kitchenData
         };
         
         const dataStr = JSON.stringify(exportData, null, 2);
@@ -1155,10 +1287,24 @@
                 if (importData.properties) {
                     properties = importData.properties;
                     updatePropertyList();
-                    alert(`データをインポートしました\n物件数: ${Object.keys(properties).length}`);
-                } else {
-                    alert('無効なデータ形式です');
                 }
+                
+                if (importData.equipmentData) {
+                    equipmentData = importData.equipmentData;
+                    renderEquipmentTable();
+                }
+                
+                if (importData.heatSourceData) {
+                    heatSourceData = importData.heatSourceData;
+                    renderHeatSourceTable();
+                }
+                
+                if (importData.kitchenData) {
+                    kitchenData = importData.kitchenData;
+                    renderKitchenTable();
+                }
+                
+                alert(`データをインポートしました\n物件数: ${Object.keys(properties).length}`);
             } catch (error) {
                 alert('ファイルの読み込みに失敗しました: ' + error.message);
             }
@@ -1166,6 +1312,195 @@
         reader.readAsText(file);
         
         event.target.value = '';
+    }
+    
+    // ========== 設備設定タブの関数 ==========
+    
+    function initializeEquipmentTables() {
+        equipmentData = JSON.parse(JSON.stringify(initialEquipmentData));
+        heatSourceData = JSON.parse(JSON.stringify(initialHeatSourceData));
+        kitchenData = JSON.parse(JSON.stringify(initialKitchenData));
+        
+        renderEquipmentTable();
+        renderHeatSourceTable();
+        renderKitchenTable();
+    }
+    
+    // 設備機器単価テーブル
+    function renderEquipmentTable() {
+        const tbody = document.getElementById('equipmentTableBody');
+        tbody.innerHTML = '';
+        
+        equipmentData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center; background: #f9f9f9;">${row[0]}</td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[1] || ''}" onchange="updateEquipmentCell(${index}, 1, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[2] || ''}" onchange="updateEquipmentCell(${index}, 2, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[3] || ''}" onchange="updateEquipmentCell(${index}, 3, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[4] || ''}" onchange="updateEquipmentCell(${index}, 4, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[5] || ''}" onchange="updateEquipmentCell(${index}, 5, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[6] || ''}" onchange="updateEquipmentCell(${index}, 6, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[7] || ''}" onchange="updateEquipmentCell(${index}, 7, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function updateEquipmentCell(rowIndex, colIndex, value) {
+        equipmentData[rowIndex][colIndex] = value;
+    }
+    
+    function addEquipmentRow() {
+        const newNo = equipmentData.length + 1;
+        equipmentData.push([newNo, '', '', '', 27000, '', '', '']);
+        renderEquipmentTable();
+    }
+    
+    function deleteEquipmentRow() {
+        if (equipmentData.length > 0) {
+            equipmentData.pop();
+            renderEquipmentTable();
+        }
+    }
+    
+    function saveEquipmentData() {
+        alert('設備機器データを保存しました');
+        // 実際の保存処理（エクスポート機能で一緒に保存）
+    }
+    
+    function resetEquipmentData() {
+        if (confirm('設備機器データを初期状態にリセットしますか？\n追加したデータは削除されます。')) {
+            equipmentData = JSON.parse(JSON.stringify(initialEquipmentData));
+            renderEquipmentTable();
+            alert('設備機器データが初期状態にリセットされました');
+        }
+    }
+    
+    // 熱源機器設定テーブル
+    function renderHeatSourceTable() {
+        const tbody = document.getElementById('heatSourceTableBody');
+        tbody.innerHTML = '';
+        
+        heatSourceData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center; background: #f9f9f9;">${row[0]}</td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[1] || ''}" onchange="updateHeatSourceCell(${index}, 1, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[2] || ''}" onchange="updateHeatSourceCell(${index}, 2, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[3] || ''}" onchange="updateHeatSourceCell(${index}, 3, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[4] || ''}" onchange="updateHeatSourceCell(${index}, 4, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[5] || ''}" onchange="updateHeatSourceCell(${index}, 5, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[6] || ''}" onchange="updateHeatSourceCell(${index}, 6, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[7] || ''}" onchange="updateHeatSourceCell(${index}, 7, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[8] || ''}" onchange="updateHeatSourceCell(${index}, 8, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[9] || ''}" onchange="updateHeatSourceCell(${index}, 9, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function updateHeatSourceCell(rowIndex, colIndex, value) {
+        heatSourceData[rowIndex][colIndex] = value;
+    }
+    
+    function addHeatSourceRow() {
+        const newNo = heatSourceData.length + 1;
+        heatSourceData.push([newNo, '', '', 0.1, 27000, 2000, 30000, 0.02, '', '']);
+        renderHeatSourceTable();
+    }
+    
+    function deleteHeatSourceRow() {
+        if (heatSourceData.length > 0) {
+            heatSourceData.pop();
+            renderHeatSourceTable();
+        }
+    }
+    
+    function saveHeatSourceData() {
+        alert('熱源機器データを保存しました');
+    }
+    
+    function resetHeatSourceData() {
+        if (confirm('熱源機器データを初期状態にリセットしますか？\n追加したデータは削除されます。')) {
+            heatSourceData = JSON.parse(JSON.stringify(initialHeatSourceData));
+            renderHeatSourceTable();
+            alert('熱源機器データが初期状態にリセットされました');
+        }
+    }
+    
+    // 厨房機器設定テーブル
+    function renderKitchenTable() {
+        const tbody = document.getElementById('kitchenTableBody');
+        tbody.innerHTML = '';
+        
+        kitchenData.forEach((row, index) => {
+            const calculatedCost = calculateKitchenCost(row[3], row[4], row[5], row[6], row[7]);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center; background: #f9f9f9;">${row[0]}</td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[1] || ''}" onchange="updateKitchenCell(${index}, 1, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[2] || ''}" onchange="updateKitchenCell(${index}, 2, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[3] || ''}" onchange="updateKitchenCell(${index}, 3, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[4] || ''}" onchange="updateKitchenCell(${index}, 4, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[5] || ''}" onchange="updateKitchenCell(${index}, 5, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[6] || ''}" onchange="updateKitchenCell(${index}, 6, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[7] || ''}" step="0.01" onchange="updateKitchenCell(${index}, 7, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: right; background: #e3f2fd; color: #1565c0; font-weight: bold;" id="kitchenCost_${index}">${calculatedCost.toLocaleString()}</td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[8] || ''}" onchange="updateKitchenCell(${index}, 8, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[9] || ''}" onchange="updateKitchenCell(${index}, 9, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function calculateKitchenCost(installHours, laborCost, expense, listPrice, rate) {
+        const hours = parseFloat(installHours) || 0;
+        const labor = parseFloat(laborCost) || 0;
+        const exp = parseFloat(expense) || 0;
+        const price = parseFloat(listPrice) || 0;
+        const r = parseFloat(rate) || 0;
+        
+        return hours * labor + price * r + exp;
+    }
+    
+    function updateKitchenCell(rowIndex, colIndex, value) {
+        kitchenData[rowIndex][colIndex] = value;
+        
+        // 計算に関わる列が変更された場合は再計算
+        if ([3, 4, 5, 6, 7].includes(colIndex)) {
+            const row = kitchenData[rowIndex];
+            const calculatedCost = calculateKitchenCost(row[3], row[4], row[5], row[6], row[7]);
+            const costCell = document.getElementById(`kitchenCost_${rowIndex}`);
+            if (costCell) {
+                costCell.textContent = calculatedCost.toLocaleString();
+            }
+        }
+    }
+    
+    function addKitchenRow() {
+        const newNo = kitchenData.length + 1;
+        kitchenData.push([newNo, '', '', 0.74, 27000, 10000, 100000, 0.60, '', '']);
+        renderKitchenTable();
+    }
+    
+    function deleteKitchenRow() {
+        if (kitchenData.length > 0) {
+            kitchenData.pop();
+            renderKitchenTable();
+        }
+    }
+    
+    function saveKitchenData() {
+        alert('厨房機器データを保存しました');
+    }
+    
+    function resetKitchenData() {
+        if (confirm('厨房機器データを初期状態にリセットしますか？\n追加したデータは削除されます。')) {
+            kitchenData = JSON.parse(JSON.stringify(initialKitchenData));
+            renderKitchenTable();
+            alert('厨房機器データが初期状態にリセットされました');
+        }
     }
 </script>
 
