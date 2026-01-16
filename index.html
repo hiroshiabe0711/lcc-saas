@@ -3,133 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <title>建物コスト算出システム - Hotel LCC-SaaS</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --white: #ffffff; }
-        body { font-family: "Segoe UI", "Meiryo", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        .header { background: var(--primary); color: white; padding: 10px 20px; font-size: 1.2rem; font-weight: bold; }
-        .main-container { display: grid; grid-template-columns: 320px 1fr; flex: 1; overflow: hidden; }
-        .sidebar { background: #e9ecef; padding: 15px; border-right: 1px solid #ccc; overflow-y: auto; font-size: 0.9rem; }
-        .content { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
-        .card { background: white; border-radius: 4px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        h3 { border-left: 5px solid var(--primary); padding-left: 10px; margin-bottom: 15px; font-size: 1rem; }
-        .input-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 4px; color: #555; font-weight: bold; }
-        select, input { width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 3px; box-sizing: border-box; }
-        .tab-nav { display: flex; gap: 2px; background: #ddd; padding: 5px 5px 0 5px; }
-        .tab-btn { padding: 10px 20px; border: none; background: #ccc; cursor: pointer; border-radius: 5px 5px 0 0; }
-        .tab-btn.active { background: white; font-weight: bold; border-bottom: 2px solid white; }
-        .tab-pane { display: none; background: white; padding: 20px; border: 1px solid #ddd; flex: 1; }
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f8f9fa; --white: #ffffff; --border: #ccc; }
+        body { font-family: "Segoe UI", "Meiryo", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { background: var(--primary); color: white; padding: 10px 20px; font-size: 1rem; font-weight: bold; flex-shrink: 0; }
+        
+        /* タブのスタイリング（スクロール可能） */
+        .tab-container { background: #ddd; padding: 5px 5px 0 5px; flex-shrink: 0; overflow-x: auto; white-space: nowrap; display: flex; }
+        .tab-btn { 
+            padding: 8px 15px; border: 1px solid var(--border); background: #eee; cursor: pointer; 
+            border-radius: 5px 5px 0 0; margin-right: 2px; font-size: 12px; transition: 0.2s;
+        }
+        .tab-btn:hover { background: #f0f0f0; }
+        .tab-btn.active { background: white; border-bottom: 2px solid white; font-weight: bold; color: var(--accent); }
+
+        /* コンテンツエリア */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .tab-pane { display: none; padding: 20px; overflow-y: auto; flex: 1; background: white; }
         .tab-pane.active { display: block; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: right; }
-        th { background: #f8f9fa; text-align: center; }
-        .total-banner { background: #2c3e50; color: #00d4ff; padding: 15px; border-radius: 4px; font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 20px; }
+
+        /* レイアウト用 */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { border: 1px solid #eee; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        h3 { margin-top: 0; font-size: 14px; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f4f4f4; }
     </style>
 </head>
 <body>
 
-<div class="header">建物コスト算出システム Pro (Python Logic v12)</div>
+<div class="header">建物コスト算出システム (ConstructionCost12.py 準拠)</div>
 
-<div class="main-container">
-    <div class="sidebar">
-        <h3>基本条件 (建物概要)</h3>
-        <div class="input-group"><label>建物構造</label>
-            <select id="struct" onchange="run()"><option value="RC">RC造</option><option value="S">鉄骨造</option><option value="SRC">SRC造</option><option value="W">木造</option></select>
-        </div>
-        <div class="input-group"><label>グレード</label>
-            <select id="grade" onchange="run()"><option value="0">Gensen</option><option value="1">Premium1</option><option value="2">Premium2</option><option value="3">TAOYA1</option><option value="4">TAOYA2</option></select>
-        </div>
-        <div class="input-group"><label>客室数 (室)</label><input type="number" id="rooms" value="100" oninput="run()"></div>
-        <div class="input-group"><label>客室面積 (㎡/室)</label><input type="number" id="r_area" value="22" oninput="run()"></div>
-        <div class="input-group"><label>共用部比率 (%)</label><input type="number" id="c_ratio" value="35" oninput="run()"></div>
-        
-        <h3>運営費条件</h3>
-        <div class="input-group"><label>人件費 (万円/年)</label><input type="number" id="p_cost" value="5000" oninput="run()"></div>
-        <div class="input-group"><label>原価率 (%)</label><input type="number" id="f_ratio" value="30" oninput="run()"></div>
+<div class="tab-container" id="tabBar">
+    <button class="tab-btn active" onclick="openTab(event, 'property')">物件管理</button>
+    <button class="tab-btn" onclick="openTab(event, 'calc_summary')">コストサマリ</button>
+    <button class="tab-btn" onclick="openTab(event, 'onsen')">温泉設備</button>
+    <button class="tab-btn" onclick="openTab(event, 'restaurant')">レストラン</button>
+    <button class="tab-btn" onclick="openTab(event, 'lounge')">ラウンジ</button>
+    <button class="tab-btn" onclick="openTab(event, 'hallway')">通路</button>
+    <button class="tab-btn" onclick="openTab(event, 'amusement')">アミューズメント</button>
+    <button class="tab-btn" onclick="openTab(event, 'guest_room')">客室</button>
+    <button class="tab-btn" onclick="openTab(event, 'arch_settings')">建築初期設定</button>
+    <button class="tab-btn" onclick="openTab(event, 'equipment')">設備設定</button>
+    <button class="tab-btn" onclick="openTab(event, 'furniture')">家具</button>
+    <button class="tab-btn" onclick="openTab(event, 'settings')">経費設定</button>
+    <button class="tab-btn" onclick="openTab(event, 'lcc')">LCC分析</button>
+</div>
+
+<div class="main-content">
+    <div id="property" class="tab-pane active">
+        <h3>物件管理</h3>
+        <p>ここに物件名、建設地、構造、グレード等の基本情報を配置します。</p>
     </div>
 
-    <div class="content">
-        <div id="total_display" class="total-banner">新築時工事費合計: 0 万円</div>
+    <div id="calc_summary" class="tab-pane">
+        <h3>コストサマリ</h3>
+        <p>全体の建設費合計、延床面積、坪単価等を表示します。</p>
+    </div>
 
-        <div class="tab-nav">
-            <button class="tab-btn active" onclick="openTab(event, 'tab1')">建設費算出シート</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab2')">LCCシミュレーション</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab3')">運営費内訳</button>
-        </div>
+    <div id="onsen" class="tab-pane">
+        <h3>温泉設備</h3>
+        <p>浴槽、洗い場、サウナ、ろ過装置等の設定項目です。</p>
+    </div>
 
-        <div id="tab1" class="tab-pane active">
-            <h3>工事費内訳明細</h3>
-            <table>
-                <thead><tr><th>項目</th><th>数量/面積</th><th>単価(万円)</th><th>金額(万円)</th></tr></thead>
-                <tbody id="cost_table_body"></tbody>
-            </table>
-        </div>
+    <div id="restaurant" class="tab-pane">
+        <h3>レストラン</h3>
+        <p>厨房面積、席数、内装グレード等の設定項目です。</p>
+    </div>
 
-        <div id="tab2" class="tab-pane">
-            <h3>75年間の長期修繕計画</h3>
-            <canvas id="lccChart" style="max-height: 400px;"></canvas>
-        </div>
+    <div id="lounge" class="tab-pane">
+        <h3>ラウンジ</h3>
+        <p>ラウンジ面積、照明、特注家具等の設定項目です。</p>
+    </div>
 
-        <div id="tab3" class="tab-pane">
-            <h3>年間運営コスト推定</h3>
-            <div id="op_cost_detail"></div>
-        </div>
+    <div id="hallway" class="tab-pane">
+        <h3>通路</h3>
+        <p>廊下幅、共用部仕上げ等の設定項目です。</p>
+    </div>
+
+    <div id="amusement" class="tab-pane">
+        <h3>アミューズメント</h3>
+        <p>キッズコーナー、売店、リラクゼーション等の設定です。</p>
+    </div>
+
+    <div id="guest_room" class="tab-pane">
+        <h3>客室</h3>
+        <p>客室数、タイプ別面積、内装単価、ユニットバス等の設定です。</p>
+    </div>
+
+    <div id="arch_settings" class="tab-pane">
+        <h3>建築初期設定</h3>
+        <p>基本構造単価、労務費、共通仮設費率等のマスタ設定です。</p>
+    </div>
+
+    <div id="equipment" class="tab-pane">
+        <h3>設備設定</h3>
+        <p>空調方式、受変電設備、給排水方式等の設定です。</p>
+    </div>
+
+    <div id="furniture" class="tab-pane">
+        <h3>家具</h3>
+        <p>FF&E、特注家具、什器のマスタ設定です。</p>
+    </div>
+
+    <div id="settings" class="tab-pane">
+        <h3>経費設定</h3>
+        <p>設計料、諸経費、予備費、金利等の設定項目です。</p>
+    </div>
+
+    <div id="lcc" class="tab-pane">
+        <h3>LCC分析</h3>
+        <p>75年間の修繕・更新費用、年間維持管理費のシミュレーション結果を表示します。</p>
     </div>
 </div>
 
 <script>
-    function openTab(evt, tabName) {
-        let i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tab-pane");
-        for (i = 0; i < tabcontent.length; i++) tabcontent[i].classList.remove("active");
-        tablinks = document.getElementsByClassName("tab-btn");
-        for (i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
-        document.getElementById(tabName).classList.add("active");
+    function openTab(evt, tabId) {
+        // すべてのコンテンツを隠す
+        const panes = document.getElementsByClassName("tab-pane");
+        for (let i = 0; i < panes.length; i++) {
+            panes[i].classList.remove("active");
+        }
+        // すべてのタブボタンのactive解除
+        const btns = document.getElementsByClassName("tab-btn");
+        for (let i = 0; i < btns.length; i++) {
+            btns[i].classList.remove("active");
+        }
+        // 指定したタブを表示
+        document.getElementById(tabId).classList.add("active");
         evt.currentTarget.classList.add("active");
     }
-
-    const unitPrices = { "RC": [50, 55, 60, 65, 70], "S": [45, 50, 55, 60, 65], "SRC": [55, 60, 65, 70, 75], "W": [30, 35, 40, 45, 50] };
-
-    function run() {
-        const rooms = parseFloat(document.getElementById('rooms').value) || 0;
-        const rArea = parseFloat(document.getElementById('r_area').value) || 0;
-        const cRatio = (parseFloat(document.getElementById('c_ratio').value) || 0) / 100;
-        const struct = document.getElementById('struct').value;
-        const grade = parseInt(document.getElementById('grade').value);
-
-        const totalArea = (rooms * rArea) / (1 - cRatio);
-        const baseUP = unitPrices[struct][grade];
-        const constCost = totalArea * baseUP;
-
-        // 表の更新
-        let html = `<tr><td>本体建築工事</td><td>${Math.round(totalArea)} ㎡</td><td>${baseUP}</td><td>${Math.round(constCost).toLocaleString()}</td></tr>`;
-        html += `<tr><td>家具・備品(FFE)</td><td>${rooms} 室</td><td>120</td><td>${(rooms * 120).toLocaleString()}</td></tr>`;
-        document.getElementById('cost_table_body').innerHTML = html;
-
-        const grandTotal = constCost + (rooms * 120);
-        document.getElementById('total_display').innerText = `新築時工事費合計: ${Math.round(grandTotal).toLocaleString()} 万円`;
-
-        updateChart(grandTotal);
-    }
-
-    let chart;
-    function updateChart(total) {
-        const ctx = document.getElementById('lccChart').getContext('2d');
-        const data = Array.from({length: 75}, (_, i) => {
-            const y = i + 1;
-            let cost = total * 0.01;
-            if (y % 12 === 0) cost += total * 0.15;
-            if (y % 15 === 0) cost += total * 0.10;
-            return cost;
-        });
-        if (chart) chart.destroy();
-        chart = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: Array.from({length: 75}, (_, i) => i + 1), datasets: [{ label: '修繕費(万円)', data: data, backgroundColor: '#3498db' }] }
-        });
-    }
-    run();
 </script>
+
 </body>
 </html>
