@@ -79,11 +79,47 @@
             width: 350px;
             border-left: 1px solid #ccc;
             background: #f9f9f9;
+            padding: 20px;
+        }
+        
+        #buildingCanvas {
+            width: 100%;
+            height: 500px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .floor-area-container {
+            margin: 15px 0;
+            margin-left: 180px;
+        }
+        
+        .floor-area-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #999;
-            font-size: 14px;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .floor-area-row label {
+            min-width: 80px;
+            font-size: 13px;
+        }
+        
+        .floor-area-row input {
+            width: 100px;
+            text-align: right;
+        }
+        
+        .total-area-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fffde7;
+            border: 1px solid #fbc02d;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #f57c00;
         }
 
         .section-title { 
@@ -414,10 +450,17 @@
                 <div class="form-row">
                     <label class="form-label">階数:</label>
                     <span>地上</span>
-                    <input type="number" id="floors_above" value="0" style="width: 60px;">
+                    <input type="number" id="floors_above" value="0" style="width: 60px;" min="0">
                     <span>階 / 地下</span>
-                    <input type="number" id="floors_below" value="0" style="width: 60px;">
+                    <input type="number" id="floors_below" value="0" style="width: 60px;" min="0">
                     <span>階</span>
+                </div>
+                
+                <!-- 階ごとの面積入力 -->
+                <div id="floorAreaContainer" class="floor-area-container" style="display: none;">
+                    <div class="form-label" style="margin-bottom: 10px; margin-left: -180px;">階ごとの面積入力 (㎡):</div>
+                    <div id="floorAreaInputs"></div>
+                    <div class="total-area-display" id="totalAreaDisplay">合計: 0 ㎡</div>
                 </div>
                 
                 <div style="margin-top: 20px;">
@@ -565,7 +608,13 @@
             </div>
             
             <div class="summary-right">
-                <p>階数を入れてください</p>
+                <div style="width: 100%;">
+                    <h3 style="text-align: center; margin-bottom: 15px; font-size: 14px;">建物断面図</h3>
+                    <svg id="buildingCanvas" viewBox="0 0 300 500"></svg>
+                    <p id="buildingInfo" style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
+                        階数を入力してください
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -651,6 +700,7 @@
 <script>
     let properties = {};
     let currentPropertyId = null;
+    let floorAreas = {}; // 階ごとの面積を保存
 
     document.addEventListener('DOMContentLoaded', () => {
         updatePropertyList();
@@ -676,6 +726,10 @@
 
         document.getElementById('birth_date').addEventListener('change', calculateDateDiff);
         document.getElementById('completion_date').addEventListener('change', calculateDateDiff);
+        
+        // 階数変更時のイベントリスナー
+        document.getElementById('floors_above').addEventListener('input', updateFloorInputs);
+        document.getElementById('floors_below').addEventListener('input', updateFloorInputs);
     }
 
     function updateTotalGuests() {
@@ -703,6 +757,256 @@
 
     function calculateAll() {
         alert('全体コスト計算を実行します');
+    }
+
+    // 階ごとの面積入力フィールドを更新
+    function updateFloorInputs() {
+        const aboveFloors = parseInt(document.getElementById('floors_above').value) || 0;
+        const belowFloors = parseInt(document.getElementById('floors_below').value) || 0;
+        const totalFloors = aboveFloors + belowFloors;
+        
+        const container = document.getElementById('floorAreaContainer');
+        const inputsDiv = document.getElementById('floorAreaInputs');
+        
+        if (totalFloors === 0) {
+            container.style.display = 'none';
+            updateBuildingCanvas();
+            return;
+        }
+        
+        container.style.display = 'block';
+        inputsDiv.innerHTML = '';
+        
+        // 地上階（上から下へ：最上階→1階）
+        for (let i = aboveFloors; i >= 1; i--) {
+            const row = document.createElement('div');
+            row.className = 'floor-area-row';
+            
+            const label = document.createElement('label');
+            label.textContent = `${i}階:`;
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.id = `floor_${i}F`;
+            input.value = floorAreas[`${i}F`] || '';
+            input.min = '0';
+            input.step = '0.01';
+            input.addEventListener('input', () => {
+                floorAreas[`${i}F`] = input.value;
+                updateTotalArea();
+                updateBuildingCanvas();
+            });
+            
+            const unit = document.createElement('span');
+            unit.textContent = '㎡';
+            
+            row.appendChild(label);
+            row.appendChild(input);
+            row.appendChild(unit);
+            inputsDiv.appendChild(row);
+        }
+        
+        // 地下階（B1→B2→B3...）
+        for (let i = 1; i <= belowFloors; i++) {
+            const row = document.createElement('div');
+            row.className = 'floor-area-row';
+            
+            const label = document.createElement('label');
+            label.textContent = `地下${i}階:`;
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.id = `floor_B${i}F`;
+            input.value = floorAreas[`B${i}F`] || '';
+            input.min = '0';
+            input.step = '0.01';
+            input.addEventListener('input', () => {
+                floorAreas[`B${i}F`] = input.value;
+                updateTotalArea();
+                updateBuildingCanvas();
+            });
+            
+            const unit = document.createElement('span');
+            unit.textContent = '㎡';
+            
+            row.appendChild(label);
+            row.appendChild(input);
+            row.appendChild(unit);
+            inputsDiv.appendChild(row);
+        }
+        
+        updateTotalArea();
+        updateBuildingCanvas();
+    }
+
+    // 合計床面積を計算
+    function updateTotalArea() {
+        let total = 0;
+        Object.values(floorAreas).forEach(area => {
+            const value = parseFloat(area);
+            if (!isNaN(value)) {
+                total += value;
+            }
+        });
+        
+        document.getElementById('totalAreaDisplay').textContent = `合計: ${total.toFixed(2)} ㎡`;
+        document.getElementById('total_area').value = total.toFixed(2);
+    }
+
+    // 建物断面図を描画
+    function updateBuildingCanvas() {
+        const aboveFloors = parseInt(document.getElementById('floors_above').value) || 0;
+        const belowFloors = parseInt(document.getElementById('floors_below').value) || 0;
+        const totalFloors = aboveFloors + belowFloors;
+        
+        const svg = document.getElementById('buildingCanvas');
+        const info = document.getElementById('buildingInfo');
+        
+        svg.innerHTML = '';
+        
+        if (totalFloors === 0) {
+            info.textContent = '階数を入力してください';
+            return;
+        }
+        
+        // 情報テキスト更新
+        let infoText = '';
+        if (aboveFloors > 0 && belowFloors > 0) {
+            infoText = `地上${aboveFloors}階 / 地下${belowFloors}階`;
+        } else if (aboveFloors > 0) {
+            infoText = `地上${aboveFloors}階`;
+        } else {
+            infoText = `地下${belowFloors}階`;
+        }
+        info.textContent = infoText;
+        
+        // 描画パラメータ
+        const floorHeight = 35;
+        const maxWidth = 200;
+        const rightEdge = 220;
+        const textOffsetX = 8;
+        const textOffsetY = 5;
+        
+        // 最大面積を取得
+        let maxArea = 0;
+        Object.values(floorAreas).forEach(area => {
+            const value = parseFloat(area);
+            if (!isNaN(value) && value > maxArea) {
+                maxArea = value;
+            }
+        });
+        
+        if (maxArea === 0) maxArea = 1;
+        
+        // 描画開始位置
+        const totalHeight = totalFloors * floorHeight;
+        const startY = 50;
+        
+        let currentY = startY;
+        
+        // 地上階を描画（上から下へ）
+        for (let i = aboveFloors; i >= 1; i--) {
+            const floorKey = `${i}F`;
+            const area = parseFloat(floorAreas[floorKey]) || 0;
+            const width = area > 0 ? maxWidth * (area / maxArea) : maxWidth * 0.3;
+            const startX = rightEdge - width;
+            
+            // 階の矩形
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', startX);
+            rect.setAttribute('y', currentY);
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', floorHeight);
+            rect.setAttribute('fill', i % 2 === 1 ? '#f0f0f0' : '#ffffff');
+            rect.setAttribute('stroke', 'black');
+            rect.setAttribute('stroke-width', '2');
+            svg.appendChild(rect);
+            
+            // FL線
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', rightEdge);
+            line.setAttribute('y1', currentY + floorHeight);
+            line.setAttribute('x2', rightEdge + 20);
+            line.setAttribute('y2', currentY + floorHeight);
+            line.setAttribute('stroke', 'black');
+            line.setAttribute('stroke-width', '1');
+            svg.appendChild(line);
+            
+            // 階数表示
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', rightEdge + textOffsetX);
+            text.setAttribute('y', currentY + floorHeight - textOffsetY);
+            text.setAttribute('font-size', '9');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('fill', '#696969');
+            text.textContent = `▽${i}階`;
+            svg.appendChild(text);
+            
+            currentY += floorHeight;
+        }
+        
+        // 地盤線(GL)
+        if (belowFloors > 0) {
+            const glY = currentY;
+            const glLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            glLine.setAttribute('x1', rightEdge - maxWidth - 20);
+            glLine.setAttribute('y1', glY);
+            glLine.setAttribute('x2', rightEdge + 20);
+            glLine.setAttribute('y2', glY);
+            glLine.setAttribute('stroke', 'black');
+            glLine.setAttribute('stroke-width', '1');
+            svg.appendChild(glLine);
+            
+            const glText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            glText.setAttribute('x', rightEdge - maxWidth - 35);
+            glText.setAttribute('y', glY + 5);
+            glText.setAttribute('font-size', '9');
+            glText.setAttribute('font-weight', 'bold');
+            glText.setAttribute('fill', '#696969');
+            glText.textContent = 'GL';
+            svg.appendChild(glText);
+        }
+        
+        // 地下階を描画
+        for (let i = 1; i <= belowFloors; i++) {
+            const floorKey = `B${i}F`;
+            const area = parseFloat(floorAreas[floorKey]) || 0;
+            const width = area > 0 ? maxWidth * (area / maxArea) : maxWidth * 0.3;
+            const startX = rightEdge - width;
+            
+            // 階の矩形
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', startX);
+            rect.setAttribute('y', currentY);
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', floorHeight);
+            rect.setAttribute('fill', i % 2 === 1 ? '#e8f5e9' : '#ffffff');
+            rect.setAttribute('stroke', 'black');
+            rect.setAttribute('stroke-width', '2');
+            svg.appendChild(rect);
+            
+            // FL線
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', rightEdge);
+            line.setAttribute('y1', currentY + floorHeight);
+            line.setAttribute('x2', rightEdge + 20);
+            line.setAttribute('y2', currentY + floorHeight);
+            line.setAttribute('stroke', 'black');
+            line.setAttribute('stroke-width', '1');
+            svg.appendChild(line);
+            
+            // 階数表示
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', rightEdge + textOffsetX);
+            text.setAttribute('y', currentY + floorHeight - textOffsetY);
+            text.setAttribute('font-size', '9');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('fill', '#696969');
+            text.textContent = `▽B${i}階`;
+            svg.appendChild(text);
+            
+            currentY += floorHeight;
+        }
     }
 
     function updatePropertyList() {
@@ -766,7 +1070,13 @@
         document.getElementById('prop_remarks').value = prop.remarks;
         
         if (prop.data) {
+            // 階ごとの面積データを復元
+            if (prop.data.floorAreas) {
+                floorAreas = prop.data.floorAreas;
+            }
+            
             Object.keys(prop.data).forEach(key => {
+                if (key === 'floorAreas') return;
                 const el = document.getElementById(key);
                 if (el) {
                     if (el.type === 'checkbox') {
@@ -778,20 +1088,23 @@
             });
             updateTotalGuests();
             calculateDateDiff();
+            updateFloorInputs();
         }
     }
 
     function gatherAllData() {
         const data = {};
         document.querySelectorAll('input, select, textarea').forEach(el => {
-            if (el.id && el.id !== 'propertyList' && el.id !== 'importFile') {
+            if (el.id && el.id !== 'propertyList' && el.id !== 'importFile' && !el.id.startsWith('floor_')) {
                 if (el.type === 'checkbox') {
                     data[el.id] = el.checked;
                 } else {
-                    data[el.id] = el.value;
+                    data[el.value] = el.value;
                 }
             }
         });
+        // 階ごとの面積データを保存
+        data.floorAreas = floorAreas;
         return data;
     }
 
