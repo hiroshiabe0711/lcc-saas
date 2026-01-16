@@ -4,31 +4,39 @@
     <meta charset="UTF-8">
     <title>建物コスト算出システム - Hotel LCC-SaaS</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f8f9fa; --white: #ffffff; --border: #ccc; }
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f8f9fa; --border: #ccc; }
         body { font-family: "Segoe UI", "Meiryo", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: var(--primary); color: white; padding: 10px 20px; font-size: 1rem; font-weight: bold; flex-shrink: 0; }
         
-        /* タブのスタイリング（スクロール可能） */
-        .tab-container { background: #ddd; padding: 5px 5px 0 5px; flex-shrink: 0; overflow-x: auto; white-space: nowrap; display: flex; }
-        .tab-btn { 
-            padding: 8px 15px; border: 1px solid var(--border); background: #eee; cursor: pointer; 
-            border-radius: 5px 5px 0 0; margin-right: 2px; font-size: 12px; transition: 0.2s;
-        }
-        .tab-btn:hover { background: #f0f0f0; }
+        /* タブのスタイリング */
+        .tab-container { background: #ddd; padding: 5px 5px 0 5px; flex-shrink: 0; overflow-x: auto; white-space: nowrap; display: flex; border-bottom: 1px solid var(--border); }
+        .tab-btn { padding: 8px 15px; border: 1px solid var(--border); background: #eee; cursor: pointer; border-radius: 5px 5px 0 0; margin-right: 2px; font-size: 12px; }
         .tab-btn.active { background: white; border-bottom: 2px solid white; font-weight: bold; color: var(--accent); }
 
         /* コンテンツエリア */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .tab-pane { display: none; padding: 20px; overflow-y: auto; flex: 1; background: white; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: white; }
+        .tab-pane { display: none; padding: 25px; overflow-y: auto; flex: 1; }
         .tab-pane.active { display: block; }
 
-        /* レイアウト用 */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { border: 1px solid #eee; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        h3 { margin-top: 0; font-size: 14px; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background: #f4f4f4; }
+        /* セクション・レイアウト */
+        .section-title { font-size: 16px; font-weight: bold; border-left: 5px solid var(--primary); padding-left: 10px; margin-bottom: 15px; color: var(--primary); }
+        .card { border: 1px solid var(--border); padding: 15px; border-radius: 5px; margin-bottom: 20px; background: #fff; }
+        
+        .property-list-area { display: flex; gap: 10px; margin-bottom: 20px; }
+        #propertyList { flex: 1; height: 100px; border: 1px solid #aaa; border-radius: 4px; padding: 5px; }
+        .btn-col { display: flex; flex-direction: column; gap: 5px; }
+
+        button { cursor: pointer; padding: 8px 12px; border-radius: 4px; border: 1px solid #888; background: #f0f0f0; font-size: 12px; }
+        .btn-primary { background: var(--accent); color: white; border: none; }
+
+        /* 入力グリッド */
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px 30px; }
+        .input-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select { padding: 8px; border: 1px solid #aaa; border-radius: 4px; font-size: 14px; }
+        input[readonly] { background-color: #f0f0f0; color: #666; }
+        
+        .result-highlight { color: #e74c3c; font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -53,87 +61,175 @@
 
 <div class="main-content">
     <div id="property" class="tab-pane active">
-        <h3>物件管理</h3>
-        <p>ここに物件名、建設地、構造、グレード等の基本情報を配置します。</p>
+        <div class="section-title">登録済み物件一覧</div>
+        <div class="card property-list-area">
+            <select id="propertyList" size="5"></select>
+            <div class="btn-col">
+                <button class="btn-primary" onclick="loadProperty()">📂 読み込み</button>
+                <button onclick="createNewProperty()">🆕 新規作成</button>
+                <button style="color:red;" onclick="deleteProperty()">🗑️ 削除</button>
+            </div>
+        </div>
+
+        <div class="section-title">物件基本情報</div>
+        <div class="card">
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>物件名</label>
+                    <input type="text" id="prop_name" placeholder="名称未設定">
+                </div>
+                <div class="input-group">
+                    <label>建設地 (地域係数反映)</label>
+                    <select id="location_type" onchange="updateCalculations()">
+                        <option value="1.00">東京都内 (100%)</option>
+                        <option value="0.90">その他関東 (90%)</option>
+                        <option value="0.85">関西 (85%)</option>
+                        <option value="0.80">地方都市 (80%)</option>
+                        <option value="0.75">地方 (75%)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>建物構造</label>
+                    <select id="structure" onchange="updateCalculations()">
+                        <option value="RC">RC造</option>
+                        <option value="S">鉄骨造</option>
+                        <option value="SRC">SRC造</option>
+                        <option value="W">木造</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>グレード</label>
+                    <select id="grade" onchange="updateCalculations()">
+                        <option value="0">スタンダード</option>
+                        <option value="1">ベーシック1</option>
+                        <option value="2">ベーシック2</option>
+                        <option value="3">デラックス1</option>
+                        <option value="4">デラックス2</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>延床面積 (㎡)</label>
+                    <input type="number" id="total_floor_area" value="2000" oninput="updateCalculations()">
+                </div>
+                <div class="input-group">
+                    <label>補正後建築単価 (円/㎡)</label>
+                    <input type="text" id="base_unit_price" readonly class="result-highlight">
+                </div>
+            </div>
+            <div style="margin-top:20px; text-align: right;">
+                <button class="btn-primary" onclick="saveProperty()">💾 物件データを保存</button>
+            </div>
+        </div>
     </div>
 
-    <div id="calc_summary" class="tab-pane">
-        <h3>コストサマリ</h3>
-        <p>全体の建設費合計、延床面積、坪単価等を表示します。</p>
-    </div>
-
-    <div id="onsen" class="tab-pane">
-        <h3>温泉設備</h3>
-        <p>浴槽、洗い場、サウナ、ろ過装置等の設定項目です。</p>
-    </div>
-
-    <div id="restaurant" class="tab-pane">
-        <h3>レストラン</h3>
-        <p>厨房面積、席数、内装グレード等の設定項目です。</p>
-    </div>
-
-    <div id="lounge" class="tab-pane">
-        <h3>ラウンジ</h3>
-        <p>ラウンジ面積、照明、特注家具等の設定項目です。</p>
-    </div>
-
-    <div id="hallway" class="tab-pane">
-        <h3>通路</h3>
-        <p>廊下幅、共用部仕上げ等の設定項目です。</p>
-    </div>
-
-    <div id="amusement" class="tab-pane">
-        <h3>アミューズメント</h3>
-        <p>キッズコーナー、売店、リラクゼーション等の設定です。</p>
-    </div>
-
-    <div id="guest_room" class="tab-pane">
-        <h3>客室</h3>
-        <p>客室数、タイプ別面積、内装単価、ユニットバス等の設定です。</p>
-    </div>
-
-    <div id="arch_settings" class="tab-pane">
-        <h3>建築初期設定</h3>
-        <p>基本構造単価、労務費、共通仮設費率等のマスタ設定です。</p>
-    </div>
-
-    <div id="equipment" class="tab-pane">
-        <h3>設備設定</h3>
-        <p>空調方式、受変電設備、給排水方式等の設定です。</p>
-    </div>
-
-    <div id="furniture" class="tab-pane">
-        <h3>家具</h3>
-        <p>FF&E、特注家具、什器のマスタ設定です。</p>
-    </div>
-
-    <div id="settings" class="tab-pane">
-        <h3>経費設定</h3>
-        <p>設計料、諸経費、予備費、金利等の設定項目です。</p>
-    </div>
-
-    <div id="lcc" class="tab-pane">
-        <h3>LCC分析</h3>
-        <p>75年間の修繕・更新費用、年間維持管理費のシミュレーション結果を表示します。</p>
-    </div>
+    <div id="calc_summary" class="tab-pane"><h3>コストサマリ</h3></div>
+    <div id="onsen" class="tab-pane"><h3>温泉設備</h3></div>
+    <div id="restaurant" class="tab-pane"><h3>レストラン</h3></div>
+    <div id="lounge" class="tab-pane"><h3>ラウンジ</h3></div>
+    <div id="hallway" class="tab-pane"><h3>通路</h3></div>
+    <div id="amusement" class="tab-pane"><h3>アミューズメント</h3></div>
+    <div id="guest_room" class="tab-pane"><h3>客室</h3></div>
+    <div id="arch_settings" class="tab-pane"><h3>建築初期設定</h3></div>
+    <div id="equipment" class="tab-pane"><h3>設備設定</h3></div>
+    <div id="furniture" class="tab-pane"><h3>家具</h3></div>
+    <div id="settings" class="tab-pane"><h3>経費設定</h3></div>
+    <div id="lcc" class="tab-pane"><h3>LCC分析</h3></div>
 </div>
 
 <script>
+    // Python版マスタデータ (100%時の単価)
+    const unitPriceMaster = {
+        "RC":  [500000, 550000, 600000, 650000, 700000],
+        "S":   [450000, 500000, 550000, 600000, 650000],
+        "SRC": [550000, 600000, 650000, 700000, 750000],
+        "W":   [300000, 350000, 400000, 450000, 500000]
+    };
+
+    function updateCalculations() {
+        const struct = document.getElementById('structure').value;
+        const gradeIdx = parseInt(document.getElementById('grade').value);
+        const regionRate = parseFloat(document.getElementById('location_type').value);
+        
+        // 基準単価 × 地域係数
+        const basePrice = unitPriceMaster[struct][gradeIdx];
+        const adjustedPrice = basePrice * regionRate;
+        
+        document.getElementById('base_unit_price').value = Math.round(adjustedPrice).toLocaleString();
+    }
+
+    // --- 物件管理機能 (Local Storage) ---
+    function refreshPropertyList() {
+        const listSelect = document.getElementById('propertyList');
+        listSelect.innerHTML = "";
+        const properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
+        for (let key in properties) {
+            let opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = properties[key].prop_name || "無題の物件";
+            listSelect.appendChild(opt);
+        }
+    }
+
+    function saveProperty() {
+        const propName = document.getElementById('prop_name').value || "新規物件";
+        const data = {
+            prop_name: propName,
+            location_type: document.getElementById('location_type').value,
+            structure: document.getElementById('structure').value,
+            grade: document.getElementById('grade').value,
+            total_floor_area: document.getElementById('total_floor_area').value
+        };
+        let properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
+        properties[propName] = data;
+        localStorage.setItem('hotel_properties', JSON.stringify(properties));
+        alert("保存しました");
+        refreshPropertyList();
+    }
+
+    function loadProperty() {
+        const selected = document.getElementById('propertyList').value;
+        if (!selected) return alert("物件を選択してください");
+        const properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
+        const data = properties[selected];
+
+        document.getElementById('prop_name').value = data.prop_name;
+        document.getElementById('location_type').value = data.location_type;
+        document.getElementById('structure').value = data.structure;
+        document.getElementById('grade').value = data.grade;
+        document.getElementById('total_floor_area').value = data.total_floor_area;
+
+        updateCalculations();
+    }
+
+    function createNewProperty() {
+        if(confirm("入力をリセットしますか？")) {
+            document.getElementById('prop_name').value = "";
+            updateCalculations();
+        }
+    }
+
+    function deleteProperty() {
+        const selected = document.getElementById('propertyList').value;
+        if (!selected || !confirm("削除しますか？")) return;
+        let properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
+        delete properties[selected];
+        localStorage.setItem('hotel_properties', JSON.stringify(properties));
+        refreshPropertyList();
+    }
+
     function openTab(evt, tabId) {
-        // すべてのコンテンツを隠す
         const panes = document.getElementsByClassName("tab-pane");
-        for (let i = 0; i < panes.length; i++) {
-            panes[i].classList.remove("active");
-        }
-        // すべてのタブボタンのactive解除
+        for (let i = 0; i < panes.length; i++) panes[i].classList.remove("active");
         const btns = document.getElementsByClassName("tab-btn");
-        for (let i = 0; i < btns.length; i++) {
-            btns[i].classList.remove("active");
-        }
-        // 指定したタブを表示
+        for (let i = 0; i < btns.length; i++) btns[i].classList.remove("active");
         document.getElementById(tabId).classList.add("active");
         evt.currentTarget.classList.add("active");
     }
+
+    window.onload = function() {
+        refreshPropertyList();
+        updateCalculations();
+    };
 </script>
 
 </body>
