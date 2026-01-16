@@ -8,17 +8,14 @@
         body { font-family: "Segoe UI", "Meiryo", sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { background: var(--primary); color: white; padding: 10px 20px; font-size: 1rem; font-weight: bold; flex-shrink: 0; }
         
-        /* タブのスタイリング */
         .tab-container { background: #ddd; padding: 5px 5px 0 5px; flex-shrink: 0; overflow-x: auto; white-space: nowrap; display: flex; border-bottom: 1px solid var(--border); }
         .tab-btn { padding: 8px 15px; border: 1px solid var(--border); background: #eee; cursor: pointer; border-radius: 5px 5px 0 0; margin-right: 2px; font-size: 12px; }
         .tab-btn.active { background: white; border-bottom: 2px solid white; font-weight: bold; color: var(--accent); }
 
-        /* コンテンツエリア */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: white; }
         .tab-pane { display: none; padding: 25px; overflow-y: auto; flex: 1; }
         .tab-pane.active { display: block; }
 
-        /* セクション・レイアウト */
         .section-title { font-size: 16px; font-weight: bold; border-left: 5px solid var(--primary); padding-left: 10px; margin-bottom: 15px; color: var(--primary); }
         .card { border: 1px solid var(--border); padding: 15px; border-radius: 5px; margin-bottom: 20px; background: #fff; }
         
@@ -29,14 +26,14 @@
         button { cursor: pointer; padding: 8px 12px; border-radius: 4px; border: 1px solid #888; background: #f0f0f0; font-size: 12px; }
         .btn-primary { background: var(--accent); color: white; border: none; }
 
-        /* 入力グリッド */
         .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px 30px; }
         .input-group { display: flex; flex-direction: column; margin-bottom: 10px; }
-        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input, select { padding: 8px; border: 1px solid #aaa; border-radius: 4px; font-size: 14px; }
-        input[readonly] { background-color: #f0f0f0; color: #666; }
+        .full-width { grid-column: 1 / -1; } /* 住所や備考を横いっぱいに広げる */
         
-        .result-highlight { color: #e74c3c; font-weight: bold; font-size: 1.1rem; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select, textarea { padding: 8px; border: 1px solid #aaa; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        textarea { resize: vertical; min-height: 60px; }
+        input[readonly] { background-color: #f0f0f0; color: #666; }
     </style>
 </head>
 <body>
@@ -76,10 +73,10 @@
             <div class="input-grid">
                 <div class="input-group">
                     <label>物件名</label>
-                    <input type="text" id="prop_name" placeholder="名称未設定">
+                    <input type="text" id="prop_name" placeholder="例：〇〇ホテル新築計画">
                 </div>
                 <div class="input-group">
-                    <label>建設地 (地域係数反映)</label>
+                    <label>建設地（地域係数）</label>
                     <select id="location_type" onchange="updateCalculations()">
                         <option value="1.00">東京都内 (100%)</option>
                         <option value="0.90">その他関東 (90%)</option>
@@ -87,6 +84,10 @@
                         <option value="0.80">地方都市 (80%)</option>
                         <option value="0.75">地方 (75%)</option>
                     </select>
+                </div>
+                <div class="input-group full-width">
+                    <label>住所</label>
+                    <input type="text" id="address" placeholder="例：東京都中央区銀座1-1-1">
                 </div>
                 <div class="input-group">
                     <label>建物構造</label>
@@ -113,7 +114,11 @@
                 </div>
                 <div class="input-group">
                     <label>補正後建築単価 (円/㎡)</label>
-                    <input type="text" id="base_unit_price" readonly class="result-highlight">
+                    <input type="text" id="base_unit_price" readonly style="color: #e74c3c; font-weight: bold;">
+                </div>
+                <div class="input-group full-width">
+                    <label>備考</label>
+                    <textarea id="remarks" placeholder="特記事項があれば入力してください"></textarea>
                 </div>
             </div>
             <div style="margin-top:20px; text-align: right;">
@@ -122,22 +127,11 @@
         </div>
     </div>
 
-    <div id="calc_summary" class="tab-pane"><h3>コストサマリ</h3></div>
-    <div id="onsen" class="tab-pane"><h3>温泉設備</h3></div>
-    <div id="restaurant" class="tab-pane"><h3>レストラン</h3></div>
-    <div id="lounge" class="tab-pane"><h3>ラウンジ</h3></div>
-    <div id="hallway" class="tab-pane"><h3>通路</h3></div>
-    <div id="amusement" class="tab-pane"><h3>アミューズメント</h3></div>
-    <div id="guest_room" class="tab-pane"><h3>客室</h3></div>
-    <div id="arch_settings" class="tab-pane"><h3>建築初期設定</h3></div>
-    <div id="equipment" class="tab-pane"><h3>設備設定</h3></div>
-    <div id="furniture" class="tab-pane"><h3>家具</h3></div>
-    <div id="settings" class="tab-pane"><h3>経費設定</h3></div>
-    <div id="lcc" class="tab-pane"><h3>LCC分析</h3></div>
-</div>
+    <div id="calc_summary" class="tab-pane"></div>
+    </div>
 
 <script>
-    // Python版マスタデータ (100%時の単価)
+    // マスタデータ
     const unitPriceMaster = {
         "RC":  [500000, 550000, 600000, 650000, 700000],
         "S":   [450000, 500000, 550000, 600000, 650000],
@@ -149,15 +143,60 @@
         const struct = document.getElementById('structure').value;
         const gradeIdx = parseInt(document.getElementById('grade').value);
         const regionRate = parseFloat(document.getElementById('location_type').value);
-        
-        // 基準単価 × 地域係数
         const basePrice = unitPriceMaster[struct][gradeIdx];
         const adjustedPrice = basePrice * regionRate;
-        
         document.getElementById('base_unit_price').value = Math.round(adjustedPrice).toLocaleString();
     }
 
-    // --- 物件管理機能 (Local Storage) ---
+    // 保存機能に住所と備考を追加
+    function saveProperty() {
+        const propName = document.getElementById('prop_name').value || "新規物件";
+        const data = {
+            prop_name: propName,
+            location_type: document.getElementById('location_type').value,
+            address: document.getElementById('address').value, // 住所
+            structure: document.getElementById('structure').value,
+            grade: document.getElementById('grade').value,
+            total_floor_area: document.getElementById('total_floor_area').value,
+            remarks: document.getElementById('remarks').value // 備考
+        };
+        let properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
+        properties[propName] = data;
+        localStorage.setItem('hotel_properties', JSON.stringify(properties));
+        alert("物件データ「" + propName + "」を保存しました");
+        refreshPropertyList();
+    }
+
+    // 読み込み機能に住所と備考を追加
+    function loadProperty() {
+        const selected = document.getElementById('propertyList').value;
+        if (!selected) return alert("物件を選択してください");
+        const properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
+        const data = properties[selected];
+
+        document.getElementById('prop_name').value = data.prop_name || "";
+        document.getElementById('location_type').value = data.location_type || "1.00";
+        document.getElementById('address').value = data.address || ""; // 住所
+        document.getElementById('structure').value = data.structure || "RC";
+        document.getElementById('grade').value = data.grade || "0";
+        document.getElementById('total_floor_area').value = data.total_floor_area || "2000";
+        document.getElementById('remarks').value = data.remarks || ""; // 備考
+
+        updateCalculations();
+    }
+
+    // リセット（新規作成）
+    function createNewProperty() {
+        if(confirm("入力をリセットしますか？")) {
+            document.getElementById('prop_name').value = "";
+            document.getElementById('address').value = "";
+            document.getElementById('remarks').value = "";
+            document.getElementById('total_floor_area').value = "2000";
+            updateCalculations();
+        }
+    }
+
+    // (以下、共通関数)
     function refreshPropertyList() {
         const listSelect = document.getElementById('propertyList');
         listSelect.innerHTML = "";
@@ -170,53 +209,6 @@
         }
     }
 
-    function saveProperty() {
-        const propName = document.getElementById('prop_name').value || "新規物件";
-        const data = {
-            prop_name: propName,
-            location_type: document.getElementById('location_type').value,
-            structure: document.getElementById('structure').value,
-            grade: document.getElementById('grade').value,
-            total_floor_area: document.getElementById('total_floor_area').value
-        };
-        let properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
-        properties[propName] = data;
-        localStorage.setItem('hotel_properties', JSON.stringify(properties));
-        alert("保存しました");
-        refreshPropertyList();
-    }
-
-    function loadProperty() {
-        const selected = document.getElementById('propertyList').value;
-        if (!selected) return alert("物件を選択してください");
-        const properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
-        const data = properties[selected];
-
-        document.getElementById('prop_name').value = data.prop_name;
-        document.getElementById('location_type').value = data.location_type;
-        document.getElementById('structure').value = data.structure;
-        document.getElementById('grade').value = data.grade;
-        document.getElementById('total_floor_area').value = data.total_floor_area;
-
-        updateCalculations();
-    }
-
-    function createNewProperty() {
-        if(confirm("入力をリセットしますか？")) {
-            document.getElementById('prop_name').value = "";
-            updateCalculations();
-        }
-    }
-
-    function deleteProperty() {
-        const selected = document.getElementById('propertyList').value;
-        if (!selected || !confirm("削除しますか？")) return;
-        let properties = JSON.parse(localStorage.getItem('hotel_properties') || "{}");
-        delete properties[selected];
-        localStorage.setItem('hotel_properties', JSON.stringify(properties));
-        refreshPropertyList();
-    }
-
     function openTab(evt, tabId) {
         const panes = document.getElementsByClassName("tab-pane");
         for (let i = 0; i < panes.length; i++) panes[i].classList.remove("active");
@@ -226,10 +218,7 @@
         evt.currentTarget.classList.add("active");
     }
 
-    window.onload = function() {
-        refreshPropertyList();
-        updateCalculations();
-    };
+    window.onload = function() { refreshPropertyList(); updateCalculations(); };
 </script>
 
 </body>
