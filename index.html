@@ -493,11 +493,12 @@
                 
                 <div style="margin-top: 20px;">
                     <div class="form-label" style="margin-bottom: 8px;">仕様グレード:</div>
-                    <select class="grade-select" size="4" id="grade">
+                    <select class="grade-select" size="5" id="grade">
                         <option>エコノミー</option>
                         <option>スタンダード 1</option>
                         <option>スタンダード 2</option>
                         <option>デラックス 1</option>
+                        <option>デラックス 2</option>
                     </select>
                 </div>
                 
@@ -662,9 +663,125 @@
     </div>
 
     <div id="arch_initial" class="tab-pane">
-        <div style="padding: 20px;">
-            <div class="section-title">建築初期設定</div>
-            <p>建築の初期設定</p>
+        <div style="padding: 20px; max-width: 1600px;">
+            <div class="section-title">建築設定</div>
+            
+            <!-- 建設地域掛け率設定 -->
+            <div style="margin-top: 20px;">
+                <h3 style="font-size: 15px; font-weight: bold; margin-bottom: 10px;">建設地域掛け率設定</h3>
+                <table style="width: auto; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                        <tr style="background: #f0f0f0;">
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">建設地域</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">掛け率 (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">東京都内</td>
+                            <td style="border: 1px solid #ccc; padding: 5px;">
+                                <input type="number" id="region_rate_tokyo" value="100" style="width: 80px; text-align: right; padding: 5px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">その他関東</td>
+                            <td style="border: 1px solid #ccc; padding: 5px;">
+                                <input type="number" id="region_rate_kanto" value="90" style="width: 80px; text-align: right; padding: 5px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">関西</td>
+                            <td style="border: 1px solid #ccc; padding: 5px;">
+                                <input type="number" id="region_rate_kansai" value="85" style="width: 80px; text-align: right; padding: 5px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">地方都市</td>
+                            <td style="border: 1px solid #ccc; padding: 5px;">
+                                <input type="number" id="region_rate_city" value="80" style="width: 80px; text-align: right; padding: 5px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ccc; padding: 8px;">地方</td>
+                            <td style="border: 1px solid #ccc; padding: 5px;">
+                                <input type="number" id="region_rate_rural" value="75" style="width: 80px; text-align: right; padding: 5px;">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 10px;">
+                    <button class="btn btn-success" onclick="saveRegionRates()">地域掛け率を保存</button>
+                    <button class="btn btn-default" onclick="resetRegionRates()" style="margin-left: 5px;">地域掛け率をリセット</button>
+                </div>
+            </div>
+            
+            <!-- 建物構造別設定 -->
+            <div style="margin-top: 40px;">
+                <h3 style="font-size: 15px; font-weight: bold; margin-bottom: 10px;">建物構造別設定 (円/㎡)</h3>
+                <table style="width: auto; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                        <tr style="background: #f0f0f0;">
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">構造</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">エコノミー</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">スタンダード 1</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">スタンダード 2</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">デラックス 1</th>
+                            <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">デラックス 2</th>
+                        </tr>
+                    </thead>
+                    <tbody id="structureTableBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 内装単価設定 -->
+            <div style="margin-top: 40px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h3 style="font-size: 15px; font-weight: bold;">内装単価設定 (円/㎡)</h3>
+                    <button class="btn btn-default" onclick="addInteriorRow()">追加</button>
+                    <button class="btn btn-default" onclick="deleteInteriorRow()">削除</button>
+                    <button class="btn btn-success" onclick="saveInteriorData()">保存</button>
+                    <button class="btn btn-default" onclick="resetInteriorData()">リセット</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="border-collapse: collapse; font-size: 11px;">
+                        <thead>
+                            <tr style="background: #f0f0f0;">
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center;" rowspan="2">室用途</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center;" rowspan="2">天井高(m)</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center;" colspan="5">内装単価設定(床)</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center;" colspan="5">内装単価設定(天井)</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center;" colspan="5">内装単価設定(壁)</th>
+                            </tr>
+                            <tr style="background: #f0f0f0;">
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">エコノミー</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">スタンダード 1</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">スタンダード 2</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">デラックス 1</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">デラックス 2</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">エコノミー</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">スタンダード 1</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">スタンダード 2</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">デラックス 1</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">デラックス 2</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">エコノミー</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">スタンダード 1</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">スタンダード 2</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">デラックス 1</th>
+                                <th style="border: 1px solid #ccc; padding: 3px; font-size: 10px;">デラックス 2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interiorTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <h3 style="font-size: 15px; font-weight: bold;">下地単価設定 (Ver1.0では未設定)</h3>
+                <p style="color: #999; margin-top: 10px;">現在開発中です。</p>
+            </div>
         </div>
     </div>
 
@@ -780,9 +897,68 @@
     </div>
 
     <div id="furniture" class="tab-pane">
-        <div style="padding: 20px;">
-            <div class="section-title">家具</div>
-            <p>家具の詳細設定</p>
+        <div style="padding: 20px; max-width: 1400px;">
+            <div class="section-title">家具設定</div>
+            
+            <!-- 家具設定単価1 -->
+            <div style="margin-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h3 style="font-size: 15px; font-weight: bold;">家具設定単価1</h3>
+                    <button class="btn btn-default" onclick="addFurniture1Row()">追加</button>
+                    <button class="btn btn-default" onclick="deleteFurniture1Row()">削除</button>
+                    <button class="btn btn-success" onclick="saveFurniture1Data()">保存</button>
+                    <button class="btn btn-default" onclick="resetFurniture1Data()">リセット</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="furniture1Table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f0f0f0;">
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 40px;">No</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 200px;">部材</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 150px;">略称</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">取付工数</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">労務単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">雑材料</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">新設機器単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">単位面積の個数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="furniture1TableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 家具設定単価2 -->
+            <div style="margin-top: 40px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h3 style="font-size: 15px; font-weight: bold;">家具設定単価2</h3>
+                    <button class="btn btn-default" onclick="addFurniture2Row()">追加</button>
+                    <button class="btn btn-default" onclick="deleteFurniture2Row()">削除</button>
+                    <button class="btn btn-success" onclick="saveFurniture2Data()">保存</button>
+                    <button class="btn btn-default" onclick="resetFurniture2Data()">リセット</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="furniture2Table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f0f0f0;">
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 40px;">No</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 200px;">部材</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 150px;">略称</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">取付工数</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">労務単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 80px;">雑材料</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">新設機器単価</th>
+                                <th style="border: 1px solid #ccc; padding: 5px; text-align: center; min-width: 100px;">客室当の個数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="furniture2TableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -810,6 +986,14 @@
     let equipmentData = [];
     let heatSourceData = [];
     let kitchenData = [];
+    
+    // 建築設定データ
+    let structureData = [];
+    let interiorData = [];
+    
+    // 家具設定データ
+    let furniture1Data = [];
+    let furniture2Data = [];
     
     // 初期設備データ
     const initialEquipmentData = [
@@ -891,12 +1075,103 @@
         [22, "パイプ棚", "パイプ棚", 0.37, 27000, 1500, 20000, 0.75, "", ""],
         [23, "プレハブ冷蔵庫(3坪)", "プレハブ冷蔵庫(3坪)", 4.00, 27000, 180000, 3000000, 0.60, "", ""]
     ];
+    
+    // 建物構造別単価データ（構造名, エコノミー, スタンダード1, スタンダード2, デラックス1, デラックス2）
+    const initialStructureData = [
+        ["木造", 300000, 350000, 400000, 450000, 500000],
+        ["RC造", 500000, 550000, 600000, 650000, 700000],
+        ["鉄骨造", 550000, 600000, 650000, 700000, 750000],
+        ["SRC造", 600000, 650000, 700000, 750000, 800000]
+    ];
+    
+    // 内装単価データ（室用途, 天井高, 床×5グレード, 天井×5グレード, 壁×5グレード）
+    const initialInteriorData = [
+        ["通路", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["客室", 2.5, 4400, 5050, 5050, 6350, 6350, 4400, 5050, 5050, 7000, 7000, 4400, 5050, 5050, 7000, 7000],
+        ["アミューズメント", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["レセプション", 3.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["レストラン", 3.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["事務所", 2.5, 1800, 1800, 1800, 1800, 1800, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100],
+        ["会議室", 2.7, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["浴室", 4.5, 12000, 18000, 18000, 18000, 18000, 25000, 25000, 25000, 25000, 25000, 35000, 35000, 35000, 40000, 40000],
+        ["脱衣室", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["湯上処", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["露天風呂", 4.5, 12000, 18000, 18000, 18000, 18000, 25000, 25000, 25000, 25000, 25000, 35000, 35000, 35000, 40000, 40000],
+        ["内風呂", 2.5, 4400, 5050, 5050, 6350, 6350, 4400, 5050, 5050, 7000, 7000, 4400, 5050, 5050, 7000, 7000],
+        ["岩盤浴", 2.5, 4400, 5050, 5050, 6350, 6350, 4400, 5050, 5050, 7000, 7000, 4400, 5050, 5050, 7000, 7000],
+        ["サウナ", 2.5, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000],
+        ["ラウンジ", 3.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["厨房", 2.5, 1800, 1800, 1800, 1800, 1800, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100],
+        ["売店", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["フロント", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["ロビー", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["ファサード", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["ライブキッチン", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["和室(10-15J)", 2.5, 4400, 5050, 5050, 6350, 6350, 4400, 5050, 5050, 7000, 7000, 4400, 5050, 5050, 7000, 7000],
+        ["和室・洋室", 2.5, 4400, 5050, 5050, 6350, 6350, 4400, 5050, 5050, 7000, 7000, 4400, 5050, 5050, 7000, 7000],
+        ["和ベッド", 2.5, 4400, 5050, 5050, 6350, 6350, 4400, 5050, 5050, 7000, 7000, 4400, 5050, 5050, 7000, 7000],
+        ["洋室", 2.5, 4400, 5050, 5050, 6350, 6350, 4400, 5050, 5050, 7000, 7000, 4400, 5050, 5050, 7000, 7000],
+        ["卓球コーナー", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["キッズスペース", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750],
+        ["漫画コーナー", 2.5, 1800, 2060, 2060, 3100, 3100, 3100, 3490, 3490, 3750, 3750, 3100, 3490, 3490, 3750, 3750]
+    ];
+    
+    // 家具設定単価1データ（No, 部材, 略称, 取付工数, 労務単価, 雑材料, 新設機器単価, 単位面積の個数）
+    const initialFurniture1Data = [
+        [1, "メラミンカウンターA  1800×950", "バーカウンター", 0.1, 27000, 2000, 389000, 0.032],
+        [2, "メラミンカウンターB  1800×950", "ソフトドリンクカウンター", 0.1, 27000, 2000, 480000, 0.002],
+        [3, "メラミンカウンターC  1800×950", "アルコールカウンター", 0.1, 27000, 2000, 480000, 0.002],
+        [4, "メラミンカウンターD  1800×950", "カトラリ―カウンター", 0.1, 27000, 2000, 389000, 0.004],
+        [5, "メラミンカウンターE  950×950", "アイスカウンター", 0.1, 27000, 2000, 216000, 0.002],
+        [6, "メラミンカウンターE  1350×1350", "ソフトクリームカウンター", 0.1, 27000, 2000, 260000, 0.002],
+        [7, "返却台", "返却台", 0.1, 27000, 2000, 30000, 0.02],
+        [8, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [9, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [10, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [11, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [12, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [13, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [14, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [15, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [16, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [17, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [18, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [19, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02],
+        [20, "〇〇〇", "〇〇〇", 0.1, 27000, 2000, 30000, 0.02]
+    ];
+    
+    // 家具設定単価2データ（No, 部材, 略称, 取付工数, 労務単価, 雑材料, 新設機器単価, 客室当の個数）
+    const initialFurniture2Data = [
+        [1, "テーブル（自立固定）  Ｗ1600", "2人テーブル", 0.1, 27000, 2000, 19000, 0.02],
+        [2, "テーブル（自立固定）  Ｗ1600", "4人テーブル", 0.1, 27000, 2000, 38000, 0.02],
+        [3, "テーブル（自立固定）  Ｗ1800", "6人テーブル", 0.12, 27000, 2000, 57000, 0.02],
+        [4, "ゼノンＢ（張りぐるみ）", "椅子Ａ", 0.3, 27000, 2000, 120000, 0.02],
+        [5, "マニコＢ（背張）", "椅子Ｂ", 0.3, 27000, 2000, 120000, 0.02],
+        [6, "椅子Ｃ", "椅子Ｃ", 0.3, 27000, 2000, 120000, 0.02],
+        [7, "椅子Ｄ", "椅子Ｄ", 0.3, 27000, 2000, 120000, 0.02],
+        [8, "ベンチソファＷ4060", "ソファーＡ", 0.3, 27000, 2000, 230000, 0.02],
+        [9, "ベンチソファＷ3040", "ソファーＢ", 0.3, 27000, 2000, 173000, 0.02],
+        [10, "ベンチソファＷ2110", "ソファーＣ", 0.3, 27000, 2000, 123000, 0.02],
+        [11, "ラウンジソファ", "ソファーＤ", 0.3, 27000, 2000, 81200, 0.02],
+        [12, "アペーゴサイドテーブル  ＷＣ", "ローテーブルＡ", 0.3, 27000, 2000, 33300, 0.02],
+        [13, "アビタスタイルローテーブルＷ1200", "ローテーブルＢ", 0.3, 27000, 2000, 52200, 0.02],
+        [14, "屋外ローテーブル", "ローテーブルＣ", 0.3, 27000, 2000, 40800, 0.02],
+        [15, "コルヌラウンジチェア", "ラウンジチェアＡ", 0.3, 27000, 2000, 72900, 0.02],
+        [16, "ストートラウンジチェア", "ラウンジチェアＢ", 0.3, 27000, 2000, 114800, 0.02],
+        [17, "ハイバック（Ｌ字Ｗ6100+2715）", "ソファーＤ", 2, 27000, 2000, 640000, 0.02],
+        [18, "ＴＶ台Ａ", "ＴＶ台Ａ", 0.3, 27000, 2000, 99000, 0.02],
+        [19, "ＴＶ台Ｂ", "ＴＶ台Ｂ", 0.3, 27000, 2000, 126000, 0.02],
+        [20, "ＴＶ台Ｃ", "ＴＶ台Ｃ", 0.3, 27000, 2000, 156000, 0.02],
+        [21, "ヘッドボード", "ヘッドボード", 0.3, 27000, 2000, 200000, 0.02]
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
         updatePropertyList();
         setupEventListeners();
         updateTotalGuests();
         initializeEquipmentTables();
+        initializeArchTables();
+        initializeFurnitureTables();
     });
 
     function openTab(tabName) {
@@ -1554,7 +1829,18 @@
             properties: properties,
             equipmentData: equipmentData,
             heatSourceData: heatSourceData,
-            kitchenData: kitchenData
+            kitchenData: kitchenData,
+            structureData: structureData,
+            interiorData: interiorData,
+            furniture1Data: furniture1Data,
+            furniture2Data: furniture2Data,
+            regionRates: {
+                tokyo: document.getElementById('region_rate_tokyo').value,
+                kanto: document.getElementById('region_rate_kanto').value,
+                kansai: document.getElementById('region_rate_kansai').value,
+                city: document.getElementById('region_rate_city').value,
+                rural: document.getElementById('region_rate_rural').value
+            }
         };
         
         const dataStr = JSON.stringify(exportData, null, 2);
@@ -1597,6 +1883,34 @@
                 if (importData.kitchenData) {
                     kitchenData = importData.kitchenData;
                     renderKitchenTable();
+                }
+                
+                if (importData.structureData) {
+                    structureData = importData.structureData;
+                    renderStructureTable();
+                }
+                
+                if (importData.interiorData) {
+                    interiorData = importData.interiorData;
+                    renderInteriorTable();
+                }
+                
+                if (importData.furniture1Data) {
+                    furniture1Data = importData.furniture1Data;
+                    renderFurniture1Table();
+                }
+                
+                if (importData.furniture2Data) {
+                    furniture2Data = importData.furniture2Data;
+                    renderFurniture2Table();
+                }
+                
+                if (importData.regionRates) {
+                    document.getElementById('region_rate_tokyo').value = importData.regionRates.tokyo || 100;
+                    document.getElementById('region_rate_kanto').value = importData.regionRates.kanto || 90;
+                    document.getElementById('region_rate_kansai').value = importData.regionRates.kansai || 85;
+                    document.getElementById('region_rate_city').value = importData.regionRates.city || 80;
+                    document.getElementById('region_rate_rural').value = importData.regionRates.rural || 75;
                 }
                 
                 alert(`データをインポートしました\n物件数: ${Object.keys(properties).length}`);
@@ -1796,6 +2110,219 @@
             kitchenData = JSON.parse(JSON.stringify(initialKitchenData));
             renderKitchenTable();
             alert('厨房機器データが初期状態にリセットされました');
+        }
+    }
+    
+    // ========== 建築初期設定タブの関数 ==========
+    
+    function initializeArchTables() {
+        structureData = JSON.parse(JSON.stringify(initialStructureData));
+        interiorData = JSON.parse(JSON.stringify(initialInteriorData));
+        
+        renderStructureTable();
+        renderInteriorTable();
+    }
+    
+    // 建物構造別設定テーブル
+    function renderStructureTable() {
+        const tbody = document.getElementById('structureTableBody');
+        tbody.innerHTML = '';
+        
+        structureData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            const [structure, eco, std1, std2, dlx1, dlx2] = row;
+            
+            tr.innerHTML = `
+                <td style="border: 1px solid #ccc; padding: 8px; background: #f9f9f9;">${structure}</td>
+                <td style="border: 1px solid #ccc; padding: 5px;"><input type="number" value="${eco}" onchange="updateStructureCell(${index}, 1, this.value)" style="width: 100px; text-align: right; padding: 5px;"></td>
+                <td style="border: 1px solid #ccc; padding: 5px;"><input type="number" value="${std1}" onchange="updateStructureCell(${index}, 2, this.value)" style="width: 100px; text-align: right; padding: 5px;"></td>
+                <td style="border: 1px solid #ccc; padding: 5px;"><input type="number" value="${std2}" onchange="updateStructureCell(${index}, 3, this.value)" style="width: 100px; text-align: right; padding: 5px;"></td>
+                <td style="border: 1px solid #ccc; padding: 5px;"><input type="number" value="${dlx1}" onchange="updateStructureCell(${index}, 4, this.value)" style="width: 100px; text-align: right; padding: 5px;"></td>
+                <td style="border: 1px solid #ccc; padding: 5px;"><input type="number" value="${dlx2}" onchange="updateStructureCell(${index}, 5, this.value)" style="width: 100px; text-align: right; padding: 5px;"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function updateStructureCell(rowIndex, colIndex, value) {
+        structureData[rowIndex][colIndex] = value;
+    }
+    
+    // 内装単価設定テーブル
+    function renderInteriorTable() {
+        const tbody = document.getElementById('interiorTableBody');
+        tbody.innerHTML = '';
+        
+        interiorData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            let html = `
+                <td style="border: 1px solid #ccc; padding: 5px;"><input type="text" value="${row[0]}" onchange="updateInteriorCell(${index}, 0, this.value)" style="width: 120px; padding: 3px; border: none;"></td>
+                <td style="border: 1px solid #ccc; padding: 5px;"><input type="number" value="${row[1]}" onchange="updateInteriorCell(${index}, 1, this.value)" step="0.1" style="width: 60px; padding: 3px; text-align: right; border: none;"></td>
+            `;
+            
+            // 床・天井・壁の各グレード（15列）
+            for (let i = 2; i < 17; i++) {
+                html += `<td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[i]}" onchange="updateInteriorCell(${index}, ${i}, this.value)" style="width: 60px; padding: 3px; text-align: right; border: none;"></td>`;
+            }
+            
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function updateInteriorCell(rowIndex, colIndex, value) {
+        interiorData[rowIndex][colIndex] = value;
+    }
+    
+    function addInteriorRow() {
+        const newRow = ["新規", 2.5, 1800, 1800, 1800, 1800, 1800, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100, 3100];
+        interiorData.push(newRow);
+        renderInteriorTable();
+    }
+    
+    function deleteInteriorRow() {
+        if (interiorData.length > 0) {
+            interiorData.pop();
+            renderInteriorTable();
+        }
+    }
+    
+    function saveInteriorData() {
+        alert('内装単価データを保存しました');
+    }
+    
+    function resetInteriorData() {
+        if (confirm('内装単価データを初期状態にリセットしますか？\n追加したデータは削除されます。')) {
+            interiorData = JSON.parse(JSON.stringify(initialInteriorData));
+            renderInteriorTable();
+            alert('内装単価データが初期状態にリセットされました');
+        }
+    }
+    
+    // 地域掛け率の保存とリセット
+    function saveRegionRates() {
+        alert('地域掛け率を保存しました');
+        // エクスポート時に自動的に含まれます
+    }
+    
+    function resetRegionRates() {
+        if (confirm('地域掛け率を初期状態にリセットしますか？')) {
+            document.getElementById('region_rate_tokyo').value = 100;
+            document.getElementById('region_rate_kanto').value = 90;
+            document.getElementById('region_rate_kansai').value = 85;
+            document.getElementById('region_rate_city').value = 80;
+            document.getElementById('region_rate_rural').value = 75;
+            alert('地域掛け率が初期状態にリセットされました');
+        }
+    }
+    
+    // ========== 家具タブの関数 ==========
+    
+    function initializeFurnitureTables() {
+        furniture1Data = JSON.parse(JSON.stringify(initialFurniture1Data));
+        furniture2Data = JSON.parse(JSON.stringify(initialFurniture2Data));
+        
+        renderFurniture1Table();
+        renderFurniture2Table();
+    }
+    
+    // 家具設定単価1テーブル
+    function renderFurniture1Table() {
+        const tbody = document.getElementById('furniture1TableBody');
+        tbody.innerHTML = '';
+        
+        furniture1Data.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center; background: #f9f9f9;">${row[0]}</td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[1] || ''}" onchange="updateFurniture1Cell(${index}, 1, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[2] || ''}" onchange="updateFurniture1Cell(${index}, 2, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[3] || ''}" onchange="updateFurniture1Cell(${index}, 3, this.value)" step="0.01" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[4] || ''}" onchange="updateFurniture1Cell(${index}, 4, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[5] || ''}" onchange="updateFurniture1Cell(${index}, 5, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[6] || ''}" onchange="updateFurniture1Cell(${index}, 6, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[7] || ''}" onchange="updateFurniture1Cell(${index}, 7, this.value)" step="0.001" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function updateFurniture1Cell(rowIndex, colIndex, value) {
+        furniture1Data[rowIndex][colIndex] = value;
+    }
+    
+    function addFurniture1Row() {
+        const newNo = furniture1Data.length + 1;
+        furniture1Data.push([newNo, '', '', 0.3, 27000, 2000, 120000, 0.02]);
+        renderFurniture1Table();
+    }
+    
+    function deleteFurniture1Row() {
+        if (furniture1Data.length > 0) {
+            furniture1Data.pop();
+            renderFurniture1Table();
+        }
+    }
+    
+    function saveFurniture1Data() {
+        alert('家具設定単価1データを保存しました');
+    }
+    
+    function resetFurniture1Data() {
+        if (confirm('家具設定単価1データを初期状態にリセットしますか？\n追加したデータは削除されます。')) {
+            furniture1Data = JSON.parse(JSON.stringify(initialFurniture1Data));
+            renderFurniture1Table();
+            alert('家具設定単価1データが初期状態にリセットされました');
+        }
+    }
+    
+    // 家具設定単価2テーブル
+    function renderFurniture2Table() {
+        const tbody = document.getElementById('furniture2TableBody');
+        tbody.innerHTML = '';
+        
+        furniture2Data.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="border: 1px solid #ccc; padding: 5px; text-align: center; background: #f9f9f9;">${row[0]}</td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[1] || ''}" onchange="updateFurniture2Cell(${index}, 1, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="text" value="${row[2] || ''}" onchange="updateFurniture2Cell(${index}, 2, this.value)" style="width: 100%; border: none; padding: 3px;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[3] || ''}" onchange="updateFurniture2Cell(${index}, 3, this.value)" step="0.01" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[4] || ''}" onchange="updateFurniture2Cell(${index}, 4, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[5] || ''}" onchange="updateFurniture2Cell(${index}, 5, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[6] || ''}" onchange="updateFurniture2Cell(${index}, 6, this.value)" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+                <td style="border: 1px solid #ccc; padding: 2px;"><input type="number" value="${row[7] || ''}" onchange="updateFurniture2Cell(${index}, 7, this.value)" step="0.01" style="width: 100%; border: none; padding: 3px; text-align: right;"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function updateFurniture2Cell(rowIndex, colIndex, value) {
+        furniture2Data[rowIndex][colIndex] = value;
+    }
+    
+    function addFurniture2Row() {
+        const newNo = furniture2Data.length + 1;
+        furniture2Data.push([newNo, '', '', 0.3, 27000, 2000, 120000, 0.02]);
+        renderFurniture2Table();
+    }
+    
+    function deleteFurniture2Row() {
+        if (furniture2Data.length > 0) {
+            furniture2Data.pop();
+            renderFurniture2Table();
+        }
+    }
+    
+    function saveFurniture2Data() {
+        alert('家具設定単価2データを保存しました');
+    }
+    
+    function resetFurniture2Data() {
+        if (confirm('家具設定単価2データを初期状態にリセットしますか？\n追加したデータは削除されます。')) {
+            furniture2Data = JSON.parse(JSON.stringify(initialFurniture2Data));
+            renderFurniture2Table();
+            alert('家具設定単価2データが初期状態にリセットされました');
         }
     }
 </script>
