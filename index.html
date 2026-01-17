@@ -498,7 +498,6 @@
                         <option>スタンダード 1</option>
                         <option>スタンダード 2</option>
                         <option>デラックス 1</option>
-                        <option>デラックス 2</option>
                     </select>
                 </div>
                 
@@ -510,27 +509,27 @@
                         <label>熱源機器</label>
                         <input type="number" id="hot_spring_cost" value="0" readonly style="width: 100px;">
                         <span>円</span>
-                        <span class="note-text">宿泊人数を入力してください</span>
+                        <span class="note-text" id="heat_source_note" style="color: #1565c0;">宿泊人数を入力してください</span>
                     </div>
                     
                     <div class="fuel-row">
                         <label>燃料種別:</label>
                         <select class="fuel-type" id="fuel_type">
-                            <option>ガス</option>
+                            <option>重油</option>
                             <option>灯油</option>
-                            <option>電気</option>
+                            <option selected>ガス</option>
                         </select>
                         <span>台数:</span>
-                        <input type="number" id="unit_count" value="1" style="width: 50px;">
+                        <input type="number" id="unit_count" value="1" style="width: 50px;" min="1">
                         <span class="unit-label" id="required_output">必要出力: 0 Kw</span>
                     </div>
                     
                     <div class="facility-item">
                         <input type="checkbox" id="self_gen">
-                        <label>自家発電装置</label>
+                        <label>昇降機設備</label>
                         <input type="number" id="self_gen_cost" value="0" readonly style="width: 100px;">
                         <span>円</span>
-                        <span class="note-text">容量数を入力してください</span>
+                        <span class="note-text" id="elevator_note" style="color: #1565c0;">計算式: 客室数 × [425,000(ELV)+30,000(DW)]</span>
                     </div>
                     
                     <div class="facility-item">
@@ -538,7 +537,7 @@
                         <label>ガス設備</label>
                         <input type="number" id="gas_cost" value="0" readonly style="width: 100px;">
                         <span>円</span>
-                        <span class="note-text">宿泊人数を入力してください</span>
+                        <span class="note-text" id="gas_note" style="color: #1565c0;">計算式: 宿泊人数 × 10,000 + 2,000,000</span>
                     </div>
                     
                     <div class="facility-item">
@@ -546,15 +545,15 @@
                         <label>浄化槽設備</label>
                         <input type="number" id="purification_cost" value="0" readonly style="width: 100px;">
                         <span>円</span>
-                        <span class="note-text">宿泊人数を入力してください</span>
+                        <span class="note-text" id="septic_note" style="color: #1565c0;">計算式: 宿泊人数 × 300,000 + 5,000,000</span>
                     </div>
                     
                     <div class="facility-item">
                         <input type="checkbox" id="hot_water">
-                        <label>油圧設備</label>
+                        <label>油送設備</label>
                         <input type="number" id="hot_water_cost" value="0" readonly style="width: 100px;">
                         <span>円</span>
-                        <span class="note-text">宿泊人数を入力してください</span>
+                        <span class="note-text" id="oil_note" style="color: #1565c0;">計算式: 宿泊人数 × 10,000 + 3,000,000</span>
                     </div>
                     
                     <div class="facility-item">
@@ -562,7 +561,7 @@
                         <label>受変電設備</label>
                         <input type="number" id="emergency_cost" value="0" readonly style="width: 100px;">
                         <span>円</span>
-                        <span class="note-text">宿泊人数を入力してください</span>
+                        <span class="note-text" id="substation_note" style="color: #1565c0;">計算式: 宿泊人数 × 500,000 + 1,000,000</span>
                     </div>
                     
                     <div class="facility-item">
@@ -570,7 +569,7 @@
                         <label>自家発電設備</label>
                         <input type="number" id="solar_cost" value="0" readonly style="width: 100px;">
                         <span>円</span>
-                        <span class="note-text">宿泊人数を入力してください</span>
+                        <span class="note-text" id="generator_note" style="color: #1565c0;">計算式: 宿泊人数 × 35,000 + 1,000,000</span>
                     </div>
                 </div>
                 
@@ -922,6 +921,19 @@
         // 階数変更時のイベントリスナー
         document.getElementById('floors_above').addEventListener('input', updateFloorInputs);
         document.getElementById('floors_below').addEventListener('input', updateFloorInputs);
+        
+        // その他設備情報の計算トリガー
+        ['room_japanese', 'room_japanese_western', 'room_japanese_bed', 'room_western'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateAdditionalEquipmentCosts);
+        });
+        
+        document.getElementById('fuel_type').addEventListener('change', updateHeatSourceEquipment);
+        document.getElementById('unit_count').addEventListener('input', updateHeatSourceEquipment);
+        
+        // チェックボックスの変更時に小計を更新
+        ['hot_spring', 'self_gen', 'gas_station', 'purification', 'hot_water', 'emergency', 'solar'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updateAdditionalEquipmentSubtotal);
+        });
     }
 
     function updateTotalGuests() {
@@ -932,6 +944,9 @@
 
         const total = (japanese * 4.5) + (japaneseWestern * 4.0) + (japaneseBed * 3.0) + (western * 3.0);
         document.getElementById('total_guests').textContent = `合計宿泊人数: ${Math.round(total)} 人`;
+        
+        // 付加設備の金額も更新
+        updateAdditionalEquipmentCosts();
     }
 
     function calculateDateDiff() {
@@ -948,7 +963,224 @@
     }
 
     function calculateAll() {
-        alert('全体コスト計算を実行します');
+        updateAdditionalEquipmentCosts();
+        alert('全体コスト計算を実行しました');
+    }
+    
+    // ========== その他設備情報の計算 ==========
+    
+    // 合計宿泊人数を取得
+    function getTotalGuests() {
+        const japanese = parseFloat(document.getElementById('room_japanese').value) || 0;
+        const japaneseWestern = parseFloat(document.getElementById('room_japanese_western').value) || 0;
+        const japaneseBed = parseFloat(document.getElementById('room_japanese_bed').value) || 0;
+        const western = parseFloat(document.getElementById('room_western').value) || 0;
+        
+        return (japanese * 4.5) + (japaneseWestern * 4.0) + (japaneseBed * 3.0) + (western * 3.0);
+    }
+    
+    // 合計客室数を取得
+    function getTotalRooms() {
+        const japanese = parseInt(document.getElementById('room_japanese').value) || 0;
+        const japaneseWestern = parseInt(document.getElementById('room_japanese_western').value) || 0;
+        const japaneseBed = parseInt(document.getElementById('room_japanese_bed').value) || 0;
+        const western = parseInt(document.getElementById('room_western').value) || 0;
+        
+        return japanese + japaneseWestern + japaneseBed + western;
+    }
+    
+    // 付加設備の金額を更新
+    function updateAdditionalEquipmentCosts() {
+        const totalGuests = Math.round(getTotalGuests());
+        const totalRooms = getTotalRooms();
+        
+        // ①熱源機器
+        updateHeatSourceEquipment();
+        
+        // ②昇降機設備
+        if (totalRooms > 0) {
+            const elevatorCost = totalRooms * (425000 + 30000);
+            document.getElementById('self_gen_cost').value = elevatorCost;
+            document.getElementById('elevator_note').textContent = 
+                `計算式: ${totalRooms}室 × [425,000(ELV)+30,000(DW)] = ${elevatorCost.toLocaleString()}円`;
+        } else {
+            document.getElementById('self_gen_cost').value = '0';
+            document.getElementById('elevator_note').textContent = '客室数を入力してください';
+        }
+        
+        // ③ガス設備
+        if (totalGuests > 0) {
+            const gasCost = totalGuests * 10000 + 2000000;
+            document.getElementById('gas_cost').value = gasCost;
+            document.getElementById('gas_note').textContent = 
+                `計算式: ${totalGuests}人 × 10,000 + 2,000,000 = ${gasCost.toLocaleString()}円 (厨房利用程度0.75m³/人)`;
+        } else {
+            document.getElementById('gas_cost').value = '0';
+            document.getElementById('gas_note').textContent = '宿泊人数を入力してください';
+        }
+        
+        // ④浄化槽設備
+        if (totalGuests > 0) {
+            const septicCost = totalGuests * 300000 + 5000000;
+            document.getElementById('purification_cost').value = septicCost;
+            document.getElementById('septic_note').textContent = 
+                `計算式: ${totalGuests}人 × 300,000 + 5,000,000 = ${septicCost.toLocaleString()}円`;
+        } else {
+            document.getElementById('purification_cost').value = '0';
+            document.getElementById('septic_note').textContent = '宿泊人数を入力してください';
+        }
+        
+        // ⑤油送設備
+        if (totalGuests > 0) {
+            const oilCost = totalGuests * 10000 + 3000000;
+            document.getElementById('hot_water_cost').value = oilCost;
+            document.getElementById('oil_note').textContent = 
+                `計算式: ${totalGuests}人 × 10,000 + 3,000,000 = ${oilCost.toLocaleString()}円`;
+        } else {
+            document.getElementById('hot_water_cost').value = '0';
+            document.getElementById('oil_note').textContent = '宿泊人数を入力してください';
+        }
+        
+        // ⑥受変電設備
+        if (totalGuests > 0) {
+            const substationCost = totalGuests * 500000 + 1000000;
+            document.getElementById('emergency_cost').value = substationCost;
+            document.getElementById('substation_note').textContent = 
+                `計算式: ${totalGuests}人 × 500,000 + 1,000,000 = ${substationCost.toLocaleString()}円`;
+        } else {
+            document.getElementById('emergency_cost').value = '0';
+            document.getElementById('substation_note').textContent = '宿泊人数を入力してください';
+        }
+        
+        // ⑦自家発電設備
+        if (totalGuests > 0) {
+            const generatorCost = totalGuests * 35000 + 1000000;
+            document.getElementById('solar_cost').value = generatorCost;
+            document.getElementById('generator_note').textContent = 
+                `計算式: ${totalGuests}人 × 35,000 + 1,000,000 = ${generatorCost.toLocaleString()}円`;
+        } else {
+            document.getElementById('solar_cost').value = '0';
+            document.getElementById('generator_note').textContent = '宿泊人数を入力してください';
+        }
+        
+        // 小計を更新
+        updateAdditionalEquipmentSubtotal();
+    }
+    
+    // 熱源機器の必要出力を計算し、適切な機器を選定
+    function updateHeatSourceEquipment() {
+        const totalGuests = Math.round(getTotalGuests());
+        
+        if (totalGuests <= 0) {
+            document.getElementById('hot_spring_cost').value = '0';
+            document.getElementById('required_output').textContent = '必要出力: 0 Kw';
+            document.getElementById('heat_source_note').textContent = '宿泊人数を入力してください';
+            document.getElementById('heat_source_note').style.color = '#4a90e2';
+            updateAdditionalEquipmentSubtotal();
+            return;
+        }
+        
+        // 必要な出力を計算
+        // 出力 = 0.0016 × 宿泊人数 × (((60+55)/2-5)×20×2-(60-55)×30) / 2
+        const output = 0.0016 * totalGuests * (((60 + 55) / 2 - 5) * 20 * 2 - (60 - 55) * 30) / 2;
+        
+        // 燃料種別を取得
+        const fuelType = document.getElementById('fuel_type').value;
+        
+        // 台数を取得
+        let unitCount = parseInt(document.getElementById('unit_count').value) || 1;
+        if (unitCount <= 0) unitCount = 1;
+        
+        // 1台あたりの必要出力
+        const outputPerUnit = output / unitCount;
+        
+        // 必要出力を表示
+        document.getElementById('required_output').textContent = `必要出力: ${output.toFixed(1)} Kw`;
+        
+        // 設備設定タブの熱源機器設定から適切な機器を選定
+        let selectedEquipment = null;
+        let selectedCost = 0;
+        let selectedName = '';
+        
+        for (let row of heatSourceData) {
+            const [no, name, abbrev, installHours, laborCost, miscMaterial, newEquipmentCost, areaRatio, equipmentFuelType, outputStr] = row;
+            
+            // 燃料種別が一致するかチェック
+            if (equipmentFuelType !== fuelType) continue;
+            
+            // 出力を取得（例: "349Kw" から 349 を抽出）
+            try {
+                const equipmentOutput = parseFloat(outputStr.replace(/Kw|kw|KW/gi, '').trim());
+                
+                if (isNaN(equipmentOutput)) continue;
+                
+                // 1台あたりの必要出力以上の機器を探す
+                if (equipmentOutput >= outputPerUnit) {
+                    // まだ選定されていないか、より小さい（適切な）出力の機器なら更新
+                    if (selectedEquipment === null || equipmentOutput < selectedEquipment) {
+                        selectedEquipment = equipmentOutput;
+                        selectedName = abbrev;
+                        
+                        // 機器単価を取得
+                        const unitCost = parseFloat(String(newEquipmentCost).replace(/,/g, '')) || 0;
+                        // 台数分の金額を計算
+                        selectedCost = unitCost * unitCount;
+                    }
+                }
+            } catch (e) {
+                continue;
+            }
+        }
+        
+        // 結果を設定
+        if (selectedEquipment !== null) {
+            document.getElementById('hot_spring_cost').value = selectedCost;
+            
+            // 計算過程を表示
+            const noteText = `必要出力: ${output.toFixed(1)}Kw ÷ ${unitCount}台 = ${outputPerUnit.toFixed(1)}Kw/台 → ${selectedName}(${selectedEquipment.toFixed(1)}Kw) × ${unitCount}台 = ${selectedCost.toLocaleString()}円`;
+            
+            document.getElementById('heat_source_note').textContent = noteText;
+            document.getElementById('heat_source_note').style.color = '#1565c0';
+        } else {
+            document.getElementById('hot_spring_cost').value = '0';
+            
+            const noteText = `必要出力: ${output.toFixed(1)}Kw ÷ ${unitCount}台 = ${outputPerUnit.toFixed(1)}Kw/台 → 適切な機器が見つかりません（燃料種別: ${fuelType}）`;
+            
+            document.getElementById('heat_source_note').textContent = noteText;
+            document.getElementById('heat_source_note').style.color = '#d32f2f';
+        }
+        
+        // 小計を更新
+        updateAdditionalEquipmentSubtotal();
+    }
+    
+    // 付加設備小計を計算
+    function updateAdditionalEquipmentSubtotal() {
+        let total = 0;
+        
+        // 各チェックボックスと金額を確認
+        const equipmentItems = [
+            { checkbox: 'hot_spring', cost: 'hot_spring_cost' },
+            { checkbox: 'self_gen', cost: 'self_gen_cost' },
+            { checkbox: 'gas_station', cost: 'gas_cost' },
+            { checkbox: 'purification', cost: 'purification_cost' },
+            { checkbox: 'hot_water', cost: 'hot_water_cost' },
+            { checkbox: 'emergency', cost: 'emergency_cost' },
+            { checkbox: 'solar', cost: 'solar_cost' }
+        ];
+        
+        equipmentItems.forEach(item => {
+            const checkbox = document.getElementById(item.checkbox);
+            const costInput = document.getElementById(item.cost);
+            
+            if (checkbox && checkbox.checked && costInput) {
+                const cost = parseFloat(costInput.value) || 0;
+                total += cost;
+            }
+        });
+        
+        // 小計を表示
+        document.getElementById('sum_equipment').textContent = total.toLocaleString() + ' 円';
     }
 
     // 階ごとの面積入力フィールドを更新
