@@ -2973,17 +2973,70 @@ function setupEventListeners() {
             const womenGuests = totalGuests * (womenRatio / 100);
             
             // 男性用
-            document.getElementById('men_sauna_cost').value = Math.round(menGuests * 200 + 1500000).toLocaleString();
-            document.getElementById('men_jacuzzi_cost').value = Math.round(menGuests * 500 + 3000000).toLocaleString();
-            document.getElementById('men_water_bath_cost').value = Math.round(menGuests * 500 + 1000000).toLocaleString();
+            // サウナ
+            const menSaunaCheckbox = document.getElementById('men_sauna');
+            if (menSaunaCheckbox && menSaunaCheckbox.checked) {
+                const cost = menGuests * 200 + 1500000;
+                document.getElementById('men_sauna_cost').value = Math.round(cost).toLocaleString();
+            } else {
+                document.getElementById('men_sauna_cost').value = '0';
+            }
+            
+            // ジャグジー
+            const menJacuzziCheckbox = document.getElementById('men_jacuzzi');
+            if (menJacuzziCheckbox && menJacuzziCheckbox.checked) {
+                const cost = menGuests * 500 + 3000000;
+                document.getElementById('men_jacuzzi_cost').value = Math.round(cost).toLocaleString();
+            } else {
+                document.getElementById('men_jacuzzi_cost').value = '0';
+            }
+            
+            // 水風呂
+            const menWaterBathCheckbox = document.getElementById('men_water_bath');
+            if (menWaterBathCheckbox && menWaterBathCheckbox.checked) {
+                const cost = menGuests * 500 + 1000000;
+                document.getElementById('men_water_bath_cost').value = Math.round(cost).toLocaleString();
+            } else {
+                document.getElementById('men_water_bath_cost').value = '0';
+            }
             
             // 女性用
-            document.getElementById('women_sauna_cost').value = Math.round(womenGuests * 200 + 1500000).toLocaleString();
-            document.getElementById('women_jacuzzi_cost').value = Math.round(womenGuests * 500 + 3000000).toLocaleString();
-            document.getElementById('women_water_bath_cost').value = Math.round(womenGuests * 500 + 1000000).toLocaleString();
+            // サウナ
+            const womenSaunaCheckbox = document.getElementById('women_sauna');
+            if (womenSaunaCheckbox && womenSaunaCheckbox.checked) {
+                const cost = womenGuests * 200 + 1500000;
+                document.getElementById('women_sauna_cost').value = Math.round(cost).toLocaleString();
+            } else {
+                document.getElementById('women_sauna_cost').value = '0';
+            }
+            
+            // ジャグジー
+            const womenJacuzziCheckbox = document.getElementById('women_jacuzzi');
+            if (womenJacuzziCheckbox && womenJacuzziCheckbox.checked) {
+                const cost = womenGuests * 500 + 3000000;
+                document.getElementById('women_jacuzzi_cost').value = Math.round(cost).toLocaleString();
+            } else {
+                document.getElementById('women_jacuzzi_cost').value = '0';
+            }
+            
+            // 水風呂
+            const womenWaterBathCheckbox = document.getElementById('women_water_bath');
+            if (womenWaterBathCheckbox && womenWaterBathCheckbox.checked) {
+                const cost = womenGuests * 500 + 1000000;
+                document.getElementById('women_water_bath_cost').value = Math.round(cost).toLocaleString();
+            } else {
+                document.getElementById('women_water_bath_cost').value = '0';
+            }
             
         } catch (error) {
             console.error('特殊設備計算エラー:', error);
+            // エラー時は0にリセット
+            document.getElementById('men_sauna_cost').value = '0';
+            document.getElementById('men_jacuzzi_cost').value = '0';
+            document.getElementById('men_water_bath_cost').value = '0';
+            document.getElementById('women_sauna_cost').value = '0';
+            document.getElementById('women_jacuzzi_cost').value = '0';
+            document.getElementById('women_water_bath_cost').value = '0';
         }
     }
 
