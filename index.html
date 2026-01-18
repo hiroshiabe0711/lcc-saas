@@ -1644,12 +1644,175 @@
     
     
     <div id="hallway" class="tab-pane">
-        <div style="padding: 20px;">
-            <div class="section-title">通路</div>
-            <p>通路の詳細設定</p>
+        <div style="padding: 20px; max-width: 1400px;">
+            <div class="section-title">通路詳細設定</div>
+            <p style="font-size: 12px; color: #666; text-align: right; margin-bottom: 15px;">
+                面積を入力すると金額が表示されます。計上金額に含める場合は、項目に☑を入れてください。
+            </p>
+            
+            <!-- 小計表示 -->
+            <div style="margin: 15px 0; padding: 12px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 4px;">
+                <span style="font-weight: bold; font-size: 16px;">小計:</span>
+                <input type="text" id="hallway_subtotal" value="0" readonly 
+                       style="width: 150px; text-align: right; font-size: 16px; font-weight: bold; 
+                              border: none; background: transparent; color: #d32f2f; margin-left: 10px;">
+                <span style="font-weight: bold; font-size: 16px;"> 円</span>
+            </div>
+            
+            <!-- ①建築フレーム（階数に応じて動的生成） -->
+            <div style="border: 2px solid #2196f3; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #e3f2fd;">
+                <h3 style="margin-top: 0; color: #1976d2; font-size: 15px; border-bottom: 2px solid #2196f3; padding-bottom: 8px;">建築</h3>
+                <div id="hallway_arch_container">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+                
+                <!-- 建築項目の計算過程 -->
+                <div style="margin-top: 15px; padding: 10px; background: white; border: 1px solid #2196f3; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #1976d2;">建築項目の計算過程</p>
+                    <div id="hallway_arch_process_container" style="font-size: 11px; font-family: 'Courier New', monospace; color: #0d47a1;">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ②機械設備フレーム -->
+            <div style="border: 2px solid #4caf50; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #e8f5e9;">
+                <h3 style="margin-top: 0; color: #2e7d32; font-size: 15px; border-bottom: 2px solid #4caf50; padding-bottom: 8px;">機械設備</h3>
+                
+                <!-- 共用部エアコン -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_mech_ac_check">
+                    <label style="min-width: 120px;">共用部エアコン</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_mech_ac_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="hallway_mech_ac_recommended" style="font-size: 12px; color: #2e7d32; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_mech_ac_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- スプリンクラー -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_mech_sprinkler_check">
+                    <label style="min-width: 120px;">スプリンクラー</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_mech_sprinkler_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="hallway_mech_sprinkler_recommended" style="font-size: 12px; color: #2e7d32; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_mech_sprinkler_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 消火栓箱 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_mech_fire_hose_check">
+                    <label style="min-width: 120px;">消火栓箱</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_mech_fire_hose_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="hallway_mech_fire_hose_recommended" style="font-size: 12px; color: #2e7d32; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_mech_fire_hose_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 機械設備の計算過程 -->
+                <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #4caf50; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #2e7d32;">機械設備の計算過程</p>
+                    <pre id="hallway_mech_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #1b5e20;">-</pre>
+                </div>
+            </div>
+            <!-- ③電気設備フレーム -->
+            <div style="border: 2px solid #ff9800; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #fff3e0;">
+                <h3 style="margin-top: 0; color: #e65100; font-size: 15px; border-bottom: 2px solid #ff9800; padding-bottom: 8px;">電気設備</h3>
+                
+                <!-- LED照明 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_elec_led_check">
+                    <label style="min-width: 120px;">LED照明</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_elec_led_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="hallway_elec_led_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_elec_led_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 煙感知器 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_elec_smoke_check">
+                    <label style="min-width: 120px;">煙感知器</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_elec_smoke_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="hallway_elec_smoke_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_elec_smoke_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 誘導灯 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_elec_exit_light_check">
+                    <label style="min-width: 120px;">誘導灯</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_elec_exit_light_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="hallway_elec_exit_light_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_elec_exit_light_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- スピーカー -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_elec_speaker_check">
+                    <label style="min-width: 120px;">スピーカー</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_elec_speaker_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="hallway_elec_speaker_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_elec_speaker_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- コンセント -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="hallway_elec_outlet_check">
+                    <label style="min-width: 120px;">コンセント</label>
+                    <label>個数:</label>
+                    <input type="number" id="hallway_elec_outlet_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="hallway_elec_outlet_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="hallway_elec_outlet_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 電気設備の計算過程 -->
+                <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #ff9800; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #e65100;">電気設備の計算過程</p>
+                    <pre id="hallway_elec_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #e65100;">-</pre>
+                </div>
+            </div>
         </div>
     </div>
 
+    
+    
+    
     <div id="amusement" class="tab-pane">
         <div style="padding: 20px;">
             <div class="section-title">アミューズメント</div>
@@ -2177,6 +2340,8 @@
         initializeOnsenTab(); 
         initializeRestaurantTab(); 
         initializeLoungeTab(); // ← この行を追加
+        initializeHallwayTab(); // ← この行を追加
+
 
     });
 
@@ -2230,6 +2395,9 @@ function setupEventListeners() {
                 }
                 if (typeof updateLoungeArchCosts === 'function') {
                     updateLoungeArchCosts();
+                }
+                if (typeof updateHallwayArchCosts === 'function') {
+                    updateHallwayArchCosts();
                 }
             });
         }
@@ -2560,6 +2728,12 @@ function setupEventListeners() {
         
         updateTotalArea();
         updateBuildingCanvas();
+
+        // 通路タブの階数を更新（← この2行を追加）
+        if (typeof updateHallwayFloors === 'function') {
+            updateHallwayFloors();
+        }
+
     }
 
     // 合計床面積を計算
@@ -5091,6 +5265,567 @@ function setupEventListeners() {
     }
     
     // ========== ラウンジタブの関数ここまで ==========
+    // ========== 通路タブの関数 ==========
+    
+    // 通路の階数データを保持
+    let hallwayFloorData = {};
+    
+    // 通路タブの初期化
+    function initializeHallwayTab() {
+        setupHallwayEventListeners();
+        updateHallwayFloors();
+    }
+    
+    function setupHallwayEventListeners() {
+        // 機械設備・電気設備の個数変更時
+        ['hallway_mech_ac_count', 'hallway_mech_sprinkler_count', 'hallway_mech_fire_hose_count',
+         'hallway_elec_led_count', 'hallway_elec_smoke_count', 'hallway_elec_exit_light_count',
+         'hallway_elec_speaker_count', 'hallway_elec_outlet_count'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateHallwayEquipmentCosts);
+            }
+        });
+        
+        // チェックボックス変更時の小計更新
+        ['hallway_mech_ac_check', 'hallway_mech_sprinkler_check', 'hallway_mech_fire_hose_check',
+         'hallway_elec_led_check', 'hallway_elec_smoke_check', 'hallway_elec_exit_light_check',
+         'hallway_elec_speaker_check', 'hallway_elec_outlet_check'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', updateHallwaySubtotal);
+            }
+        });
+    }
+    
+    // 階数に応じて通路タブの建築項目を動的に生成
+    function updateHallwayFloors() {
+        try {
+            const aboveFloors = parseInt(document.getElementById('floors_above').value) || 0;
+            const underground = parseInt(document.getElementById('floors_below').value) || 0;
+            
+            // 現在必要な階のキーセットを作成
+            const currentFloorKeys = new Set();
+            
+            // 地上階（上層階から順に）
+            for (let i = 0; i < aboveFloors; i++) {
+                const floorNum = aboveFloors - i;
+                currentFloorKeys.add(`${floorNum}F`);
+            }
+            
+            // 地下階
+            for (let i = 0; i < underground; i++) {
+                const floorNum = i + 1;
+                currentFloorKeys.add(`B${floorNum}F`);
+            }
+            
+            // 不要な階のデータを削除
+            Object.keys(hallwayFloorData).forEach(key => {
+                if (!currentFloorKeys.has(key)) {
+                    delete hallwayFloorData[key];
+                }
+            });
+            
+            // 新しい階のデータを作成
+            currentFloorKeys.forEach(floorKey => {
+                if (!hallwayFloorData[floorKey]) {
+                    hallwayFloorData[floorKey] = {
+                        area: 0,
+                        cost: 0,
+                        process: '',
+                        checked: false
+                    };
+                }
+            });
+            
+            // 建築フレームの内容を更新
+            const archContainer = document.getElementById('hallway_arch_container');
+            if (!archContainer) return;
+            
+            archContainer.innerHTML = '';
+            
+            // 地上階を上層階から順に表示
+            for (let i = 0; i < aboveFloors; i++) {
+                const floorNum = aboveFloors - i;
+                const floorKey = `${floorNum}F`;
+                createHallwayFloorItem(archContainer, floorKey, `${floorNum}階通路`);
+            }
+            
+            // 地下階を表示
+            for (let i = 0; i < underground; i++) {
+                const floorNum = i + 1;
+                const floorKey = `B${floorNum}F`;
+                createHallwayFloorItem(archContainer, floorKey, `地下${floorNum}階通路`);
+            }
+            
+            // 計算過程コンテナを更新
+            const processContainer = document.getElementById('hallway_arch_process_container');
+            if (processContainer) {
+                processContainer.innerHTML = '';
+                
+                // 地上階
+                for (let i = 0; i < aboveFloors; i++) {
+                    const floorNum = aboveFloors - i;
+                    const floorKey = `${floorNum}F`;
+                    const pre = document.createElement('pre');
+                    pre.id = `hallway_arch_process_${floorKey}`;
+                    pre.style.cssText = 'font-size: 11px; margin: 5px 0; white-space: pre-wrap;';
+                    pre.textContent = '-';
+                    processContainer.appendChild(pre);
+                }
+                
+                // 地下階
+                for (let i = 0; i < underground; i++) {
+                    const floorNum = i + 1;
+                    const floorKey = `B${floorNum}F`;
+                    const pre = document.createElement('pre');
+                    pre.id = `hallway_arch_process_${floorKey}`;
+                    pre.style.cssText = 'font-size: 11px; margin: 5px 0; white-space: pre-wrap;';
+                    pre.textContent = '-';
+                    processContainer.appendChild(pre);
+                }
+            }
+            
+            // 初期計算
+            updateHallwayArchCosts();
+            updateHallwayRecommendedCounts();
+            
+        } catch (error) {
+            console.error('通路階数更新エラー:', error);
+        }
+    }
+    
+    // 各階の通路項目を作成
+    function createHallwayFloorItem(container, floorKey, labelText) {
+        const itemDiv = document.createElement('div');
+        itemDiv.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `hallway_arch_${floorKey}_check`;
+        checkbox.checked = hallwayFloorData[floorKey].checked;
+        checkbox.addEventListener('change', (e) => {
+            hallwayFloorData[floorKey].checked = e.target.checked;
+            updateHallwaySubtotal();
+        });
+        
+        const label = document.createElement('label');
+        label.style.cssText = 'min-width: 120px; font-weight: bold;';
+        label.textContent = labelText;
+        
+        const areaLabel = document.createElement('label');
+        areaLabel.textContent = '面積:';
+        
+        const areaInput = document.createElement('input');
+        areaInput.type = 'number';
+        areaInput.id = `hallway_arch_${floorKey}_area`;
+        areaInput.value = hallwayFloorData[floorKey].area;
+        areaInput.step = '0.01';
+        areaInput.style.cssText = 'width: 80px; text-align: right;';
+        areaInput.addEventListener('input', (e) => {
+            hallwayFloorData[floorKey].area = parseFloat(e.target.value) || 0;
+            updateHallwayArchCosts();
+        });
+        
+        const unitSpan = document.createElement('span');
+        unitSpan.textContent = '㎡';
+        
+        const costLabel = document.createElement('label');
+        costLabel.textContent = '金額:';
+        costLabel.style.marginLeft = '20px';
+        
+        const costInput = document.createElement('input');
+        costInput.type = 'text';
+        costInput.id = `hallway_arch_${floorKey}_cost`;
+        costInput.value = '0';
+        costInput.readOnly = true;
+        costInput.style.cssText = 'width: 120px; text-align: right; background: #f5f5f5;';
+        
+        const yenSpan = document.createElement('span');
+        yenSpan.textContent = '円';
+        
+        itemDiv.appendChild(checkbox);
+        itemDiv.appendChild(label);
+        itemDiv.appendChild(areaLabel);
+        itemDiv.appendChild(areaInput);
+        itemDiv.appendChild(unitSpan);
+        itemDiv.appendChild(costLabel);
+        itemDiv.appendChild(costInput);
+        itemDiv.appendChild(yenSpan);
+        
+        container.appendChild(itemDiv);
+    }
+    // 通路タブの建築項目の金額を自動計算
+    function updateHallwayArchCosts() {
+        Object.keys(hallwayFloorData).forEach(floorKey => {
+            try {
+                const area = hallwayFloorData[floorKey].area;
+                const costInput = document.getElementById(`hallway_arch_${floorKey}_cost`);
+                const processElement = document.getElementById(`hallway_arch_process_${floorKey}`);
+                
+                if (area > 0) {
+                    const costs = getInteriorUnitCosts("通路");
+                    if (costs) {
+                        const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                        const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                        
+                        if (costInput) {
+                            costInput.value = Math.round(cost).toLocaleString();
+                        }
+                        hallwayFloorData[floorKey].cost = Math.round(cost);
+                        
+                        // 階数表示用のラベルを生成
+                        let floorLabel;
+                        if (floorKey.startsWith('B')) {
+                            const floorNum = floorKey.substring(1, floorKey.length - 1);
+                            floorLabel = `地下${floorNum}階通路`;
+                        } else {
+                            const floorNum = floorKey.substring(0, floorKey.length - 1);
+                            floorLabel = `${floorNum}階通路`;
+                        }
+                        
+                        let process = `【${floorLabel} - ${gradeName}】\n`;
+                        process += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                        process += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                        process += `       = ${Math.round(cost).toLocaleString()}円`;
+                        
+                        if (processElement) {
+                            processElement.textContent = process;
+                        }
+                        hallwayFloorData[floorKey].process = process;
+                    } else {
+                        if (costInput) {
+                            costInput.value = '0';
+                        }
+                        hallwayFloorData[floorKey].cost = 0;
+                        
+                        let floorLabel;
+                        if (floorKey.startsWith('B')) {
+                            const floorNum = floorKey.substring(1, floorKey.length - 1);
+                            floorLabel = `地下${floorNum}階通路`;
+                        } else {
+                            const floorNum = floorKey.substring(0, floorKey.length - 1);
+                            floorLabel = `${floorNum}階通路`;
+                        }
+                        
+                        if (processElement) {
+                            processElement.textContent = `【${floorLabel}】単価情報が取得できません`;
+                        }
+                    }
+                } else {
+                    if (costInput) {
+                        costInput.value = '0';
+                    }
+                    hallwayFloorData[floorKey].cost = 0;
+                    
+                    if (processElement) {
+                        processElement.textContent = '';
+                    }
+                    hallwayFloorData[floorKey].process = '';
+                }
+            } catch (error) {
+                console.error(`通路${floorKey}の計算エラー:`, error);
+            }
+        });
+        
+        updateHallwayRecommendedCounts();
+        updateHallwaySubtotal();
+    }
+    
+    // 通路の機械設備・電気設備の推奨個数を計算
+    function updateHallwayRecommendedCounts() {
+        try {
+            let totalArea = 0;
+            
+            Object.values(hallwayFloorData).forEach(data => {
+                totalArea += data.area || 0;
+            });
+            
+            if (totalArea > 0) {
+                // 共用部エアコン
+                const acData = getEquipmentDataByAbbrev("共用部エアコン");
+                if (acData && acData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * acData.areaRatio);
+                    document.getElementById('hallway_mech_ac_recommended').textContent = `推奨: ${recommended}台`;
+                } else {
+                    document.getElementById('hallway_mech_ac_recommended').textContent = '';
+                }
+                
+                // スプリンクラー
+                const sprinklerData = getEquipmentDataByAbbrev("スプリンクラー");
+                if (sprinklerData && sprinklerData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * sprinklerData.areaRatio);
+                    document.getElementById('hallway_mech_sprinkler_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('hallway_mech_sprinkler_recommended').textContent = '';
+                }
+                
+                // 消火栓箱
+                const fireHoseData = getEquipmentDataByAbbrev("消火栓箱");
+                if (fireHoseData && fireHoseData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * fireHoseData.areaRatio);
+                    document.getElementById('hallway_mech_fire_hose_recommended').textContent = `推奨: ${recommended}台`;
+                } else {
+                    document.getElementById('hallway_mech_fire_hose_recommended').textContent = '';
+                }
+                
+                // LED照明（通路LED）
+                const ledData = getEquipmentDataByAbbrev("通路LED");
+                if (ledData && ledData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * ledData.areaRatio);
+                    document.getElementById('hallway_elec_led_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('hallway_elec_led_recommended').textContent = '';
+                }
+                
+                // 煙感知器
+                const smokeData = getEquipmentDataByAbbrev("煙感知器");
+                if (smokeData && smokeData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * smokeData.areaRatio);
+                    document.getElementById('hallway_elec_smoke_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('hallway_elec_smoke_recommended').textContent = '';
+                }
+                
+                // 誘導灯
+                const exitLightData = getEquipmentDataByAbbrev("誘導灯");
+                if (exitLightData && exitLightData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * exitLightData.areaRatio);
+                    document.getElementById('hallway_elec_exit_light_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('hallway_elec_exit_light_recommended').textContent = '';
+                }
+                
+                // スピーカー
+                const speakerData = getEquipmentDataByAbbrev("スピーカー");
+                if (speakerData && speakerData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * speakerData.areaRatio);
+                    document.getElementById('hallway_elec_speaker_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('hallway_elec_speaker_recommended').textContent = '';
+                }
+                
+                // コンセント
+                const outletData = getEquipmentDataByAbbrev("コンセント");
+                if (outletData && outletData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * outletData.areaRatio);
+                    document.getElementById('hallway_elec_outlet_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('hallway_elec_outlet_recommended').textContent = '';
+                }
+                
+            } else {
+                // 面積が0の場合は推奨値をクリア
+                document.getElementById('hallway_mech_ac_recommended').textContent = '-';
+                document.getElementById('hallway_mech_sprinkler_recommended').textContent = '-';
+                document.getElementById('hallway_mech_fire_hose_recommended').textContent = '-';
+                document.getElementById('hallway_elec_led_recommended').textContent = '-';
+                document.getElementById('hallway_elec_smoke_recommended').textContent = '-';
+                document.getElementById('hallway_elec_exit_light_recommended').textContent = '-';
+                document.getElementById('hallway_elec_speaker_recommended').textContent = '-';
+                document.getElementById('hallway_elec_outlet_recommended').textContent = '-';
+            }
+        } catch (error) {
+            console.error('通路推奨個数計算エラー:', error);
+        }
+    }
+    // 通路の機械設備・電気設備の金額を計算
+    function updateHallwayEquipmentCosts() {
+        let mechProcessText = "【機械設備の計算】\n";
+        let elecProcessText = "【電気設備の計算】\n";
+        
+        // 共用部エアコン
+        try {
+            const count = parseFloat(document.getElementById('hallway_mech_ac_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("共用部エアコン");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_mech_ac_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[共用部エアコン]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_mech_ac_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_mech_ac_cost').value = '0';
+        }
+        
+        // スプリンクラー
+        try {
+            const count = parseFloat(document.getElementById('hallway_mech_sprinkler_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("スプリンクラー");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_mech_sprinkler_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[スプリンクラー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_mech_sprinkler_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_mech_sprinkler_cost').value = '0';
+        }
+        
+        // 消火栓箱
+        try {
+            const count = parseFloat(document.getElementById('hallway_mech_fire_hose_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("消火栓箱");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_mech_fire_hose_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[消火栓箱]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_mech_fire_hose_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_mech_fire_hose_cost').value = '0';
+        }
+        
+        // LED照明（通路LED）
+        try {
+            const count = parseFloat(document.getElementById('hallway_elec_led_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("通路LED");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_elec_led_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[LED照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_elec_led_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_elec_led_cost').value = '0';
+        }
+        
+        // 煙感知器
+        try {
+            const count = parseFloat(document.getElementById('hallway_elec_smoke_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("煙感知器");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_elec_smoke_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[煙感知器]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_elec_smoke_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_elec_smoke_cost').value = '0';
+        }
+        
+        // 誘導灯
+        try {
+            const count = parseFloat(document.getElementById('hallway_elec_exit_light_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("誘導灯");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_elec_exit_light_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[誘導灯]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_elec_exit_light_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_elec_exit_light_cost').value = '0';
+        }
+        
+        // スピーカー
+        try {
+            const count = parseFloat(document.getElementById('hallway_elec_speaker_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("スピーカー");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_elec_speaker_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[スピーカー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_elec_speaker_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_elec_speaker_cost').value = '0';
+        }
+        
+        // コンセント
+        try {
+            const count = parseFloat(document.getElementById('hallway_elec_outlet_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("コンセント");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('hallway_elec_outlet_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[コンセント]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('hallway_elec_outlet_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('hallway_elec_outlet_cost').value = '0';
+        }
+        
+        document.getElementById('hallway_mech_process').textContent = mechProcessText;
+        document.getElementById('hallway_elec_process').textContent = elecProcessText;
+        
+        updateHallwaySubtotal();
+    }
+    
+    // 通路小計を計算
+    function updateHallwaySubtotal() {
+        let total = 0;
+        
+        // 建築項目（各階の通路）
+        Object.keys(hallwayFloorData).forEach(floorKey => {
+            const data = hallwayFloorData[floorKey];
+            if (data.checked) {
+                total += data.cost || 0;
+            }
+        });
+        
+        // 機械設備項目
+        const mechItems = [
+            { check: 'hallway_mech_ac_check', cost: 'hallway_mech_ac_cost' },
+            { check: 'hallway_mech_sprinkler_check', cost: 'hallway_mech_sprinkler_cost' },
+            { check: 'hallway_mech_fire_hose_check', cost: 'hallway_mech_fire_hose_cost' }
+        ];
+        
+        // 電気設備項目
+        const elecItems = [
+            { check: 'hallway_elec_led_check', cost: 'hallway_elec_led_cost' },
+            { check: 'hallway_elec_smoke_check', cost: 'hallway_elec_smoke_cost' },
+            { check: 'hallway_elec_exit_light_check', cost: 'hallway_elec_exit_light_cost' },
+            { check: 'hallway_elec_speaker_check', cost: 'hallway_elec_speaker_cost' },
+            { check: 'hallway_elec_outlet_check', cost: 'hallway_elec_outlet_cost' }
+        ];
+        
+        const allItems = [...mechItems, ...elecItems];
+        
+        allItems.forEach(item => {
+            const checkbox = document.getElementById(item.check);
+            const costInput = document.getElementById(item.cost);
+            if (checkbox && checkbox.checked && costInput) {
+                const costStr = costInput.value.replace(/,/g, '');
+                const cost = parseFloat(costStr) || 0;
+                total += cost;
+            }
+        });
+        
+        document.getElementById('hallway_subtotal').value = Math.round(total).toLocaleString();
+        
+        // コストサマリの小計も更新
+        const sumHallwayElement = document.getElementById('sum_hallway');
+        if (sumHallwayElement) {
+            sumHallwayElement.textContent = Math.round(total).toLocaleString() + ' 円';
+        }
+    }
+    
+    // ========== 通路タブの関数ここまで ==========
 
 
 
