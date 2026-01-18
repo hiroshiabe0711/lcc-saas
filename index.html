@@ -620,12 +620,460 @@
         </div>
     </div>
 
-    <div id="onsen" class="tab-pane">
-        <div style="padding: 20px;">
-            <div class="section-title">温泉設備</div>
-            <p>温泉設備の詳細設定</p>
+<div id="onsen" class="tab-pane">
+        <div style="padding: 20px; max-width: 1600px;">
+            <div class="section-title">温泉設備詳細設定</div>
+            
+            <!-- 小計表示 -->
+            <div style="margin: 15px 0; padding: 12px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 4px;">
+                <span style="font-weight: bold; font-size: 16px;">小計:</span>
+                <input type="text" id="onsen_subtotal" value="0" readonly 
+                       style="width: 150px; text-align: right; font-size: 16px; font-weight: bold; 
+                              border: none; background: transparent; color: #d32f2f; margin-left: 10px;">
+                <span style="font-weight: bold; font-size: 16px;"> 円</span>
+            </div>
+            
+            <h3 style="font-size: 15px; font-weight: bold; margin-top: 30px; margin-bottom: 15px;">浴室設定</h3>
+            
+            <!-- 男性用・女性用の横並び -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <!-- 男性用 -->
+                <div style="border: 2px solid #1976d2; border-radius: 8px; padding: 20px; background: #e3f2fd;">
+                    <h4 style="margin-top: 0; color: #1565c0; font-size: 16px; border-bottom: 2px solid #1976d2; padding-bottom: 8px;">男性用</h4>
+                    
+                    <!-- 温泉タイプ -->
+                    <div style="margin-top: 15px;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">温泉タイプ</p>
+                        
+                        <!-- ①内湯浴槽 -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 8px;">内湯浴槽</p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap;">
+                                <input type="checkbox" id="men_indoor_bath_check">
+                                <label style="min-width: 80px;">面積 (㎡):</label>
+                                <input type="number" id="men_indoor_bath_area" value="0" step="0.01" 
+                                       style="width: 80px; text-align: right;">
+                                <span>㎡</span>
+                                <input type="text" id="men_indoor_bath_cost" value="0" readonly 
+                                       style="width: 120px; text-align: right; background: #f5f5f5;">
+                                <span>円</span>
+                            </div>
+                            <div style="font-size: 12px; color: #1565c0; margin-left: 25px;">
+                                <span>浴槽容量: </span>
+                                <span id="men_recommended_indoor_capacity" style="font-weight: bold;">-</span>
+                                <span id="men_recommended_indoor_tub_area" style="font-weight: bold; margin-left: 10px;">-</span>
+                            </div>
+                        </div>
+                        
+                        <!-- ②露天風呂 -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 8px;">露天風呂</p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap;">
+                                <input type="checkbox" id="men_outdoor_bath_check">
+                                <label style="min-width: 80px;">面積 (㎡):</label>
+                                <input type="number" id="men_outdoor_bath_area" value="0" step="0.01" 
+                                       style="width: 80px; text-align: right;">
+                                <span>㎡</span>
+                                <input type="text" id="men_outdoor_bath_cost" value="0" readonly 
+                                       style="width: 120px; text-align: right; background: #f5f5f5;">
+                                <span>円</span>
+                            </div>
+                            <div style="font-size: 12px; color: #1565c0; margin-left: 25px;">
+                                <span>浴槽容量: </span>
+                                <span id="men_recommended_outdoor_capacity" style="font-weight: bold;">-</span>
+                                <span id="men_recommended_outdoor_tub_area" style="font-weight: bold; margin-left: 10px;">-</span>
+                            </div>
+                        </div>
+                        
+                        <!-- ③浴室 -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 8px;">浴室</p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap;">
+                                <input type="checkbox" id="men_bathroom_check">
+                                <label style="min-width: 80px;">面積 (㎡):</label>
+                                <input type="number" id="men_bathroom_area" value="0" step="0.01" 
+                                       style="width: 80px; text-align: right;">
+                                <span>㎡</span>
+                                <input type="text" id="men_bathroom_cost" value="0" readonly 
+                                       style="width: 120px; text-align: right; background: #f5f5f5;">
+                                <span>円</span>
+                            </div>
+                            <div style="font-size: 12px; color: #1565c0; margin-left: 25px;">
+                                <span>推奨面積: </span>
+                                <span id="men_recommended_bathroom_area" style="font-weight: bold;">-</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 建築項目の計算過程 -->
+                        <div style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px;">建築項目の計算過程</p>
+                            <pre id="men_bath_arch_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: monospace;">-</pre>
+                        </div>
+                        
+                        <!-- 推奨値の計算式 -->
+                        <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border: 1px solid #4caf50; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px;">推奨値の計算式</p>
+                            <pre id="men_calculation_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: monospace;">-</pre>
+                        </div>
+                    </div>
+                    <!-- 洗い場 -->
+                    <div style="margin-top: 20px;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">洗い場</p>
+                        
+                        <!-- 隔て板 -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="men_partition_check">
+                            <label style="min-width: 80px;">隔て板</label>
+                            <label>個数:</label>
+                            <input type="number" id="men_partition_count" value="0" style="width: 60px; text-align: right;">
+                            <span id="men_partition_recommended" style="font-size: 12px; color: #1565c0; font-weight: bold;">-</span>
+                            <label style="margin-left: 10px;">金額:</label>
+                            <input type="text" id="men_partition_cost" value="0" readonly 
+                                   style="width: 100px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- 照明 -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="men_wash_lighting_check">
+                            <label style="min-width: 80px;">照明</label>
+                            <label>個数:</label>
+                            <input type="number" id="men_wash_lighting_count" value="0" style="width: 60px; text-align: right;">
+                            <span id="men_wash_lighting_recommended" style="font-size: 12px; color: #1565c0; font-weight: bold;">-</span>
+                            <label style="margin-left: 10px;">金額:</label>
+                            <input type="text" id="men_wash_lighting_cost" value="0" readonly 
+                                   style="width: 100px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- シャワー水栓 -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="men_shower_faucet_check">
+                            <label style="min-width: 80px;">シャワー水栓</label>
+                            <label>個数:</label>
+                            <input type="number" id="men_shower_faucet_count" value="0" style="width: 60px; text-align: right;">
+                            <span id="men_shower_faucet_recommended" style="font-size: 12px; color: #1565c0; font-weight: bold;">-</span>
+                            <label style="margin-left: 10px;">金額:</label>
+                            <input type="text" id="men_shower_faucet_cost" value="0" readonly 
+                                   style="width: 100px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- 洗い場設備の計算過程 -->
+                        <div style="margin-top: 10px; padding: 10px; background: #f1f8e9; border: 1px solid #8bc34a; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px;">洗い場設備の計算過程</p>
+                            <pre id="men_wash_equipment_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #33691e;">-</pre>
+                        </div>
+                    </div>
+                    
+                    <!-- 特殊設備 -->
+                    <div style="margin-top: 20px;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">特殊設備</p>
+                        
+                        <!-- サウナ -->
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="men_sauna">
+                            <label style="min-width: 100px;">サウナ</label>
+                            <label>金額:</label>
+                            <input type="text" id="men_sauna_cost" value="0" readonly 
+                                   style="width: 120px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- ジャグジー -->
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="men_jacuzzi">
+                            <label style="min-width: 100px;">ジャグジー</label>
+                            <label>金額:</label>
+                            <input type="text" id="men_jacuzzi_cost" value="0" readonly 
+                                   style="width: 120px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- 水風呂 -->
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="men_water_bath">
+                            <label style="min-width: 100px;">水風呂</label>
+                            <label>金額:</label>
+                            <input type="text" id="men_water_bath_cost" value="0" readonly 
+                                   style="width: 120px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 女性用 -->
+                <div style="border: 2px solid #e91e63; border-radius: 8px; padding: 20px; background: #fce4ec;">
+                    <h4 style="margin-top: 0; color: #c2185b; font-size: 16px; border-bottom: 2px solid #e91e63; padding-bottom: 8px;">女性用</h4>
+                    
+                    <!-- 温泉タイプ -->
+                    <div style="margin-top: 15px;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">温泉タイプ</p>
+                        
+                        <!-- ①内湯浴槽 -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 8px;">内湯浴槽</p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap;">
+                                <input type="checkbox" id="women_indoor_bath_check">
+                                <label style="min-width: 80px;">面積 (㎡):</label>
+                                <input type="number" id="women_indoor_bath_area" value="0" step="0.01" 
+                                       style="width: 80px; text-align: right;">
+                                <span>㎡</span>
+                                <input type="text" id="women_indoor_bath_cost" value="0" readonly 
+                                       style="width: 120px; text-align: right; background: #f5f5f5;">
+                                <span>円</span>
+                            </div>
+                            <div style="font-size: 12px; color: #c2185b; margin-left: 25px;">
+                                <span>浴槽容量: </span>
+                                <span id="women_recommended_indoor_capacity" style="font-weight: bold;">-</span>
+                                <span id="women_recommended_indoor_tub_area" style="font-weight: bold; margin-left: 10px;">-</span>
+                            </div>
+                        </div>
+                        
+                        <!-- ②露天風呂 -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 8px;">露天風呂</p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap;">
+                                <input type="checkbox" id="women_outdoor_bath_check">
+                                <label style="min-width: 80px;">面積 (㎡):</label>
+                                <input type="number" id="women_outdoor_bath_area" value="0" step="0.01" 
+                                       style="width: 80px; text-align: right;">
+                                <span>㎡</span>
+                                <input type="text" id="women_outdoor_bath_cost" value="0" readonly 
+                                       style="width: 120px; text-align: right; background: #f5f5f5;">
+                                <span>円</span>
+                            </div>
+                            <div style="font-size: 12px; color: #c2185b; margin-left: 25px;">
+                                <span>浴槽容量: </span>
+                                <span id="women_recommended_outdoor_capacity" style="font-weight: bold;">-</span>
+                                <span id="women_recommended_outdoor_tub_area" style="font-weight: bold; margin-left: 10px;">-</span>
+                            </div>
+                        </div>
+                        
+                        <!-- ③浴室 -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 8px;">浴室</p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap;">
+                                <input type="checkbox" id="women_bathroom_check">
+                                <label style="min-width: 80px;">面積 (㎡):</label>
+                                <input type="number" id="women_bathroom_area" value="0" step="0.01" 
+                                       style="width: 80px; text-align: right;">
+                                <span>㎡</span>
+                                <input type="text" id="women_bathroom_cost" value="0" readonly 
+                                       style="width: 120px; text-align: right; background: #f5f5f5;">
+                                <span>円</span>
+                            </div>
+                            <div style="font-size: 12px; color: #c2185b; margin-left: 25px;">
+                                <span>推奨面積: </span>
+                                <span id="women_recommended_bathroom_area" style="font-weight: bold;">-</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 建築項目の計算過程 -->
+                        <div style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px;">建築項目の計算過程</p>
+                            <pre id="women_bath_arch_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: monospace;">-</pre>
+                        </div>
+                        
+                        <!-- 推奨値の計算式 -->
+                        <div style="margin-top: 15px; padding: 10px; background: #fce4ec; border: 1px solid #e91e63; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px;">推奨値の計算式</p>
+                            <pre id="women_calculation_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: monospace;">-</pre>
+                        </div>
+                    </div>
+                    
+                    <!-- 洗い場 -->
+                    <div style="margin-top: 20px;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">洗い場</p>
+                        
+                        <!-- 隔て板 -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="women_partition_check">
+                            <label style="min-width: 80px;">隔て板</label>
+                            <label>個数:</label>
+                            <input type="number" id="women_partition_count" value="0" style="width: 60px; text-align: right;">
+                            <span id="women_partition_recommended" style="font-size: 12px; color: #c2185b; font-weight: bold;">-</span>
+                            <label style="margin-left: 10px;">金額:</label>
+                            <input type="text" id="women_partition_cost" value="0" readonly 
+                                   style="width: 100px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- 照明 -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="women_wash_lighting_check">
+                            <label style="min-width: 80px;">照明</label>
+                            <label>個数:</label>
+                            <input type="number" id="women_wash_lighting_count" value="0" style="width: 60px; text-align: right;">
+                            <span id="women_wash_lighting_recommended" style="font-size: 12px; color: #c2185b; font-weight: bold;">-</span>
+                            <label style="margin-left: 10px;">金額:</label>
+                            <input type="text" id="women_wash_lighting_cost" value="0" readonly 
+                                   style="width: 100px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- シャワー水栓 -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="women_shower_faucet_check">
+                            <label style="min-width: 80px;">シャワー水栓</label>
+                            <label>個数:</label>
+                            <input type="number" id="women_shower_faucet_count" value="0" style="width: 60px; text-align: right;">
+                            <span id="women_shower_faucet_recommended" style="font-size: 12px; color: #c2185b; font-weight: bold;">-</span>
+                            <label style="margin-left: 10px;">金額:</label>
+                            <input type="text" id="women_shower_faucet_cost" value="0" readonly 
+                                   style="width: 100px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- 洗い場設備の計算過程 -->
+                        <div style="margin-top: 10px; padding: 10px; background: #fce4ec; border: 1px solid #f48fb1; border-radius: 4px;">
+                            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px;">洗い場設備の計算過程</p>
+                            <pre id="women_wash_equipment_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #880e4f;">-</pre>
+                        </div>
+                    </div>
+                    
+                    <!-- 特殊設備 -->
+                    <div style="margin-top: 20px;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">特殊設備</p>
+                        
+                        <!-- サウナ -->
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="women_sauna">
+                            <label style="min-width: 100px;">サウナ</label>
+                            <label>金額:</label>
+                            <input type="text" id="women_sauna_cost" value="0" readonly 
+                                   style="width: 120px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- ジャグジー -->
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="women_jacuzzi">
+                            <label style="min-width: 100px;">ジャグジー</label>
+                            <label>金額:</label>
+                            <input type="text" id="women_jacuzzi_cost" value="0" readonly 
+                                   style="width: 120px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                        
+                        <!-- 水風呂 -->
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <input type="checkbox" id="women_water_bath">
+                            <label style="min-width: 100px;">水風呂</label>
+                            <label>金額:</label>
+                            <input type="text" id="women_water_bath_cost" value="0" readonly 
+                                   style="width: 120px; text-align: right; background: #f5f5f5;">
+                            <span>円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 浴室関係設定 -->
+            <h3 style="font-size: 15px; font-weight: bold; margin-top: 30px; margin-bottom: 15px;">
+                浴室関係設定 (計算に使用する変数)
+            </h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px 40px; max-width: 1200px;">
+                <!-- 左列 -->
+                <div>
+                    <div class="form-row"><label class="form-label">浴室営業時間:</label>
+                        <input type="number" id="bath_open_hours" value="14" step="0.1" style="width: 80px;">
+                        <span>時間</span></div>
+                    
+                    <div class="form-row"><label class="form-label">洗い場利用時間:</label>
+                        <input type="number" id="wash_time" value="20" step="1" style="width: 80px;">
+                        <span>分</span></div>
+                    
+                    <div class="form-row"><label class="form-label">浴場利用率:</label>
+                        <input type="number" id="bath_utilization_rate" value="80" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                    
+                    <div class="form-row"><label class="form-label">浴槽利用時間:</label>
+                        <input type="number" id="tub_time" value="15" step="1" style="width: 80px;">
+                        <span>分</span></div>
+                    
+                    <div class="form-row"><label class="form-label">脱衣室利用時間:</label>
+                        <input type="number" id="changing_room_time" value="5" step="1" style="width: 80px;">
+                        <span>分</span></div>
+                    
+                    <div class="form-row"><label class="form-label">男洗面器利用時間:</label>
+                        <input type="number" id="men_face_wash_time" value="3" step="1" style="width: 80px;">
+                        <span>分</span></div>
+                    
+                    <div class="form-row"><label class="form-label">女洗面器利用時間:</label>
+                        <input type="number" id="women_face_wash_time" value="5" step="1" style="width: 80px;">
+                        <span>分</span></div>
+                    
+                    <div class="form-row"><label class="form-label">ピーク係数:</label>
+                        <input type="number" id="peak_factor" value="1.5" step="0.1" style="width: 80px;">
+                        <span>2時間平均に対するピーク時間の係数</span></div>
+                    
+                    <div class="form-row"><label class="form-label">利用者男性率:</label>
+                        <input type="number" id="men_ratio" value="55" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                    
+                    <div class="form-row"><label class="form-label">利用者女性率:</label>
+                        <input type="number" id="women_ratio" value="45" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                </div>
+                
+                <!-- 右列 -->
+                <div>
+                    <div class="form-row"><label class="form-label">洗い場使用面積:</label>
+                        <input type="number" id="wash_area_per_person" value="1.5" step="0.1" style="width: 80px;">
+                        <span>㎡/人</span></div>
+                    
+                    <div class="form-row"><label class="form-label">脱衣室使用面積:</label>
+                        <input type="number" id="changing_room_per_person" value="0.8" step="0.1" style="width: 80px;">
+                        <span>㎡/人</span></div>
+                    
+                    <div class="form-row"><label class="form-label">男脱衣室面積の割増:</label>
+                        <input type="number" id="men_changing_room_add" value="20" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                    
+                    <div class="form-row"><label class="form-label">女脱衣室面積の割増:</label>
+                        <input type="number" id="women_changing_room_add" value="30" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                    
+                    <div class="form-row"><label class="form-label">浴室内部通路割増:</label>
+                        <input type="number" id="bath_hallway_add" value="15" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                    
+                    <div class="form-row"><label class="form-label">浴槽使用面積:</label>
+                        <input type="number" id="tub_area_per_person" value="0.5" step="0.1" style="width: 80px;">
+                        <span>㎡/人</span></div>
+                    
+                    <div class="form-row"><label class="form-label">浴室使用面積:</label>
+                        <input type="number" id="bath_area_per_person" value="2.0" step="0.1" style="width: 80px;">
+                        <span>㎡/人</span></div>
+                    
+                    <div class="form-row"><label class="form-label">浴室面積の割増:</label>
+                        <input type="number" id="bath_area_add" value="120" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                    
+                    <div class="form-row"><label class="form-label">浴槽深さ:</label>
+                        <input type="number" id="tub_depth" value="0.6" step="0.1" style="width: 80px;">
+                        <span>m</span></div>
+                    
+                    <div class="form-row"><label class="form-label">洗面器利用率:</label>
+                        <input type="number" id="face_wash_utilization_rate" value="70" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                    
+                    <div class="form-row"><label class="form-label">カラン利用率:</label>
+                        <input type="number" id="faucet_utilization_rate" value="90" step="1" style="width: 80px;">
+                        <span>%</span></div>
+                </div>
+            </div>
         </div>
     </div>
+
+
+
+
+
+
+
+
+
 
     <div id="restaurant" class="tab-pane">
         <div style="padding: 20px;">
@@ -1172,6 +1620,7 @@
         initializeEquipmentTables();
         initializeArchTables();
         initializeFurnitureTables();
+        initializeOnsenTab(); // ← この行を追加
     });
 
     function openTab(tabName) {
@@ -2325,6 +2774,578 @@
             alert('家具設定単価2データが初期状態にリセットされました');
         }
     }
+
+    // ========== 温泉設備タブの関数 ==========
+    
+    // 温泉設備の初期化
+    function initializeOnsenTab() {
+        setupOnsenEventListeners();
+        updateOnsenCalculations();
+    }
+    
+    function setupOnsenEventListeners() {
+        // 浴室関係設定の変更時に計算を更新
+        const onsenSettingIds = [
+            'bath_open_hours', 'wash_time', 'bath_utilization_rate', 'tub_time',
+            'changing_room_time', 'men_face_wash_time', 'women_face_wash_time',
+            'peak_factor', 'men_ratio', 'women_ratio', 'wash_area_per_person',
+            'changing_room_per_person', 'men_changing_room_add', 'women_changing_room_add',
+            'bath_hallway_add', 'tub_area_per_person', 'bath_area_per_person',
+            'bath_area_add', 'tub_depth', 'face_wash_utilization_rate', 'faucet_utilization_rate'
+        ];
+        
+        onsenSettingIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateOnsenCalculations);
+            }
+        });
+        
+        // 面積入力時に建築金額を計算
+        ['men_indoor_bath_area', 'men_outdoor_bath_area', 'men_bathroom_area',
+         'women_indoor_bath_area', 'women_outdoor_bath_area', 'women_bathroom_area'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateOnsenBathArchCosts);
+            }
+        });
+        
+        // 個数入力時に洗い場設備金額を計算
+        ['men_partition_count', 'men_wash_lighting_count', 'men_shower_faucet_count',
+         'women_partition_count', 'women_wash_lighting_count', 'women_shower_faucet_count'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateWashEquipmentCosts);
+            }
+        });
+        
+        // チェックボックスの変更時に小計を更新
+        ['men_indoor_bath_check', 'men_outdoor_bath_check', 'men_bathroom_check',
+         'women_indoor_bath_check', 'women_outdoor_bath_check', 'women_bathroom_check',
+         'men_partition_check', 'men_wash_lighting_check', 'men_shower_faucet_check',
+         'women_partition_check', 'women_wash_lighting_check', 'women_shower_faucet_check',
+         'men_sauna', 'men_jacuzzi', 'men_water_bath',
+         'women_sauna', 'women_jacuzzi', 'women_water_bath'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', updateOnsenSubtotal);
+            }
+        });
+    }
+    
+    // 温泉設備の推奨値計算
+    function updateOnsenCalculations() {
+        try {
+            const totalGuests = getTotalGuests();
+            const bathOpenHours = parseFloat(document.getElementById('bath_open_hours').value) || 14;
+            const washTime = parseFloat(document.getElementById('wash_time').value) || 20;
+            const tubTime = parseFloat(document.getElementById('tub_time').value) || 15;
+            const peakFactor = parseFloat(document.getElementById('peak_factor').value) || 1.5;
+            const menRatio = parseFloat(document.getElementById('men_ratio').value) || 55;
+            const womenRatio = parseFloat(document.getElementById('women_ratio').value) || 45;
+            const tubAreaPerPerson = parseFloat(document.getElementById('tub_area_per_person').value) || 0.5;
+            const bathAreaPerPerson = parseFloat(document.getElementById('bath_area_per_person').value) || 2.0;
+            const tubDepth = parseFloat(document.getElementById('tub_depth').value) || 0.6;
+            const bathAreaAdd = parseFloat(document.getElementById('bath_area_add').value) || 120;
+            
+            if (bathOpenHours <= 0) {
+                document.getElementById('men_calculation_process').textContent = '浴室営業時間を入力してください';
+                document.getElementById('women_calculation_process').textContent = '浴室営業時間を入力してください';
+                return;
+            }
+            
+            // ========== 男性用の計算 ==========
+            const menGuests = totalGuests * (menRatio / 100);
+            const menTubVolumeM3 = menGuests * peakFactor / bathOpenHours * (tubTime / 60) * tubAreaPerPerson * tubDepth;
+            const menIndoorCapacityL = menTubVolumeM3 * 1000;
+            const menIndoorTubArea = menTubVolumeM3 / tubDepth;
+            const menOutdoorCapacityL = (menTubVolumeM3 / 2) * 1000;
+            const menOutdoorTubArea = menTubVolumeM3 / tubDepth / 2;
+            const menBathAreaM2 = menGuests * peakFactor / bathOpenHours * ((tubTime + washTime) / 60) * bathAreaPerPerson * (bathAreaAdd / 100);
+            
+            // 男性用の推奨値表示
+            document.getElementById('men_recommended_indoor_capacity').textContent = `推奨値: ${Math.round(menIndoorCapacityL)} L`;
+            document.getElementById('men_recommended_indoor_tub_area').textContent = `／推奨値: ${Math.round(menIndoorTubArea)} m²`;
+            document.getElementById('men_recommended_outdoor_capacity').textContent = `推奨値: ${Math.round(menOutdoorCapacityL)} L`;
+            document.getElementById('men_recommended_outdoor_tub_area').textContent = `／推奨値: ${Math.round(menOutdoorTubArea)} m²`;
+            document.getElementById('men_recommended_bathroom_area').textContent = `推奨値: ${Math.round(menBathAreaM2)} ㎡`;
+            
+            // 男性用の計算式表示
+            const menProcessText = `内湯容量(m³) = (人数) × (比率) × (ピーク係数) ÷ (浴室営業時間) × (浴槽利用時間÷60) × (一人当浴槽面積) × (深さ)
+             = ${totalGuests} × (${menRatio}/100) × ${peakFactor} ÷ ${bathOpenHours} × (${tubTime}÷60) × ${tubAreaPerPerson} × ${tubDepth}
+             = ${menTubVolumeM3.toFixed(2)} m³
+
+露天風呂容量(m³) = (${menTubVolumeM3.toFixed(2)} / 2) = ${(menTubVolumeM3 / 2).toFixed(2)} m³  (内湯の50％として)
+
+浴室面積(㎡) = (人数) × (比率) × (ピーク係数) ÷ (浴室営業時間) × ((浴槽+洗い場時間)÷60) × (一人当面積) × (浴室面積の割増/100)
+            = ${totalGuests} × (${menRatio}/100) × ${peakFactor} ÷ ${bathOpenHours} × ((${tubTime}+${washTime})÷60) × ${bathAreaPerPerson} × (${bathAreaAdd}/100)
+            = ${menBathAreaM2.toFixed(2)} ㎡`;
+            
+            document.getElementById('men_calculation_process').textContent = menProcessText;
+            // ========== 女性用の計算 ==========
+            const womenGuests = totalGuests * (womenRatio / 100);
+            const womenTubVolumeM3 = womenGuests * peakFactor / bathOpenHours * (tubTime / 60) * tubAreaPerPerson * tubDepth;
+            const womenIndoorCapacityL = womenTubVolumeM3 * 1000;
+            const womenIndoorTubArea = womenTubVolumeM3 / tubDepth;
+            const womenOutdoorCapacityL = (womenTubVolumeM3 / 2) * 1000;
+            const womenOutdoorTubArea = womenTubVolumeM3 / tubDepth / 2;
+            const womenBathAreaM2 = womenGuests * peakFactor / bathOpenHours * ((tubTime + washTime) / 60) * bathAreaPerPerson * (bathAreaAdd / 100);
+            
+            // 女性用の推奨値表示
+            document.getElementById('women_recommended_indoor_capacity').textContent = `推奨値: ${Math.round(womenIndoorCapacityL)} L`;
+            document.getElementById('women_recommended_indoor_tub_area').textContent = `／推奨値: ${Math.round(womenIndoorTubArea)} m²`;
+            document.getElementById('women_recommended_outdoor_capacity').textContent = `推奨値: ${Math.round(womenOutdoorCapacityL)} L`;
+            document.getElementById('women_recommended_outdoor_tub_area').textContent = `／推奨値: ${Math.round(womenOutdoorTubArea)} m²`;
+            document.getElementById('women_recommended_bathroom_area').textContent = `推奨値: ${Math.round(womenBathAreaM2)} ㎡`;
+            
+            // 女性用の計算式表示
+            const womenProcessText = `内湯容量(m³) = (人数) × (比率) × (ピーク係数) ÷ (浴室営業時間) × (浴槽利用時間÷60) × (一人当浴槽面積) × (深さ)
+             = ${totalGuests} × (${womenRatio}/100) × ${peakFactor} ÷ ${bathOpenHours} × (${tubTime}÷60) × ${tubAreaPerPerson} × ${tubDepth}
+             = ${womenTubVolumeM3.toFixed(2)} m³
+
+露天風呂容量(m³) = (${womenTubVolumeM3.toFixed(2)} / 2) = ${(womenTubVolumeM3 / 2).toFixed(2)} m³  (内湯の50％として)
+
+浴室面積(㎡) = (人数) × (比率) × (ピーク係数) ÷ (浴室営業時間) × ((浴槽+洗い場時間)÷60) × (一人当面積) × (浴室面積の割増/100)
+            = ${totalGuests} × (${womenRatio}/100) × ${peakFactor} ÷ ${bathOpenHours} × ((${tubTime}+${washTime})÷60) × ${bathAreaPerPerson} × (${bathAreaAdd}/100)
+            = ${womenBathAreaM2.toFixed(2)} ㎡`;
+            
+            document.getElementById('women_calculation_process').textContent = womenProcessText;
+            
+            // 洗い場設備の推奨値を更新
+            updateWashEquipmentRecommended();
+            
+            // 特殊設備の金額を更新
+            updateSpecialEquipmentCosts();
+            
+        } catch (error) {
+            console.error('温泉設備計算エラー:', error);
+        }
+    }
+    
+    // 洗い場設備の推奨値計算
+    function updateWashEquipmentRecommended() {
+        try {
+            const totalGuests = getTotalGuests();
+            const bathOpenHours = parseFloat(document.getElementById('bath_open_hours').value) || 14;
+            const peakFactor = parseFloat(document.getElementById('peak_factor').value) || 1.5;
+            const menRatio = parseFloat(document.getElementById('men_ratio').value) || 55;
+            const womenRatio = parseFloat(document.getElementById('women_ratio').value) || 45;
+            const tubTime = parseFloat(document.getElementById('tub_time').value) || 15;
+            
+            if (bathOpenHours > 0) {
+                // 男性用
+                const menRecommended = Math.ceil((menRatio / 100) * totalGuests / bathOpenHours * peakFactor / bathOpenHours * tubTime / 60);
+                document.getElementById('men_partition_recommended').textContent = `推奨: ${menRecommended}個`;
+                document.getElementById('men_wash_lighting_recommended').textContent = `推奨: ${menRecommended}個`;
+                document.getElementById('men_shower_faucet_recommended').textContent = `推奨: ${menRecommended}個`;
+                
+                // 女性用
+                const womenRecommended = Math.ceil((womenRatio / 100) * totalGuests / bathOpenHours * peakFactor / bathOpenHours * tubTime / 60);
+                document.getElementById('women_partition_recommended').textContent = `推奨: ${womenRecommended}個`;
+                document.getElementById('women_wash_lighting_recommended').textContent = `推奨: ${womenRecommended}個`;
+                document.getElementById('women_shower_faucet_recommended').textContent = `推奨: ${womenRecommended}個`;
+            }
+        } catch (error) {
+            console.error('洗い場設備推奨値計算エラー:', error);
+        }
+    }
+    
+    // 特殊設備の金額計算
+    function updateSpecialEquipmentCosts() {
+        try {
+            const totalGuests = getTotalGuests();
+            const menRatio = parseFloat(document.getElementById('men_ratio').value) || 55;
+            const womenRatio = parseFloat(document.getElementById('women_ratio').value) || 45;
+            
+            const menGuests = totalGuests * (menRatio / 100);
+            const womenGuests = totalGuests * (womenRatio / 100);
+            
+            // 男性用
+            document.getElementById('men_sauna_cost').value = Math.round(menGuests * 200 + 1500000).toLocaleString();
+            document.getElementById('men_jacuzzi_cost').value = Math.round(menGuests * 500 + 3000000).toLocaleString();
+            document.getElementById('men_water_bath_cost').value = Math.round(menGuests * 500 + 1000000).toLocaleString();
+            
+            // 女性用
+            document.getElementById('women_sauna_cost').value = Math.round(womenGuests * 200 + 1500000).toLocaleString();
+            document.getElementById('women_jacuzzi_cost').value = Math.round(womenGuests * 500 + 3000000).toLocaleString();
+            document.getElementById('women_water_bath_cost').value = Math.round(womenGuests * 500 + 1000000).toLocaleString();
+            
+        } catch (error) {
+            console.error('特殊設備計算エラー:', error);
+        }
+    }
+
+    // 洗い場設備の金額計算
+    function updateWashEquipmentCosts() {
+        // 男性用
+        let menProcessText = "【男性用 洗い場設備の計算】\n";
+        
+        // 隔て板
+        try {
+            const count = parseFloat(document.getElementById('men_partition_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("隔て板");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('men_partition_cost').value = Math.round(cost).toLocaleString();
+                    menProcessText += `\n[隔て板]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('men_partition_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('men_partition_cost').value = '0';
+        }
+        
+        // 照明
+        try {
+            const count = parseFloat(document.getElementById('men_wash_lighting_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("洗い場照明");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('men_wash_lighting_cost').value = Math.round(cost).toLocaleString();
+                    menProcessText += `\n[照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('men_wash_lighting_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('men_wash_lighting_cost').value = '0';
+        }
+        
+        // シャワー水栓
+        try {
+            const count = parseFloat(document.getElementById('men_shower_faucet_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("シャワー水栓");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('men_shower_faucet_cost').value = Math.round(cost).toLocaleString();
+                    menProcessText += `\n[シャワー水栓]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('men_shower_faucet_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('men_shower_faucet_cost').value = '0';
+        }
+        
+        document.getElementById('men_wash_equipment_process').textContent = menProcessText;
+        
+        // 女性用
+        let womenProcessText = "【女性用 洗い場設備の計算】\n";
+        
+        // 隔て板
+        try {
+            const count = parseFloat(document.getElementById('women_partition_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("隔て板");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('women_partition_cost').value = Math.round(cost).toLocaleString();
+                    womenProcessText += `\n[隔て板]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('women_partition_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('women_partition_cost').value = '0';
+        }
+        
+        // 照明
+        try {
+            const count = parseFloat(document.getElementById('women_wash_lighting_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("洗い場照明");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('women_wash_lighting_cost').value = Math.round(cost).toLocaleString();
+                    womenProcessText += `\n[照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('women_wash_lighting_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('women_wash_lighting_cost').value = '0';
+        }
+        
+        // シャワー水栓
+        try {
+            const count = parseFloat(document.getElementById('women_shower_faucet_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("シャワー水栓");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('women_shower_faucet_cost').value = Math.round(cost).toLocaleString();
+                    womenProcessText += `\n[シャワー水栓]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('women_shower_faucet_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('women_shower_faucet_cost').value = '0';
+        }
+        
+        document.getElementById('women_wash_equipment_process').textContent = womenProcessText;
+        
+        updateOnsenSubtotal();
+    }
+    
+    // 設備データを略称から取得するヘルパー関数
+    function getEquipmentDataByAbbrev(abbrev) {
+        for (let row of equipmentData) {
+            if (row[2] === abbrev) {
+                return {
+                    installHours: parseFloat(row[3]) || 0,
+                    laborCost: parseFloat(row[4]) || 0,
+                    miscMaterial: parseFloat(row[5]) || 0,
+                    newEquipmentCost: parseFloat(row[6]) || 0,
+                    areaRatio: parseFloat(row[7]) || null
+                };
+            }
+        }
+        return null;
+    }
+    
+    // 内装単価を室用途から取得するヘルパー関数
+    function getInteriorUnitCosts(roomType) {
+        const gradeIndex = document.getElementById('grade').selectedIndex;
+        
+        for (let row of interiorData) {
+            if (row[0] === roomType) {
+                const height = parseFloat(row[1]) || 2.5;
+                const floorCostIndex = 2 + gradeIndex;
+                const ceilingCostIndex = 7 + gradeIndex;
+                const wallCostIndex = 12 + gradeIndex;
+                
+                const floorCost = parseFloat(row[floorCostIndex]) || 0;
+                const ceilingCost = parseFloat(row[ceilingCostIndex]) || 0;
+                const wallCost = parseFloat(row[wallCostIndex]) || 0;
+                
+                const gradeNames = ['エコノミー', 'スタンダード 1', 'スタンダード 2', 'デラックス 1', 'デラックス 2'];
+                const gradeName = gradeNames[gradeIndex] || 'エコノミー';
+                
+                return { height, floorCost, ceilingCost, wallCost, gradeName };
+            }
+        }
+        
+        return null;
+    }
+    // 温泉設備の建築金額計算
+    function updateOnsenBathArchCosts() {
+        // 男性用
+        let menProcessText = "【男性用 建築項目の計算】\n";
+        
+        // ①内湯浴槽
+        try {
+            const area = parseFloat(document.getElementById('men_indoor_bath_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("内風呂");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('men_indoor_bath_cost').value = Math.round(cost).toLocaleString();
+                    
+                    menProcessText += `\n[内湯浴槽 - ${gradeName}]\n`;
+                    menProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    menProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    menProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById('men_indoor_bath_cost').value = '0';
+                    menProcessText += "\n[内湯浴槽]単価情報が取得できません\n";
+                }
+            } else {
+                document.getElementById('men_indoor_bath_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('men_indoor_bath_cost').value = '0';
+        }
+        
+        // ②露天風呂
+        try {
+            const area = parseFloat(document.getElementById('men_outdoor_bath_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("露天風呂");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('men_outdoor_bath_cost').value = Math.round(cost).toLocaleString();
+                    
+                    menProcessText += `\n[露天風呂 - ${gradeName}]\n`;
+                    menProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    menProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    menProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById('men_outdoor_bath_cost').value = '0';
+                    menProcessText += "\n[露天風呂]単価情報が取得できません\n";
+                }
+            } else {
+                document.getElementById('men_outdoor_bath_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('men_outdoor_bath_cost').value = '0';
+        }
+        
+        // ③浴室
+        try {
+            const area = parseFloat(document.getElementById('men_bathroom_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("浴室");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('men_bathroom_cost').value = Math.round(cost).toLocaleString();
+                    
+                    menProcessText += `\n[浴室 - ${gradeName}]\n`;
+                    menProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    menProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    menProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById('men_bathroom_cost').value = '0';
+                    menProcessText += "\n[浴室]単価情報が取得できません\n";
+                }
+            } else {
+                document.getElementById('men_bathroom_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('men_bathroom_cost').value = '0';
+        }
+        
+        document.getElementById('men_bath_arch_process').textContent = menProcessText;
+        
+        // 女性用
+        let womenProcessText = "【女性用 建築項目の計算】\n";
+        
+        // ①内湯浴槽
+        try {
+            const area = parseFloat(document.getElementById('women_indoor_bath_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("内風呂");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('women_indoor_bath_cost').value = Math.round(cost).toLocaleString();
+                    
+                    womenProcessText += `\n[内湯浴槽 - ${gradeName}]\n`;
+                    womenProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    womenProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    womenProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById('women_indoor_bath_cost').value = '0';
+                    womenProcessText += "\n[内湯浴槽]単価情報が取得できません\n";
+                }
+            } else {
+                document.getElementById('women_indoor_bath_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('women_indoor_bath_cost').value = '0';
+        }
+        
+        // ②露天風呂
+        try {
+            const area = parseFloat(document.getElementById('women_outdoor_bath_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("露天風呂");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('women_outdoor_bath_cost').value = Math.round(cost).toLocaleString();
+                    
+                    womenProcessText += `\n[露天風呂 - ${gradeName}]\n`;
+                    womenProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    womenProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    womenProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById('women_outdoor_bath_cost').value = '0';
+                    womenProcessText += "\n[露天風呂]単価情報が取得できません\n";
+                }
+            } else {
+                document.getElementById('women_outdoor_bath_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('women_outdoor_bath_cost').value = '0';
+        }
+        
+        // ③浴室
+        try {
+            const area = parseFloat(document.getElementById('women_bathroom_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("浴室");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('women_bathroom_cost').value = Math.round(cost).toLocaleString();
+                    
+                    womenProcessText += `\n[浴室 - ${gradeName}]\n`;
+                    womenProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    womenProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    womenProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById('women_bathroom_cost').value = '0';
+                    womenProcessText += "\n[浴室]単価情報が取得できません\n";
+                }
+            } else {
+                document.getElementById('women_bathroom_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('women_bathroom_cost').value = '0';
+        }
+        
+        document.getElementById('women_bath_arch_process').textContent = womenProcessText;
+        
+        updateOnsenSubtotal();
+    }
+    // 温泉設備の小計計算
+    function updateOnsenSubtotal() {
+        let total = 0;
+        
+        // チェックされている項目の金額を合計
+        const items = [
+            { check: 'men_indoor_bath_check', cost: 'men_indoor_bath_cost' },
+            { check: 'men_outdoor_bath_check', cost: 'men_outdoor_bath_cost' },
+            { check: 'men_bathroom_check', cost: 'men_bathroom_cost' },
+            { check: 'women_indoor_bath_check', cost: 'women_indoor_bath_cost' },
+            { check: 'women_outdoor_bath_check', cost: 'women_outdoor_bath_cost' },
+            { check: 'women_bathroom_check', cost: 'women_bathroom_cost' },
+            { check: 'men_partition_check', cost: 'men_partition_cost' },
+            { check: 'men_wash_lighting_check', cost: 'men_wash_lighting_cost' },
+            { check: 'men_shower_faucet_check', cost: 'men_shower_faucet_cost' },
+            { check: 'women_partition_check', cost: 'women_partition_cost' },
+            { check: 'women_wash_lighting_check', cost: 'women_wash_lighting_cost' },
+            { check: 'women_shower_faucet_check', cost: 'women_shower_faucet_cost' },
+            { check: 'men_sauna', cost: 'men_sauna_cost' },
+            { check: 'men_jacuzzi', cost: 'men_jacuzzi_cost' },
+            { check: 'men_water_bath', cost: 'men_water_bath_cost' },
+            { check: 'women_sauna', cost: 'women_sauna_cost' },
+            { check: 'women_jacuzzi', cost: 'women_jacuzzi_cost' },
+            { check: 'women_water_bath', cost: 'women_water_bath_cost' }
+        ];
+        
+        items.forEach(item => {
+            const checkbox = document.getElementById(item.check);
+            const costInput = document.getElementById(item.cost);
+            
+            if (checkbox && checkbox.checked && costInput) {
+                const costStr = costInput.value.replace(/,/g, '');
+                const cost = parseFloat(costStr) || 0;
+                total += cost;
+            }
+        });
+        
+        document.getElementById('onsen_subtotal').value = Math.round(total).toLocaleString();
+        
+        // コストサマリの温泉設備小計も更新
+        const sumOnsenElement = document.getElementById('sum_onsen');
+        if (sumOnsenElement) {
+            sumOnsenElement.textContent = Math.round(total).toLocaleString() + ' 円';
+        }
+    }
+    
+    // ========== 温泉設備タブの関数ここまで ==========
+
+
+
 </script>
 
 </body>
