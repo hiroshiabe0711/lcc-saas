@@ -1076,9 +1076,344 @@
 
 
     <div id="restaurant" class="tab-pane">
-        <div style="padding: 20px;">
-            <div class="section-title">レストラン</div>
-            <p>レストランの詳細設定</p>
+        <div style="padding: 20px; max-width: 1400px;">
+            <div class="section-title">レストラン詳細設定</div>
+            <p style="font-size: 12px; color: #666; text-align: right; margin-bottom: 15px;">
+                面積を入力すると金額が表示されます。計上金額に含める場合は、項目に☑を入れてください。
+            </p>
+            
+            <!-- 小計表示 -->
+            <div style="margin: 15px 0; padding: 12px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 4px;">
+                <span style="font-weight: bold; font-size: 16px;">小計:</span>
+                <input type="text" id="restaurant_subtotal" value="0" readonly 
+                       style="width: 150px; text-align: right; font-size: 16px; font-weight: bold; 
+                              border: none; background: transparent; color: #d32f2f; margin-left: 10px;">
+                <span style="font-weight: bold; font-size: 16px;"> 円</span>
+            </div>
+            <!-- ①建築フレーム -->
+            <div style="border: 2px solid #2196f3; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #e3f2fd;">
+                <h3 style="margin-top: 0; color: #1976d2; font-size: 15px; border-bottom: 2px solid #2196f3; padding-bottom: 8px;">建築</h3>
+                
+                <!-- レストラン -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_arch_restaurant_check">
+                    <label style="min-width: 120px; font-weight: bold;">レストラン</label>
+                    <label>面積:</label>
+                    <input type="number" id="restaurant_arch_restaurant_area" value="0" step="0.01" 
+                           style="width: 80px; text-align: right;">
+                    <span>㎡</span>
+                    <label style="margin-left: 20px;">金額:</label>
+                    <input type="text" id="restaurant_arch_restaurant_cost" value="0" readonly 
+                           style="width: 120px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- ライブキッチン -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_arch_livekitchen_check">
+                    <label style="min-width: 120px; font-weight: bold;">ライブキッチン</label>
+                    <label>面積:</label>
+                    <input type="number" id="restaurant_arch_livekitchen_area" value="0" step="0.01" 
+                           style="width: 80px; text-align: right;">
+                    <span>㎡</span>
+                    <label style="margin-left: 20px;">金額:</label>
+                    <input type="text" id="restaurant_arch_livekitchen_cost" value="0" readonly 
+                           style="width: 120px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 厨房 -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_arch_kitchen_check">
+                    <label style="min-width: 120px; font-weight: bold;">厨房</label>
+                    <label>面積:</label>
+                    <input type="number" id="restaurant_arch_kitchen_area" value="0" step="0.01" 
+                           style="width: 80px; text-align: right;">
+                    <span>㎡</span>
+                    <label style="margin-left: 20px;">金額:</label>
+                    <input type="text" id="restaurant_arch_kitchen_cost" value="0" readonly 
+                           style="width: 120px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 建築項目の計算過程 -->
+                <div style="margin-top: 15px; padding: 10px; background: white; border: 1px solid #2196f3; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #1976d2;">建築項目の計算過程</p>
+                    <pre id="restaurant_arch_restaurant_process" style="font-size: 11px; margin: 5px 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #0d47a1;">-</pre>
+                    <pre id="restaurant_arch_livekitchen_process" style="font-size: 11px; margin: 5px 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #0d47a1;">-</pre>
+                    <pre id="restaurant_arch_kitchen_process" style="font-size: 11px; margin: 5px 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #0d47a1;">-</pre>
+                </div>
+            </div>
+            <!-- ②機械設備フレーム -->
+            <div style="border: 2px solid #4caf50; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #e8f5e9;">
+                <h3 style="margin-top: 0; color: #2e7d32; font-size: 15px; border-bottom: 2px solid #4caf50; padding-bottom: 8px;">機械設備</h3>
+                
+                <!-- 共用部エアコン -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_mech_ac_check">
+                    <label style="min-width: 120px;">共用部エアコン</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_mech_ac_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_mech_ac_recommended" style="font-size: 12px; color: #2e7d32; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_mech_ac_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- スプリンクラー -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_mech_sprinkler_check">
+                    <label style="min-width: 120px;">スプリンクラー</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_mech_sprinkler_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="restaurant_mech_sprinkler_recommended" style="font-size: 12px; color: #2e7d32; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_mech_sprinkler_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 消火栓箱 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_mech_fire_hose_check">
+                    <label style="min-width: 120px;">消火栓箱</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_mech_fire_hose_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_mech_fire_hose_recommended" style="font-size: 12px; color: #2e7d32; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_mech_fire_hose_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- フード -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_mech_hood_check">
+                    <label style="min-width: 120px;">フード</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_mech_hood_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_mech_hood_recommended" style="font-size: 12px; color: #2e7d32; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_mech_hood_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 機械設備の計算過程 -->
+                <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #4caf50; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #2e7d32;">機械設備の計算過程</p>
+                    <pre id="restaurant_mech_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #1b5e20;">-</pre>
+                </div>
+            </div>
+            <!-- ③電気設備フレーム -->
+            <div style="border: 2px solid #ff9800; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #fff3e0;">
+                <h3 style="margin-top: 0; color: #e65100; font-size: 15px; border-bottom: 2px solid #ff9800; padding-bottom: 8px;">電気設備</h3>
+                
+                <!-- LED照明 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_elec_led_check">
+                    <label style="min-width: 120px;">LED照明</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_elec_led_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="restaurant_elec_led_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_elec_led_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 煙感知器 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_elec_smoke_check">
+                    <label style="min-width: 120px;">煙感知器</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_elec_smoke_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="restaurant_elec_smoke_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_elec_smoke_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 誘導灯 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_elec_exit_light_check">
+                    <label style="min-width: 120px;">誘導灯</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_elec_exit_light_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="restaurant_elec_exit_light_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_elec_exit_light_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- スピーカー -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_elec_speaker_check">
+                    <label style="min-width: 120px;">スピーカー</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_elec_speaker_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="restaurant_elec_speaker_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_elec_speaker_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- コンセント -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_elec_outlet_check">
+                    <label style="min-width: 120px;">コンセント</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_elec_outlet_count" value="0" style="width: 60px; text-align: right;">
+                    <span>個</span>
+                    <span id="restaurant_elec_outlet_recommended" style="font-size: 12px; color: #e65100; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_elec_outlet_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 電気設備の計算過程 -->
+                <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #ff9800; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #e65100;">電気設備の計算過程</p>
+                    <pre id="restaurant_elec_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #e65100;">-</pre>
+                </div>
+            </div>
+            <!-- ④厨房設備フレーム -->
+            <div style="border: 2px solid #9c27b0; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #f3e5f5;">
+                <h3 style="margin-top: 0; color: #6a1b9a; font-size: 15px; border-bottom: 2px solid #9c27b0; padding-bottom: 8px;">厨房設備</h3>
+                <p style="font-size: 12px; color: #6a1b9a; margin-bottom: 10px;">※設備設定タブの厨房機器設定から動的に生成されます</p>
+                
+                <div id="restaurant_kitchen_equipment_container">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+                
+                <!-- 厨房設備の計算過程 -->
+                <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #9c27b0; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #6a1b9a;">厨房設備の計算過程</p>
+                    <pre id="restaurant_kitchen_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #6a1b9a;">-</pre>
+                </div>
+            </div>
+            
+            <!-- ⑤家具フレーム -->
+            <div style="border: 2px solid #795548; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #efebe9;">
+                <h3 style="margin-top: 0; color: #4e342e; font-size: 15px; border-bottom: 2px solid #795548; padding-bottom: 8px;">家具</h3>
+                
+                <!-- バーカウンター -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_furniture_bar_counter_check">
+                    <label style="min-width: 150px;">バーカウンター</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_furniture_bar_counter_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_furniture_bar_counter_recommended" style="font-size: 12px; color: #4e342e; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_furniture_bar_counter_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- ソフトドリンクカウンター -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_furniture_soft_drink_counter_check">
+                    <label style="min-width: 150px;">ソフトドリンクカウンター</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_furniture_soft_drink_counter_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_furniture_soft_drink_counter_recommended" style="font-size: 12px; color: #4e342e; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_furniture_soft_drink_counter_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- アルコールカウンター -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_furniture_alcohol_counter_check">
+                    <label style="min-width: 150px;">アルコールカウンター</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_furniture_alcohol_counter_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_furniture_alcohol_counter_recommended" style="font-size: 12px; color: #4e342e; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_furniture_alcohol_counter_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- カトラリ―カウンター -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_furniture_cutlery_counter_check">
+                    <label style="min-width: 150px;">カトラリ―カウンター</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_furniture_cutlery_counter_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_furniture_cutlery_counter_recommended" style="font-size: 12px; color: #4e342e; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_furniture_cutlery_counter_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- アイスカウンター -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_furniture_ice_counter_check">
+                    <label style="min-width: 150px;">アイスカウンター</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_furniture_ice_counter_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_furniture_ice_counter_recommended" style="font-size: 12px; color: #4e342e; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_furniture_ice_counter_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- ソフトクリームカウンター -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_furniture_soft_cream_counter_check">
+                    <label style="min-width: 150px;">ソフトクリームカウンター</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_furniture_soft_cream_counter_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_furniture_soft_cream_counter_recommended" style="font-size: 12px; color: #4e342e; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_furniture_soft_cream_counter_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 返却台 -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <input type="checkbox" id="restaurant_furniture_return_counter_check">
+                    <label style="min-width: 150px;">返却台</label>
+                    <label>個数:</label>
+                    <input type="number" id="restaurant_furniture_return_counter_count" value="0" style="width: 60px; text-align: right;">
+                    <span>台</span>
+                    <span id="restaurant_furniture_return_counter_recommended" style="font-size: 12px; color: #4e342e; font-weight: bold; min-width: 100px;">-</span>
+                    <label style="margin-left: 10px;">金額:</label>
+                    <input type="text" id="restaurant_furniture_return_counter_cost" value="0" readonly 
+                           style="width: 100px; text-align: right; background: #f5f5f5;">
+                    <span>円</span>
+                </div>
+                
+                <!-- 家具の計算過程 -->
+                <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #795548; border-radius: 4px;">
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #4e342e;">家具の計算過程</p>
+                    <pre id="restaurant_furniture_process" style="font-size: 11px; margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; color: #4e342e;">-</pre>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1620,7 +1955,8 @@
         initializeEquipmentTables();
         initializeArchTables();
         initializeFurnitureTables();
-        initializeOnsenTab(); // ← この行を追加
+        initializeOnsenTab(); 
+        initializeRestaurantTab(); // ← この行を追加
     });
 
     function openTab(tabName) {
@@ -1661,12 +1997,15 @@ function setupEventListeners() {
             document.getElementById(id).addEventListener('change', updateAdditionalEquipmentSubtotal);
         });
         
-        // グレード変更時に温泉設備の建築金額を更新
+        // グレード変更時に温泉設備・レストランの建築金額を更新
         const gradeElement = document.getElementById('grade');
         if (gradeElement) {
             gradeElement.addEventListener('change', function() {
                 if (typeof updateOnsenBathArchCosts === 'function') {
                     updateOnsenBathArchCosts();
+                }
+                if (typeof updateRestaurantArchCosts === 'function') {
+                    updateRestaurantArchCosts();
                 }
             });
         }
@@ -3408,6 +3747,671 @@ function setupEventListeners() {
     }
     
     // ========== 温泉設備タブの関数ここまで ==========
+    // ========== レストランタブの関数 ==========
+    
+    // レストラン設備の変数（厨房機器用）
+    let restaurantKitchenEquipmentData = [];
+    
+    // レストランタブの初期化
+    function initializeRestaurantTab() {
+        setupRestaurantEventListeners();
+        generateRestaurantKitchenEquipment();
+        updateRestaurantArchCosts();
+    }
+    
+    function setupRestaurantEventListeners() {
+        // 建築項目の面積変更時
+        ['restaurant_arch_restaurant_area', 'restaurant_arch_livekitchen_area', 'restaurant_arch_kitchen_area'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateRestaurantArchCosts);
+            }
+        });
+        
+        // 機械設備・電気設備の個数変更時
+        ['restaurant_mech_ac_count', 'restaurant_mech_sprinkler_count', 'restaurant_mech_fire_hose_count',
+         'restaurant_mech_hood_count', 'restaurant_elec_led_count', 'restaurant_elec_smoke_count',
+         'restaurant_elec_exit_light_count', 'restaurant_elec_speaker_count', 'restaurant_elec_outlet_count'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateRestaurantEquipmentCosts);
+            }
+        });
+        
+        // 家具の個数変更時
+        ['restaurant_furniture_bar_counter_count', 'restaurant_furniture_soft_drink_counter_count',
+         'restaurant_furniture_alcohol_counter_count', 'restaurant_furniture_cutlery_counter_count',
+         'restaurant_furniture_ice_counter_count', 'restaurant_furniture_soft_cream_counter_count',
+         'restaurant_furniture_return_counter_count'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateRestaurantFurnitureCosts);
+            }
+        });
+        
+        // チェックボックス変更時の小計更新
+        ['restaurant_arch_restaurant_check', 'restaurant_arch_livekitchen_check', 'restaurant_arch_kitchen_check',
+         'restaurant_mech_ac_check', 'restaurant_mech_sprinkler_check', 'restaurant_mech_fire_hose_check',
+         'restaurant_mech_hood_check', 'restaurant_elec_led_check', 'restaurant_elec_smoke_check',
+         'restaurant_elec_exit_light_check', 'restaurant_elec_speaker_check', 'restaurant_elec_outlet_check',
+         'restaurant_furniture_bar_counter_check', 'restaurant_furniture_soft_drink_counter_check',
+         'restaurant_furniture_alcohol_counter_check', 'restaurant_furniture_cutlery_counter_check',
+         'restaurant_furniture_ice_counter_check', 'restaurant_furniture_soft_cream_counter_check',
+         'restaurant_furniture_return_counter_check'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', updateRestaurantSubtotal);
+            }
+        });
+    }
+    
+    // レストランの建築項目の金額を自動計算
+    function updateRestaurantArchCosts() {
+        let restaurantProcess = "";
+        let livekitchenProcess = "";
+        let kitchenProcess = "";
+        
+        // レストラン
+        try {
+            const area = parseFloat(document.getElementById('restaurant_arch_restaurant_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("レストラン");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('restaurant_arch_restaurant_cost').value = Math.round(cost).toLocaleString();
+                    
+                    restaurantProcess = `【レストラン - ${gradeName}】\n`;
+                    restaurantProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    restaurantProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    restaurantProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+                } else {
+                    document.getElementById('restaurant_arch_restaurant_cost').value = '0';
+                    restaurantProcess = "【レストラン】単価情報が取得できません";
+                }
+            } else {
+                document.getElementById('restaurant_arch_restaurant_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_arch_restaurant_cost').value = '0';
+        }
+        
+        // ライブキッチン
+        try {
+            const area = parseFloat(document.getElementById('restaurant_arch_livekitchen_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("ライブキッチン");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('restaurant_arch_livekitchen_cost').value = Math.round(cost).toLocaleString();
+                    
+                    livekitchenProcess = `【ライブキッチン - ${gradeName}】\n`;
+                    livekitchenProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    livekitchenProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    livekitchenProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+                } else {
+                    document.getElementById('restaurant_arch_livekitchen_cost').value = '0';
+                    livekitchenProcess = "【ライブキッチン】単価情報が取得できません";
+                }
+            } else {
+                document.getElementById('restaurant_arch_livekitchen_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_arch_livekitchen_cost').value = '0';
+        }
+        
+        // 厨房
+        try {
+            const area = parseFloat(document.getElementById('restaurant_arch_kitchen_area').value) || 0;
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("厨房");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    document.getElementById('restaurant_arch_kitchen_cost').value = Math.round(cost).toLocaleString();
+                    
+                    kitchenProcess = `【厨房 - ${gradeName}】\n`;
+                    kitchenProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    kitchenProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    kitchenProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+                } else {
+                    document.getElementById('restaurant_arch_kitchen_cost').value = '0';
+                    kitchenProcess = "【厨房】単価情報が取得できません";
+                }
+            } else {
+                document.getElementById('restaurant_arch_kitchen_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_arch_kitchen_cost').value = '0';
+        }
+        
+        document.getElementById('restaurant_arch_restaurant_process').textContent = restaurantProcess;
+        document.getElementById('restaurant_arch_livekitchen_process').textContent = livekitchenProcess;
+        document.getElementById('restaurant_arch_kitchen_process').textContent = kitchenProcess;
+        
+        updateRestaurantRecommendedCounts();
+        updateRestaurantSubtotal();
+    }
+    // レストランの機械設備・電気設備・家具の推奨個数を計算
+    function updateRestaurantRecommendedCounts() {
+        try {
+            const restaurantArea = parseFloat(document.getElementById('restaurant_arch_restaurant_area').value) || 0;
+            const livekitchenArea = parseFloat(document.getElementById('restaurant_arch_livekitchen_area').value) || 0;
+            const kitchenArea = parseFloat(document.getElementById('restaurant_arch_kitchen_area').value) || 0;
+            const totalArea = restaurantArea + livekitchenArea + kitchenArea;
+            const kitchenAreaForHood = livekitchenArea + kitchenArea; // フード用（レストラン除外）
+            
+            if (totalArea > 0) {
+                // 共用部エアコン
+                const acData = getEquipmentDataByAbbrev("共用部エアコン");
+                if (acData && acData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * acData.areaRatio);
+                    document.getElementById('restaurant_mech_ac_recommended').textContent = `推奨: ${recommended}台`;
+                }
+                
+                // スプリンクラー
+                const sprinklerData = getEquipmentDataByAbbrev("スプリンクラー");
+                if (sprinklerData && sprinklerData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * sprinklerData.areaRatio);
+                    document.getElementById('restaurant_mech_sprinkler_recommended').textContent = `推奨: ${recommended}個`;
+                }
+                
+                // 消火栓箱
+                const fireHoseData = getEquipmentDataByAbbrev("消火栓箱");
+                if (fireHoseData && fireHoseData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * fireHoseData.areaRatio);
+                    document.getElementById('restaurant_mech_fire_hose_recommended').textContent = `推奨: ${recommended}台`;
+                }
+                
+                // フード（ライブキッチン+厨房のみ）
+                if (kitchenAreaForHood > 0) {
+                    const hoodData = getEquipmentDataByAbbrev("フード");
+                    if (hoodData && hoodData.areaRatio) {
+                        const recommended = Math.ceil(kitchenAreaForHood * hoodData.areaRatio);
+                        document.getElementById('restaurant_mech_hood_recommended').textContent = `推奨: ${recommended}台`;
+                    }
+                }
+                
+                // LED照明（レストランLED）
+                const ledData = getEquipmentDataByAbbrev("レストランLED");
+                if (ledData && ledData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * ledData.areaRatio);
+                    document.getElementById('restaurant_elec_led_recommended').textContent = `推奨: ${recommended}個`;
+                }
+                
+                // 煙感知器
+                const smokeData = getEquipmentDataByAbbrev("煙感知器");
+                if (smokeData && smokeData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * smokeData.areaRatio);
+                    document.getElementById('restaurant_elec_smoke_recommended').textContent = `推奨: ${recommended}個`;
+                }
+                
+                // 誘導灯
+                const exitLightData = getEquipmentDataByAbbrev("誘導灯");
+                if (exitLightData && exitLightData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * exitLightData.areaRatio);
+                    document.getElementById('restaurant_elec_exit_light_recommended').textContent = `推奨: ${recommended}個`;
+                }
+                
+                // スピーカー
+                const speakerData = getEquipmentDataByAbbrev("スピーカー");
+                if (speakerData && speakerData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * speakerData.areaRatio);
+                    document.getElementById('restaurant_elec_speaker_recommended').textContent = `推奨: ${recommended}個`;
+                }
+                
+                // コンセント
+                const outletData = getEquipmentDataByAbbrev("コンセント");
+                if (outletData && outletData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * outletData.areaRatio);
+                    document.getElementById('restaurant_elec_outlet_recommended').textContent = `推奨: ${recommended}個`;
+                }
+                
+                // 家具の推奨個数（家具設定単価1から取得）
+                const furnitureItems = [
+                    { abbrev: 'バーカウンター', id: 'restaurant_furniture_bar_counter_recommended' },
+                    { abbrev: 'ソフトドリンクカウンター', id: 'restaurant_furniture_soft_drink_counter_recommended' },
+                    { abbrev: 'アルコールカウンター', id: 'restaurant_furniture_alcohol_counter_recommended' },
+                    { abbrev: 'カトラリ―カウンター', id: 'restaurant_furniture_cutlery_counter_recommended' },
+                    { abbrev: 'アイスカウンター', id: 'restaurant_furniture_ice_counter_recommended' },
+                    { abbrev: 'ソフトクリームカウンター', id: 'restaurant_furniture_soft_cream_counter_recommended' },
+                    { abbrev: '返却台', id: 'restaurant_furniture_return_counter_recommended' }
+                ];
+                
+                furnitureItems.forEach(item => {
+                    const data = getFurniture1DataByAbbrev(item.abbrev);
+                    if (data && data.areaRatio) {
+                        const recommended = Math.ceil(totalArea * data.areaRatio);
+                        document.getElementById(item.id).textContent = `推奨: ${recommended}台`;
+                    }
+                });
+                
+            } else {
+                // 面積が0の場合は推奨値をクリア
+                document.getElementById('restaurant_mech_ac_recommended').textContent = '-';
+                document.getElementById('restaurant_mech_sprinkler_recommended').textContent = '-';
+                document.getElementById('restaurant_mech_fire_hose_recommended').textContent = '-';
+                document.getElementById('restaurant_mech_hood_recommended').textContent = '-';
+                document.getElementById('restaurant_elec_led_recommended').textContent = '-';
+                document.getElementById('restaurant_elec_smoke_recommended').textContent = '-';
+                document.getElementById('restaurant_elec_exit_light_recommended').textContent = '-';
+                document.getElementById('restaurant_elec_speaker_recommended').textContent = '-';
+                document.getElementById('restaurant_elec_outlet_recommended').textContent = '-';
+                document.getElementById('restaurant_furniture_bar_counter_recommended').textContent = '-';
+                document.getElementById('restaurant_furniture_soft_drink_counter_recommended').textContent = '-';
+                document.getElementById('restaurant_furniture_alcohol_counter_recommended').textContent = '-';
+                document.getElementById('restaurant_furniture_cutlery_counter_recommended').textContent = '-';
+                document.getElementById('restaurant_furniture_ice_counter_recommended').textContent = '-';
+                document.getElementById('restaurant_furniture_soft_cream_counter_recommended').textContent = '-';
+                document.getElementById('restaurant_furniture_return_counter_recommended').textContent = '-';
+            }
+        } catch (error) {
+            console.error('レストラン推奨個数計算エラー:', error);
+        }
+    }
+    
+    // 家具設定単価1データを略称から取得
+    function getFurniture1DataByAbbrev(abbrev) {
+        for (let row of furniture1Data) {
+            if (row[2] === abbrev) {
+                return {
+                    installHours: parseFloat(row[3]) || 0,
+                    laborCost: parseFloat(row[4]) || 0,
+                    miscMaterial: parseFloat(row[5]) || 0,
+                    newEquipmentCost: parseFloat(row[6]) || 0,
+                    areaRatio: parseFloat(row[7]) || null
+                };
+            }
+        }
+        return null;
+    }
+    // レストランの機械設備・電気設備の金額を計算
+    function updateRestaurantEquipmentCosts() {
+        let mechProcessText = "【機械設備の計算】\n";
+        let elecProcessText = "【電気設備の計算】\n";
+        
+        // 共用部エアコン
+        try {
+            const count = parseFloat(document.getElementById('restaurant_mech_ac_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("共用部エアコン");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_mech_ac_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[共用部エアコン]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_mech_ac_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_mech_ac_cost').value = '0';
+        }
+        
+        // スプリンクラー
+        try {
+            const count = parseFloat(document.getElementById('restaurant_mech_sprinkler_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("スプリンクラー");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_mech_sprinkler_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[スプリンクラー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_mech_sprinkler_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_mech_sprinkler_cost').value = '0';
+        }
+        
+        // 消火栓箱
+        try {
+            const count = parseFloat(document.getElementById('restaurant_mech_fire_hose_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("消火栓箱");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_mech_fire_hose_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[消火栓箱]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_mech_fire_hose_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_mech_fire_hose_cost').value = '0';
+        }
+        
+        // フード
+        try {
+            const count = parseFloat(document.getElementById('restaurant_mech_hood_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("フード");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_mech_hood_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[フード]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById('restaurant_mech_hood_cost').value = '0';
+                    mechProcessText += "\n[フード]\n  ※設備機器単価設定に「フード」を追加してください\n";
+                }
+            } else {
+                document.getElementById('restaurant_mech_hood_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_mech_hood_cost').value = '0';
+        }
+        
+        // LED照明
+        try {
+            const count = parseFloat(document.getElementById('restaurant_elec_led_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("レストランLED");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_elec_led_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[LED照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_elec_led_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_elec_led_cost').value = '0';
+        }
+        
+        // 煙感知器
+        try {
+            const count = parseFloat(document.getElementById('restaurant_elec_smoke_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("煙感知器");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_elec_smoke_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[煙感知器]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_elec_smoke_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_elec_smoke_cost').value = '0';
+        }
+        
+        // 誘導灯
+        try {
+            const count = parseFloat(document.getElementById('restaurant_elec_exit_light_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("誘導灯");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_elec_exit_light_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[誘導灯]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_elec_exit_light_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_elec_exit_light_cost').value = '0';
+        }
+        
+        // スピーカー
+        try {
+            const count = parseFloat(document.getElementById('restaurant_elec_speaker_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("スピーカー");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_elec_speaker_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[スピーカー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_elec_speaker_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_elec_speaker_cost').value = '0';
+        }
+        
+        // コンセント
+        try {
+            const count = parseFloat(document.getElementById('restaurant_elec_outlet_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("コンセント");
+                if (data) {
+                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('restaurant_elec_outlet_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[コンセント]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('restaurant_elec_outlet_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('restaurant_elec_outlet_cost').value = '0';
+        }
+        
+        document.getElementById('restaurant_mech_process').textContent = mechProcessText;
+        document.getElementById('restaurant_elec_process').textContent = elecProcessText;
+        
+        updateRestaurantKitchenCosts();
+        updateRestaurantSubtotal();
+    }
+    // 厨房設備の動的生成
+    function generateRestaurantKitchenEquipment() {
+        const container = document.getElementById('restaurant_kitchen_equipment_container');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        restaurantKitchenEquipmentData = [];
+        
+        kitchenData.forEach((row, index) => {
+            const [no, name, abbrev, installHours, laborCost, expense, listPrice, rate, unitInput, category] = row;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `restaurant_kitchen_equipment_${index}_check`;
+            
+            const label = document.createElement('label');
+            label.style.minWidth = '150px';
+            label.textContent = abbrev || name || `厨房機器${index + 1}`;
+            
+            const countLabel = document.createElement('label');
+            countLabel.textContent = '個数:';
+            
+            const countInput = document.createElement('input');
+            countInput.type = 'number';
+            countInput.id = `restaurant_kitchen_equipment_${index}_count`;
+            countInput.value = '1';
+            countInput.style.cssText = 'width: 60px; text-align: right;';
+            
+            const unitSpan = document.createElement('span');
+            unitSpan.textContent = '台';
+            
+            const costLabel = document.createElement('label');
+            costLabel.textContent = '金額:';
+            costLabel.style.marginLeft = '10px';
+            
+            const costInput = document.createElement('input');
+            costInput.type = 'text';
+            costInput.id = `restaurant_kitchen_equipment_${index}_cost`;
+            costInput.value = '0';
+            costInput.readOnly = true;
+            costInput.style.cssText = 'width: 100px; text-align: right; background: #f5f5f5;';
+            
+            const yenSpan = document.createElement('span');
+            yenSpan.textContent = '円';
+            
+            itemDiv.appendChild(checkbox);
+            itemDiv.appendChild(label);
+            itemDiv.appendChild(countLabel);
+            itemDiv.appendChild(countInput);
+            itemDiv.appendChild(unitSpan);
+            itemDiv.appendChild(costLabel);
+            itemDiv.appendChild(costInput);
+            itemDiv.appendChild(yenSpan);
+            
+            container.appendChild(itemDiv);
+            
+            restaurantKitchenEquipmentData.push({
+                index: index,
+                checkboxId: checkbox.id,
+                countId: countInput.id,
+                costId: costInput.id,
+                data: row
+            });
+            
+            // イベントリスナー
+            countInput.addEventListener('input', updateRestaurantKitchenCosts);
+            checkbox.addEventListener('change', updateRestaurantSubtotal);
+        });
+    }
+    
+    // 厨房設備の金額計算
+    function updateRestaurantKitchenCosts() {
+        let kitchenProcessText = "【厨房設備の計算】\n";
+        
+        restaurantKitchenEquipmentData.forEach(item => {
+            try {
+                const count = parseFloat(document.getElementById(item.countId).value) || 0;
+                if (count > 0) {
+                    const [no, name, abbrev, installHours, laborCost, expense, listPrice, rate, unitInput, category] = item.data;
+                    
+                    const ih = parseFloat(installHours) || 0;
+                    const lc = parseFloat(laborCost) || 0;
+                    const exp = parseFloat(expense) || 0;
+                    const lp = parseFloat(listPrice) || 0;
+                    const r = parseFloat(rate) || 0;
+                    
+                    // 機器単価 = (取付工数 × 労務単価) + 経費 + (定価 × 掛け率)
+                    const unitCost = (ih * lc) + exp + (lp * r);
+                    const totalCost = unitCost * count;
+                    
+                    document.getElementById(item.costId).value = Math.round(totalCost).toLocaleString();
+                    
+                    kitchenProcessText += `\n[${abbrev || name}]\n`;
+                    kitchenProcessText += `  単価 = (${ih}×${lc.toLocaleString()}) + ${exp.toLocaleString()} + (${lp.toLocaleString()}×${r})\n`;
+                    kitchenProcessText += `       = ${Math.round(unitCost).toLocaleString()}円\n`;
+                    kitchenProcessText += `  金額 = ${Math.round(unitCost).toLocaleString()} × ${count} = ${Math.round(totalCost).toLocaleString()}円\n`;
+                } else {
+                    document.getElementById(item.costId).value = '0';
+                }
+            } catch (error) {
+                document.getElementById(item.costId).value = '0';
+            }
+        });
+        
+        document.getElementById('restaurant_kitchen_process').textContent = kitchenProcessText;
+        updateRestaurantSubtotal();
+    }
+    
+    // 家具の金額計算
+    function updateRestaurantFurnitureCosts() {
+        let furnitureProcessText = "【家具の計算】\n";
+        
+        const furnitureItems = [
+            { abbrev: 'バーカウンター', countId: 'restaurant_furniture_bar_counter_count', costId: 'restaurant_furniture_bar_counter_cost' },
+            { abbrev: 'ソフトドリンクカウンター', countId: 'restaurant_furniture_soft_drink_counter_count', costId: 'restaurant_furniture_soft_drink_counter_cost' },
+            { abbrev: 'アルコールカウンター', countId: 'restaurant_furniture_alcohol_counter_count', costId: 'restaurant_furniture_alcohol_counter_cost' },
+            { abbrev: 'カトラリ―カウンター', countId: 'restaurant_furniture_cutlery_counter_count', costId: 'restaurant_furniture_cutlery_counter_cost' },
+            { abbrev: 'アイスカウンター', countId: 'restaurant_furniture_ice_counter_count', costId: 'restaurant_furniture_ice_counter_cost' },
+            { abbrev: 'ソフトクリームカウンター', countId: 'restaurant_furniture_soft_cream_counter_count', costId: 'restaurant_furniture_soft_cream_counter_cost' },
+            { abbrev: '返却台', countId: 'restaurant_furniture_return_counter_count', costId: 'restaurant_furniture_return_counter_cost' }
+        ];
+        
+        furnitureItems.forEach(item => {
+            try {
+                const count = parseFloat(document.getElementById(item.countId).value) || 0;
+                if (count > 0) {
+                    const data = getFurniture1DataByAbbrev(item.abbrev);
+                    if (data) {
+                        const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                        document.getElementById(item.costId).value = Math.round(cost).toLocaleString();
+                        furnitureProcessText += `\n[${item.abbrev}]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    }
+                } else {
+                    document.getElementById(item.costId).value = '0';
+                }
+            } catch (error) {
+                document.getElementById(item.costId).value = '0';
+            }
+        });
+        
+        document.getElementById('restaurant_furniture_process').textContent = furnitureProcessText;
+        updateRestaurantSubtotal();
+    }
+    
+    // レストラン小計を計算
+    function updateRestaurantSubtotal() {
+        let total = 0;
+        
+        // 建築項目
+        const archItems = [
+            { check: 'restaurant_arch_restaurant_check', cost: 'restaurant_arch_restaurant_cost' },
+            { check: 'restaurant_arch_livekitchen_check', cost: 'restaurant_arch_livekitchen_cost' },
+            { check: 'restaurant_arch_kitchen_check', cost: 'restaurant_arch_kitchen_cost' }
+        ];
+        
+        // 機械設備項目
+        const mechItems = [
+            { check: 'restaurant_mech_ac_check', cost: 'restaurant_mech_ac_cost' },
+            { check: 'restaurant_mech_sprinkler_check', cost: 'restaurant_mech_sprinkler_cost' },
+            { check: 'restaurant_mech_fire_hose_check', cost: 'restaurant_mech_fire_hose_cost' },
+            { check: 'restaurant_mech_hood_check', cost: 'restaurant_mech_hood_cost' }
+        ];
+        
+        // 電気設備項目
+        const elecItems = [
+            { check: 'restaurant_elec_led_check', cost: 'restaurant_elec_led_cost' },
+            { check: 'restaurant_elec_smoke_check', cost: 'restaurant_elec_smoke_cost' },
+            { check: 'restaurant_elec_exit_light_check', cost: 'restaurant_elec_exit_light_cost' },
+            { check: 'restaurant_elec_speaker_check', cost: 'restaurant_elec_speaker_cost' },
+            { check: 'restaurant_elec_outlet_check', cost: 'restaurant_elec_outlet_cost' }
+        ];
+        
+        // 家具項目
+        const furnitureItems = [
+            { check: 'restaurant_furniture_bar_counter_check', cost: 'restaurant_furniture_bar_counter_cost' },
+            { check: 'restaurant_furniture_soft_drink_counter_check', cost: 'restaurant_furniture_soft_drink_counter_cost' },
+            { check: 'restaurant_furniture_alcohol_counter_check', cost: 'restaurant_furniture_alcohol_counter_cost' },
+            { check: 'restaurant_furniture_cutlery_counter_check', cost: 'restaurant_furniture_cutlery_counter_cost' },
+            { check: 'restaurant_furniture_ice_counter_check', cost: 'restaurant_furniture_ice_counter_cost' },
+            { check: 'restaurant_furniture_soft_cream_counter_check', cost: 'restaurant_furniture_soft_cream_counter_cost' },
+            { check: 'restaurant_furniture_return_counter_check', cost: 'restaurant_furniture_return_counter_cost' }
+        ];
+        
+        const allItems = [...archItems, ...mechItems, ...elecItems, ...furnitureItems];
+        
+        allItems.forEach(item => {
+            const checkbox = document.getElementById(item.check);
+            const costInput = document.getElementById(item.cost);
+            if (checkbox && checkbox.checked && costInput) {
+                const costStr = costInput.value.replace(/,/g, '');
+                const cost = parseFloat(costStr) || 0;
+                total += cost;
+            }
+        });
+        
+        // 厨房設備項目
+        restaurantKitchenEquipmentData.forEach(item => {
+            const checkbox = document.getElementById(item.checkboxId);
+            const costInput = document.getElementById(item.costId);
+            if (checkbox && checkbox.checked && costInput) {
+                const costStr = costInput.value.replace(/,/g, '');
+                const cost = parseFloat(costStr) || 0;
+                total += cost;
+            }
+        });
+        
+        document.getElementById('restaurant_subtotal').value = Math.round(total).toLocaleString();
+        
+        // コストサマリの小計も更新
+        const sumRestaurantElement = document.getElementById('sum_restaurant');
+        if (sumRestaurantElement) {
+            sumRestaurantElement.textContent = Math.round(total).toLocaleString() + ' 円';
+        }
+    }
+    
+    // ========== レストランタブの関数ここまで ==========
 
 
 
