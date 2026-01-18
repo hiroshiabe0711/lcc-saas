@@ -1634,9 +1634,11 @@
         event.target.classList.add('active');
     }
 
-    function setupEventListeners() {
+function setupEventListeners() {
         ['room_japanese', 'room_japanese_western', 'room_japanese_bed', 'room_western'].forEach(id => {
-            document.getElementById(id).addEventListener('input', updateTotalGuests);
+            const element = document.getElementById(id);
+            element.addEventListener('input', updateTotalGuests);
+            element.addEventListener('input', updateOnsenCalculations); // ← 温泉設備の推奨値を更新
         });
 
         document.getElementById('birth_date').addEventListener('change', calculateDateDiff);
@@ -1658,6 +1660,16 @@
         ['hot_spring', 'self_gen', 'gas_station', 'purification', 'hot_water', 'emergency', 'solar'].forEach(id => {
             document.getElementById(id).addEventListener('change', updateAdditionalEquipmentSubtotal);
         });
+        
+        // グレード変更時に温泉設備の建築金額を更新
+        const gradeElement = document.getElementById('grade');
+        if (gradeElement) {
+            gradeElement.addEventListener('change', function() {
+                if (typeof updateOnsenBathArchCosts === 'function') {
+                    updateOnsenBathArchCosts();
+                }
+            });
+        }
     }
 
     function updateTotalGuests() {
