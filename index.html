@@ -406,15 +406,18 @@
                 <div class="section-title">建物の基本情報</div>
                 
                 <div class="form-row">
-                    <label class="form-label">建築地域:</label>
-                    <select id="region">
-                        <option>東京都内</option>
-                        <option>その他関東</option>
-                        <option>関西</option>
-                        <option>地方都市</option>
-                        <option>地方</option>
-                    </select>
-                </div>
+    <label class="form-label">建築地域:</label>
+    <select id="region">
+        <option>東京都内</option>
+        <option>その他関東</option>
+        <option>関西</option>
+        <option>地方都市</option>
+        <option>地方</option>
+    </select>
+    <input type="checkbox" id="apply_region_rate" style="margin-left: 15px;">
+    <label style="margin-left: 5px; font-size: 13px;">地域係数を反映</label>
+    <span id="region_rate_display" style="margin-left: 10px; color: #1976d2; font-weight: bold; font-size: 13px;">-</span>
+</div>
                 
                 <div class="form-row">
                     <label class="form-label">生年月日 (yyyy/mm/dd):</label>
@@ -2362,6 +2365,14 @@
     let furniture1Data = [];
     let furniture2Data = [];
     
+    // 地域係数のマッピング
+    const regionRates = {
+        '東京都内': 1.00,
+        'その他関東': 0.90,
+        '関西': 0.85,
+        '地方都市': 0.80,
+        '地方': 0.75
+    };
     // 初期設備データ
     const initialEquipmentData = [
         [1, "洋風便器洗浄便座一体型", "便器", 1.56, 27000, 4212, 120000, 0.02000],
@@ -2586,13 +2597,37 @@ function setupEventListeners() {
             document.getElementById(id).addEventListener('change', updateAdditionalEquipmentSubtotal);
         });
         
-        // グレード変更時に温泉設備・レストランの建築金額を更新
+        // ========== ここから地域係数のコードを追加 ==========
+    
+        // 建築地域変更時の処理
+        const regionElement = document.getElementById('region');
+        if (regionElement) {
+            regionElement.addEventListener('change', function() {
+                updateRegionRateDisplay();
+                if (document.getElementById('apply_region_rate').checked) {
+                    recalculateAllArchCosts();
+                }
+            });
+        }
+        
+        // 地域係数適用チェックボックス変更時の処理
+        const applyRegionRateCheckbox = document.getElementById('apply_region_rate');
+        if (applyRegionRateCheckbox) {
+            applyRegionRateCheckbox.addEventListener('change', function() {
+                recalculateAllArchCosts();
+            });
+        }
+        
+        // 初期表示
+        updateRegionRateDisplay();
+        
+        
+        
+        // グレード変更時に全タブの建築金額を更新
         const gradeElement = document.getElementById('grade');
         if (gradeElement) {
             gradeElement.addEventListener('change', function() {
-                
-                                
-                        // 温泉設備タブ
+                // 温泉設備タブ
                 if (typeof updateOnsenBathArchCosts === 'function') {
                     updateOnsenBathArchCosts();
                 }
@@ -2619,7 +2654,6 @@ function setupEventListeners() {
                 
                 // 将来的に追加される他のタブ用
                 // 客室タブなど、建築項目を持つ他のタブが追加された場合はここに追加
-
             });
         }
     }
@@ -4156,169 +4190,214 @@ function setupEventListeners() {
         return null;
     }
     // 温泉設備の建築金額計算
-    function updateOnsenBathArchCosts() {
-        // 男性用
-        let menProcessText = "【男性用 建築項目の計算】\n";
-        
-        // ①内湯浴槽
-        try {
-            const area = parseFloat(document.getElementById('men_indoor_bath_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("内風呂");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('men_indoor_bath_cost').value = Math.round(cost).toLocaleString();
-                    
-                    menProcessText += `\n[内湯浴槽 - ${gradeName}]\n`;
-                    menProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    menProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    menProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+function updateOnsenBathArchCosts() {
+    const regionRate = getRegionRate();
+    const region = document.getElementById('region').value;
+    
+    // 男性用
+    let menProcessText = "【男性用 建築項目の計算】\n";
+    
+    // ①内湯浴槽
+    try {
+        const area = parseFloat(document.getElementById('men_indoor_bath_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("内風呂");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('men_indoor_bath_cost').value = Math.round(cost).toLocaleString();
+                
+                menProcessText += `\n[内湯浴槽 - ${gradeName}]\n`;
+                menProcessText += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                menProcessText += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                menProcessText += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    menProcessText += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    menProcessText += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円\n`;
                 } else {
-                    document.getElementById('men_indoor_bath_cost').value = '0';
-                    menProcessText += "\n[内湯浴槽]単価情報が取得できません\n";
+                    menProcessText += `  最終金額 = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('men_indoor_bath_cost').value = '0';
+                menProcessText += "\n[内湯浴槽]単価情報が取得できません\n";
             }
-        } catch (error) {
+        } else {
             document.getElementById('men_indoor_bath_cost').value = '0';
         }
-        
-        // ②露天風呂
-        try {
-            const area = parseFloat(document.getElementById('men_outdoor_bath_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("露天風呂");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('men_outdoor_bath_cost').value = Math.round(cost).toLocaleString();
-                    
-                    menProcessText += `\n[露天風呂 - ${gradeName}]\n`;
-                    menProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    menProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    menProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+    } catch (error) {
+        document.getElementById('men_indoor_bath_cost').value = '0';
+    }
+    
+    // ②露天風呂
+    try {
+        const area = parseFloat(document.getElementById('men_outdoor_bath_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("露天風呂");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('men_outdoor_bath_cost').value = Math.round(cost).toLocaleString();
+                
+                menProcessText += `\n[露天風呂 - ${gradeName}]\n`;
+                menProcessText += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                menProcessText += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                menProcessText += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    menProcessText += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    menProcessText += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円\n`;
                 } else {
-                    document.getElementById('men_outdoor_bath_cost').value = '0';
-                    menProcessText += "\n[露天風呂]単価情報が取得できません\n";
+                    menProcessText += `  最終金額 = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('men_outdoor_bath_cost').value = '0';
+                menProcessText += "\n[露天風呂]単価情報が取得できません\n";
             }
-        } catch (error) {
+        } else {
             document.getElementById('men_outdoor_bath_cost').value = '0';
         }
-        
-        // ③浴室
-        try {
-            const area = parseFloat(document.getElementById('men_bathroom_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("浴室");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('men_bathroom_cost').value = Math.round(cost).toLocaleString();
-                    
-                    menProcessText += `\n[浴室 - ${gradeName}]\n`;
-                    menProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    menProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    menProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+    } catch (error) {
+        document.getElementById('men_outdoor_bath_cost').value = '0';
+    }
+    
+    // ③浴室
+    try {
+        const area = parseFloat(document.getElementById('men_bathroom_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("浴室");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('men_bathroom_cost').value = Math.round(cost).toLocaleString();
+                
+                menProcessText += `\n[浴室 - ${gradeName}]\n`;
+                menProcessText += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                menProcessText += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                menProcessText += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    menProcessText += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    menProcessText += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円\n`;
                 } else {
-                    document.getElementById('men_bathroom_cost').value = '0';
-                    menProcessText += "\n[浴室]単価情報が取得できません\n";
+                    menProcessText += `  最終金額 = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('men_bathroom_cost').value = '0';
+                menProcessText += "\n[浴室]単価情報が取得できません\n";
             }
-        } catch (error) {
+        } else {
             document.getElementById('men_bathroom_cost').value = '0';
         }
-        
-        document.getElementById('men_bath_arch_process').textContent = menProcessText;
-        
-        // 女性用
-        let womenProcessText = "【女性用 建築項目の計算】\n";
-        
-        // ①内湯浴槽
-        try {
-            const area = parseFloat(document.getElementById('women_indoor_bath_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("内風呂");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('women_indoor_bath_cost').value = Math.round(cost).toLocaleString();
-                    
-                    womenProcessText += `\n[内湯浴槽 - ${gradeName}]\n`;
-                    womenProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    womenProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    womenProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+    } catch (error) {
+        document.getElementById('men_bathroom_cost').value = '0';
+    }
+    
+    document.getElementById('men_bath_arch_process').textContent = menProcessText;
+    
+    // 女性用
+    let womenProcessText = "【女性用 建築項目の計算】\n";
+    
+    // ①内湯浴槽
+    try {
+        const area = parseFloat(document.getElementById('women_indoor_bath_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("内風呂");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('women_indoor_bath_cost').value = Math.round(cost).toLocaleString();
+                
+                womenProcessText += `\n[内湯浴槽 - ${gradeName}]\n`;
+                womenProcessText += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                womenProcessText += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                womenProcessText += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    womenProcessText += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    womenProcessText += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円\n`;
                 } else {
-                    document.getElementById('women_indoor_bath_cost').value = '0';
-                    womenProcessText += "\n[内湯浴槽]単価情報が取得できません\n";
+                    womenProcessText += `  最終金額 = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('women_indoor_bath_cost').value = '0';
+                womenProcessText += "\n[内湯浴槽]単価情報が取得できません\n";
             }
-        } catch (error) {
+        } else {
             document.getElementById('women_indoor_bath_cost').value = '0';
         }
-        
-        // ②露天風呂
-        try {
-            const area = parseFloat(document.getElementById('women_outdoor_bath_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("露天風呂");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('women_outdoor_bath_cost').value = Math.round(cost).toLocaleString();
-                    
-                    womenProcessText += `\n[露天風呂 - ${gradeName}]\n`;
-                    womenProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    womenProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    womenProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+    } catch (error) {
+        document.getElementById('women_indoor_bath_cost').value = '0';
+    }
+    
+    // ②露天風呂
+    try {
+        const area = parseFloat(document.getElementById('women_outdoor_bath_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("露天風呂");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('women_outdoor_bath_cost').value = Math.round(cost).toLocaleString();
+                
+                womenProcessText += `\n[露天風呂 - ${gradeName}]\n`;
+                womenProcessText += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                womenProcessText += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                womenProcessText += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    womenProcessText += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    womenProcessText += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円\n`;
                 } else {
-                    document.getElementById('women_outdoor_bath_cost').value = '0';
-                    womenProcessText += "\n[露天風呂]単価情報が取得できません\n";
+                    womenProcessText += `  最終金額 = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('women_outdoor_bath_cost').value = '0';
+                womenProcessText += "\n[露天風呂]単価情報が取得できません\n";
             }
-        } catch (error) {
+        } else {
             document.getElementById('women_outdoor_bath_cost').value = '0';
         }
-        
-        // ③浴室
-        try {
-            const area = parseFloat(document.getElementById('women_bathroom_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("浴室");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('women_bathroom_cost').value = Math.round(cost).toLocaleString();
-                    
-                    womenProcessText += `\n[浴室 - ${gradeName}]\n`;
-                    womenProcessText += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    womenProcessText += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    womenProcessText += `       = ${Math.round(cost).toLocaleString()}円\n`;
+    } catch (error) {
+        document.getElementById('women_outdoor_bath_cost').value = '0';
+    }
+    
+    // ③浴室
+    try {
+        const area = parseFloat(document.getElementById('women_bathroom_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("浴室");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('women_bathroom_cost').value = Math.round(cost).toLocaleString();
+                
+                womenProcessText += `\n[浴室 - ${gradeName}]\n`;
+                womenProcessText += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                womenProcessText += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                womenProcessText += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    womenProcessText += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    womenProcessText += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円\n`;
                 } else {
-                    document.getElementById('women_bathroom_cost').value = '0';
-                    womenProcessText += "\n[浴室]単価情報が取得できません\n";
+                    womenProcessText += `  最終金額 = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('women_bathroom_cost').value = '0';
+                womenProcessText += "\n[浴室]単価情報が取得できません\n";
             }
-        } catch (error) {
+        } else {
             document.getElementById('women_bathroom_cost').value = '0';
         }
-        
-        document.getElementById('women_bath_arch_process').textContent = womenProcessText;
-        
-        updateOnsenSubtotal();
+    } catch (error) {
+        document.getElementById('women_bathroom_cost').value = '0';
     }
+    
+    document.getElementById('women_bath_arch_process').textContent = womenProcessText;
+    
+    updateOnsenSubtotal();
+}
     // 温泉設備の小計計算
     function updateOnsenSubtotal() {
         let total = 0;
@@ -4425,93 +4504,117 @@ function setupEventListeners() {
     }
     
     // レストランの建築項目の金額を自動計算
-    function updateRestaurantArchCosts() {
-        let restaurantProcess = "";
-        let livekitchenProcess = "";
-        let kitchenProcess = "";
-        
-        // レストラン
-        try {
-            const area = parseFloat(document.getElementById('restaurant_arch_restaurant_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("レストラン");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('restaurant_arch_restaurant_cost').value = Math.round(cost).toLocaleString();
-                    
-                    restaurantProcess = `【レストラン - ${gradeName}】\n`;
-                    restaurantProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    restaurantProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    restaurantProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+function updateRestaurantArchCosts() {
+    const regionRate = getRegionRate();
+    const region = document.getElementById('region').value;
+    
+    let restaurantProcess = "";
+    let livekitchenProcess = "";
+    let kitchenProcess = "";
+    
+    // レストラン
+    try {
+        const area = parseFloat(document.getElementById('restaurant_arch_restaurant_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("レストラン");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('restaurant_arch_restaurant_cost').value = Math.round(cost).toLocaleString();
+                
+                restaurantProcess = `【レストラン - ${gradeName}】\n`;
+                restaurantProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                restaurantProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                restaurantProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    restaurantProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    restaurantProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('restaurant_arch_restaurant_cost').value = '0';
-                    restaurantProcess = "【レストラン】単価情報が取得できません";
+                    restaurantProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('restaurant_arch_restaurant_cost').value = '0';
+                restaurantProcess = "【レストラン】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('restaurant_arch_restaurant_cost').value = '0';
         }
-        
-        // ライブキッチン
-        try {
-            const area = parseFloat(document.getElementById('restaurant_arch_livekitchen_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("ライブキッチン");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('restaurant_arch_livekitchen_cost').value = Math.round(cost).toLocaleString();
-                    
-                    livekitchenProcess = `【ライブキッチン - ${gradeName}】\n`;
-                    livekitchenProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    livekitchenProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    livekitchenProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+    } catch (error) {
+        document.getElementById('restaurant_arch_restaurant_cost').value = '0';
+    }
+    
+    // ライブキッチン
+    try {
+        const area = parseFloat(document.getElementById('restaurant_arch_livekitchen_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("ライブキッチン");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('restaurant_arch_livekitchen_cost').value = Math.round(cost).toLocaleString();
+                
+                livekitchenProcess = `【ライブキッチン - ${gradeName}】\n`;
+                livekitchenProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                livekitchenProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                livekitchenProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    livekitchenProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    livekitchenProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('restaurant_arch_livekitchen_cost').value = '0';
-                    livekitchenProcess = "【ライブキッチン】単価情報が取得できません";
+                    livekitchenProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('restaurant_arch_livekitchen_cost').value = '0';
+                livekitchenProcess = "【ライブキッチン】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('restaurant_arch_livekitchen_cost').value = '0';
         }
-        
-        // 厨房
-        try {
-            const area = parseFloat(document.getElementById('restaurant_arch_kitchen_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("厨房");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('restaurant_arch_kitchen_cost').value = Math.round(cost).toLocaleString();
-                    
-                    kitchenProcess = `【厨房 - ${gradeName}】\n`;
-                    kitchenProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    kitchenProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    kitchenProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+    } catch (error) {
+        document.getElementById('restaurant_arch_livekitchen_cost').value = '0';
+    }
+    
+    // 厨房
+    try {
+        const area = parseFloat(document.getElementById('restaurant_arch_kitchen_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("厨房");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('restaurant_arch_kitchen_cost').value = Math.round(cost).toLocaleString();
+                
+                kitchenProcess = `【厨房 - ${gradeName}】\n`;
+                kitchenProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                kitchenProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                kitchenProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    kitchenProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    kitchenProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('restaurant_arch_kitchen_cost').value = '0';
-                    kitchenProcess = "【厨房】単価情報が取得できません";
+                    kitchenProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('restaurant_arch_kitchen_cost').value = '0';
+                kitchenProcess = "【厨房】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('restaurant_arch_kitchen_cost').value = '0';
         }
-        
-        document.getElementById('restaurant_arch_restaurant_process').textContent = restaurantProcess;
-        document.getElementById('restaurant_arch_livekitchen_process').textContent = livekitchenProcess;
-        document.getElementById('restaurant_arch_kitchen_process').textContent = kitchenProcess;
-        
-        updateRestaurantRecommendedCounts();
-        updateRestaurantSubtotal();
+    } catch (error) {
+        document.getElementById('restaurant_arch_kitchen_cost').value = '0';
     }
+    
+    document.getElementById('restaurant_arch_restaurant_process').textContent = restaurantProcess;
+    document.getElementById('restaurant_arch_livekitchen_process').textContent = livekitchenProcess;
+    document.getElementById('restaurant_arch_kitchen_process').textContent = kitchenProcess;
+    
+    updateRestaurantRecommendedCounts();
+    updateRestaurantSubtotal();
+}
     // レストランの機械設備・電気設備・家具の推奨個数を計算
     function updateRestaurantRecommendedCounts() {
         try {
@@ -5071,120 +5174,151 @@ function setupEventListeners() {
     }
     
     // ラウンジの建築項目の金額を自動計算
-    function updateLoungeArchCosts() {
-        let frontProcess = "";
-        let lobbyProcess = "";
-        let facadeProcess = "";
-        let shopProcess = "";
-        
-        // フロント
-        try {
-            const area = parseFloat(document.getElementById('lounge_arch_front_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("フロント");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('lounge_arch_front_cost').value = Math.round(cost).toLocaleString();
-                    
-                    frontProcess = `【フロント - ${gradeName}】\n`;
-                    frontProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    frontProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    frontProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+function updateLoungeArchCosts() {
+    const regionRate = getRegionRate();
+    const region = document.getElementById('region').value;
+    
+    let frontProcess = "";
+    let lobbyProcess = "";
+    let facadeProcess = "";
+    let shopProcess = "";
+    
+    // フロント
+    try {
+        const area = parseFloat(document.getElementById('lounge_arch_front_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("フロント");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('lounge_arch_front_cost').value = Math.round(cost).toLocaleString();
+                
+                frontProcess = `【フロント - ${gradeName}】\n`;
+                frontProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                frontProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                frontProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    frontProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    frontProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('lounge_arch_front_cost').value = '0';
-                    frontProcess = "【フロント】単価情報が取得できません";
+                    frontProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('lounge_arch_front_cost').value = '0';
+                frontProcess = "【フロント】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('lounge_arch_front_cost').value = '0';
         }
-        
-        // ロビー
-        try {
-            const area = parseFloat(document.getElementById('lounge_arch_lobby_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("ロビー");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('lounge_arch_lobby_cost').value = Math.round(cost).toLocaleString();
-                    
-                    lobbyProcess = `【ロビー - ${gradeName}】\n`;
-                    lobbyProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    lobbyProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    lobbyProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+    } catch (error) {
+        document.getElementById('lounge_arch_front_cost').value = '0';
+    }
+    
+    // ロビー
+    try {
+        const area = parseFloat(document.getElementById('lounge_arch_lobby_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("ロビー");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('lounge_arch_lobby_cost').value = Math.round(cost).toLocaleString();
+                
+                lobbyProcess = `【ロビー - ${gradeName}】\n`;
+                lobbyProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                lobbyProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                lobbyProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    lobbyProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    lobbyProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('lounge_arch_lobby_cost').value = '0';
-                    lobbyProcess = "【ロビー】単価情報が取得できません";
+                    lobbyProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('lounge_arch_lobby_cost').value = '0';
+                lobbyProcess = "【ロビー】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('lounge_arch_lobby_cost').value = '0';
         }
-        
-        // ファサード
-        try {
-            const area = parseFloat(document.getElementById('lounge_arch_facade_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("ファサード");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('lounge_arch_facade_cost').value = Math.round(cost).toLocaleString();
-                    
-                    facadeProcess = `【ファサード - ${gradeName}】\n`;
-                    facadeProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    facadeProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    facadeProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+    } catch (error) {
+        document.getElementById('lounge_arch_lobby_cost').value = '0';
+    }
+    
+    // ファサード
+    try {
+        const area = parseFloat(document.getElementById('lounge_arch_facade_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("ファサード");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('lounge_arch_facade_cost').value = Math.round(cost).toLocaleString();
+                
+                facadeProcess = `【ファサード - ${gradeName}】\n`;
+                facadeProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                facadeProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                facadeProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    facadeProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    facadeProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('lounge_arch_facade_cost').value = '0';
-                    facadeProcess = "【ファサード】単価情報が取得できません";
+                    facadeProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('lounge_arch_facade_cost').value = '0';
+                facadeProcess = "【ファサード】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('lounge_arch_facade_cost').value = '0';
         }
-        
-        // 売店
-        try {
-            const area = parseFloat(document.getElementById('lounge_arch_shop_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("売店");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('lounge_arch_shop_cost').value = Math.round(cost).toLocaleString();
-                    
-                    shopProcess = `【売店 - ${gradeName}】\n`;
-                    shopProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    shopProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    shopProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+    } catch (error) {
+        document.getElementById('lounge_arch_facade_cost').value = '0';
+    }
+    
+    // 売店
+    try {
+        const area = parseFloat(document.getElementById('lounge_arch_shop_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("売店");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('lounge_arch_shop_cost').value = Math.round(cost).toLocaleString();
+                
+                shopProcess = `【売店 - ${gradeName}】\n`;
+                shopProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                shopProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                shopProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    shopProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    shopProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('lounge_arch_shop_cost').value = '0';
-                    shopProcess = "【売店】単価情報が取得できません";
+                    shopProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('lounge_arch_shop_cost').value = '0';
+                shopProcess = "【売店】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('lounge_arch_shop_cost').value = '0';
         }
-        
-        document.getElementById('lounge_arch_front_process').textContent = frontProcess;
-        document.getElementById('lounge_arch_lobby_process').textContent = lobbyProcess;
-        document.getElementById('lounge_arch_facade_process').textContent = facadeProcess;
-        document.getElementById('lounge_arch_shop_process').textContent = shopProcess;
-        
-        updateLoungeRecommendedCounts();
-        updateLoungeSubtotal();
+    } catch (error) {
+        document.getElementById('lounge_arch_shop_cost').value = '0';
     }
+    
+    document.getElementById('lounge_arch_front_process').textContent = frontProcess;
+    document.getElementById('lounge_arch_lobby_process').textContent = lobbyProcess;
+    document.getElementById('lounge_arch_facade_process').textContent = facadeProcess;
+    document.getElementById('lounge_arch_shop_process').textContent = shopProcess;
+    
+    updateLoungeRecommendedCounts();
+    updateLoungeSubtotal();
+}
     // ラウンジの機械設備・電気設備の推奨個数を計算
     function updateLoungeRecommendedCounts() {
         try {
@@ -5677,81 +5811,91 @@ function setupEventListeners() {
         container.appendChild(itemDiv);
     }
     // 通路タブの建築項目の金額を自動計算
-    function updateHallwayArchCosts() {
-        Object.keys(hallwayFloorData).forEach(floorKey => {
-            try {
-                const area = hallwayFloorData[floorKey].area;
-                const costInput = document.getElementById(`hallway_arch_${floorKey}_cost`);
-                const processElement = document.getElementById(`hallway_arch_process_${floorKey}`);
-                
-                if (area > 0) {
-                    const costs = getInteriorUnitCosts("通路");
-                    if (costs) {
-                        const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                        const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                        
-                        if (costInput) {
-                            costInput.value = Math.round(cost).toLocaleString();
-                        }
-                        hallwayFloorData[floorKey].cost = Math.round(cost);
-                        
-                        // 階数表示用のラベルを生成
-                        let floorLabel;
-                        if (floorKey.startsWith('B')) {
-                            const floorNum = floorKey.substring(1, floorKey.length - 1);
-                            floorLabel = `地下${floorNum}階通路`;
-                        } else {
-                            const floorNum = floorKey.substring(0, floorKey.length - 1);
-                            floorLabel = `${floorNum}階通路`;
-                        }
-                        
-                        let process = `【${floorLabel} - ${gradeName}】\n`;
-                        process += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                        process += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                        process += `       = ${Math.round(cost).toLocaleString()}円`;
-                        
-                        if (processElement) {
-                            processElement.textContent = process;
-                        }
-                        hallwayFloorData[floorKey].process = process;
-                    } else {
-                        if (costInput) {
-                            costInput.value = '0';
-                        }
-                        hallwayFloorData[floorKey].cost = 0;
-                        
-                        let floorLabel;
-                        if (floorKey.startsWith('B')) {
-                            const floorNum = floorKey.substring(1, floorKey.length - 1);
-                            floorLabel = `地下${floorNum}階通路`;
-                        } else {
-                            const floorNum = floorKey.substring(0, floorKey.length - 1);
-                            floorLabel = `${floorNum}階通路`;
-                        }
-                        
-                        if (processElement) {
-                            processElement.textContent = `【${floorLabel}】単価情報が取得できません`;
-                        }
+function updateHallwayArchCosts() {
+    const regionRate = getRegionRate();
+    const region = document.getElementById('region').value;
+    
+    Object.keys(hallwayFloorData).forEach(floorKey => {
+        try {
+            const area = hallwayFloorData[floorKey].area;
+            const costInput = document.getElementById(`hallway_arch_${floorKey}_cost`);
+            const processElement = document.getElementById(`hallway_arch_process_${floorKey}`);
+            
+            if (area > 0) {
+                const costs = getInteriorUnitCosts("通路");
+                if (costs) {
+                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                    const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                    const cost = baseCost * regionRate;
+                    
+                    if (costInput) {
+                        costInput.value = Math.round(cost).toLocaleString();
                     }
+                    hallwayFloorData[floorKey].cost = Math.round(cost);
+                    
+                    // 階数表示用のラベルを生成
+                    let floorLabel;
+                    if (floorKey.startsWith('B')) {
+                        const floorNum = floorKey.substring(1, floorKey.length - 1);
+                        floorLabel = `地下${floorNum}階通路`;
+                    } else {
+                        const floorNum = floorKey.substring(0, floorKey.length - 1);
+                        floorLabel = `${floorNum}階通路`;
+                    }
+                    
+                    let process = `【${floorLabel} - ${gradeName}】\n`;
+                    process += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                    process += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                    process += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                    if (regionRate !== 1.0) {
+                        process += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                        process += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
+                    } else {
+                        process += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
+                    }
+                    
+                    if (processElement) {
+                        processElement.textContent = process;
+                    }
+                    hallwayFloorData[floorKey].process = process;
                 } else {
                     if (costInput) {
                         costInput.value = '0';
                     }
                     hallwayFloorData[floorKey].cost = 0;
                     
-                    if (processElement) {
-                        processElement.textContent = '';
+                    let floorLabel;
+                    if (floorKey.startsWith('B')) {
+                        const floorNum = floorKey.substring(1, floorKey.length - 1);
+                        floorLabel = `地下${floorNum}階通路`;
+                    } else {
+                        const floorNum = floorKey.substring(0, floorKey.length - 1);
+                        floorLabel = `${floorNum}階通路`;
                     }
-                    hallwayFloorData[floorKey].process = '';
+                    
+                    if (processElement) {
+                        processElement.textContent = `【${floorLabel}】単価情報が取得できません`;
+                    }
                 }
-            } catch (error) {
-                console.error(`通路${floorKey}の計算エラー:`, error);
+            } else {
+                if (costInput) {
+                    costInput.value = '0';
+                }
+                hallwayFloorData[floorKey].cost = 0;
+                
+                if (processElement) {
+                    processElement.textContent = '';
+                }
+                hallwayFloorData[floorKey].process = '';
             }
-        });
-        
-        updateHallwayRecommendedCounts();
-        updateHallwaySubtotal();
-    }
+        } catch (error) {
+            console.error(`通路${floorKey}の計算エラー:`, error);
+        }
+    });
+    
+    updateHallwayRecommendedCounts();
+    updateHallwaySubtotal();
+}
     
     // 通路の機械設備・電気設備の推奨個数を計算
     function updateHallwayRecommendedCounts() {
@@ -6087,93 +6231,117 @@ function setupEventListeners() {
     }
     
     // アミューズメントの建築項目の金額を自動計算
-    function updateAmusementArchCosts() {
-        let pingpongProcess = "";
-        let kidsProcess = "";
-        let mangaProcess = "";
-        
-        // 卓球コーナー
-        try {
-            const area = parseFloat(document.getElementById('amusement_arch_pingpong_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("卓球コーナー");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('amusement_arch_pingpong_cost').value = Math.round(cost).toLocaleString();
-                    
-                    pingpongProcess = `【卓球コーナー - ${gradeName}】\n`;
-                    pingpongProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    pingpongProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    pingpongProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+function updateAmusementArchCosts() {
+    const regionRate = getRegionRate();
+    const region = document.getElementById('region').value;
+    
+    let pingpongProcess = "";
+    let kidsProcess = "";
+    let mangaProcess = "";
+    
+    // 卓球コーナー
+    try {
+        const area = parseFloat(document.getElementById('amusement_arch_pingpong_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("卓球コーナー");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('amusement_arch_pingpong_cost').value = Math.round(cost).toLocaleString();
+                
+                pingpongProcess = `【卓球コーナー - ${gradeName}】\n`;
+                pingpongProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                pingpongProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                pingpongProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    pingpongProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    pingpongProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('amusement_arch_pingpong_cost').value = '0';
-                    pingpongProcess = "【卓球コーナー】単価情報が取得できません";
+                    pingpongProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('amusement_arch_pingpong_cost').value = '0';
+                pingpongProcess = "【卓球コーナー】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('amusement_arch_pingpong_cost').value = '0';
         }
-        
-        // キッズスペース
-        try {
-            const area = parseFloat(document.getElementById('amusement_arch_kids_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("キッズスペース");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('amusement_arch_kids_cost').value = Math.round(cost).toLocaleString();
-                    
-                    kidsProcess = `【キッズスペース - ${gradeName}】\n`;
-                    kidsProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    kidsProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    kidsProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+    } catch (error) {
+        document.getElementById('amusement_arch_pingpong_cost').value = '0';
+    }
+    
+    // キッズスペース
+    try {
+        const area = parseFloat(document.getElementById('amusement_arch_kids_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("キッズスペース");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('amusement_arch_kids_cost').value = Math.round(cost).toLocaleString();
+                
+                kidsProcess = `【キッズスペース - ${gradeName}】\n`;
+                kidsProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                kidsProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                kidsProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    kidsProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    kidsProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('amusement_arch_kids_cost').value = '0';
-                    kidsProcess = "【キッズスペース】単価情報が取得できません";
+                    kidsProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('amusement_arch_kids_cost').value = '0';
+                kidsProcess = "【キッズスペース】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('amusement_arch_kids_cost').value = '0';
         }
-        
-        // 漫画コーナー
-        try {
-            const area = parseFloat(document.getElementById('amusement_arch_manga_area').value) || 0;
-            if (area > 0) {
-                const costs = getInteriorUnitCosts("漫画コーナー");
-                if (costs) {
-                    const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
-                    const cost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
-                    document.getElementById('amusement_arch_manga_cost').value = Math.round(cost).toLocaleString();
-                    
-                    mangaProcess = `【漫画コーナー - ${gradeName}】\n`;
-                    mangaProcess += `  金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
-                    mangaProcess += `       = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
-                    mangaProcess += `       = ${Math.round(cost).toLocaleString()}円`;
+    } catch (error) {
+        document.getElementById('amusement_arch_kids_cost').value = '0';
+    }
+    
+    // 漫画コーナー
+    try {
+        const area = parseFloat(document.getElementById('amusement_arch_manga_area').value) || 0;
+        if (area > 0) {
+            const costs = getInteriorUnitCosts("漫画コーナー");
+            if (costs) {
+                const { height, floorCost, ceilingCost, wallCost, gradeName } = costs;
+                const baseCost = area * floorCost + area * ceilingCost + Math.pow(area, 0.5) * 4 * height * wallCost;
+                const cost = baseCost * regionRate;
+                document.getElementById('amusement_arch_manga_cost').value = Math.round(cost).toLocaleString();
+                
+                mangaProcess = `【漫画コーナー - ${gradeName}】\n`;
+                mangaProcess += `  基本金額 = ${area}×${floorCost.toLocaleString()} + ${area}×${ceilingCost.toLocaleString()} + ${area.toFixed(2)}^0.5×4×${height}×${wallCost.toLocaleString()}\n`;
+                mangaProcess += `          = ${(area * floorCost).toFixed(0)} + ${(area * ceilingCost).toFixed(0)} + ${(Math.pow(area, 0.5) * 4 * height * wallCost).toFixed(0)}\n`;
+                mangaProcess += `          = ${Math.round(baseCost).toLocaleString()}円\n`;
+                if (regionRate !== 1.0) {
+                    mangaProcess += `  地域係数 = ${Math.round(regionRate * 100)}% (${region})\n`;
+                    mangaProcess += `  最終金額 = ${Math.round(baseCost).toLocaleString()} × ${regionRate} = ${Math.round(cost).toLocaleString()}円`;
                 } else {
-                    document.getElementById('amusement_arch_manga_cost').value = '0';
-                    mangaProcess = "【漫画コーナー】単価情報が取得できません";
+                    mangaProcess += `  最終金額 = ${Math.round(cost).toLocaleString()}円`;
                 }
             } else {
                 document.getElementById('amusement_arch_manga_cost').value = '0';
+                mangaProcess = "【漫画コーナー】単価情報が取得できません";
             }
-        } catch (error) {
+        } else {
             document.getElementById('amusement_arch_manga_cost').value = '0';
         }
-        
-        document.getElementById('amusement_arch_pingpong_process').textContent = pingpongProcess;
-        document.getElementById('amusement_arch_kids_process').textContent = kidsProcess;
-        document.getElementById('amusement_arch_manga_process').textContent = mangaProcess;
-        
-        updateAmusementRecommendedCounts();
-        updateAmusementSubtotal();
+    } catch (error) {
+        document.getElementById('amusement_arch_manga_cost').value = '0';
     }
+    
+    document.getElementById('amusement_arch_pingpong_process').textContent = pingpongProcess;
+    document.getElementById('amusement_arch_kids_process').textContent = kidsProcess;
+    document.getElementById('amusement_arch_manga_process').textContent = mangaProcess;
+    
+    updateAmusementRecommendedCounts();
+    updateAmusementSubtotal();
+}
     
     // アミューズメントの機械設備・電気設備の推奨個数を計算
     function updateAmusementRecommendedCounts() {
@@ -6475,6 +6643,56 @@ function setupEventListeners() {
     }
     
     // ========== アミューズメントタブの関数ここまで ==========
+    // ========== 地域係数関連の関数 ==========
+
+// 地域係数の表示を更新
+function updateRegionRateDisplay() {
+    const region = document.getElementById('region').value;
+    const rate = regionRates[region] || 1.0;
+    const percentage = Math.round(rate * 100);
+    document.getElementById('region_rate_display').textContent = `(係数: ${percentage}%)`;
+}
+
+// 現在の地域係数を取得
+function getRegionRate() {
+    const applyRegionRate = document.getElementById('apply_region_rate').checked;
+    if (!applyRegionRate) {
+        return 1.0; // 適用しない場合は1.0（100%）
+    }
+    
+    const region = document.getElementById('region').value;
+    return regionRates[region] || 1.0;
+}
+
+// 全タブの建築項目を再計算
+function recalculateAllArchCosts() {
+    // 温泉設備タブ
+    if (typeof updateOnsenBathArchCosts === 'function') {
+        updateOnsenBathArchCosts();
+    }
+    
+    // レストランタブ
+    if (typeof updateRestaurantArchCosts === 'function') {
+        updateRestaurantArchCosts();
+    }
+    
+    // ラウンジタブ
+    if (typeof updateLoungeArchCosts === 'function') {
+        updateLoungeArchCosts();
+    }
+    
+    // 通路タブ
+    if (typeof updateHallwayArchCosts === 'function') {
+        updateHallwayArchCosts();
+    }
+    
+    // アミューズメントタブ
+    if (typeof updateAmusementArchCosts === 'function') {
+        updateAmusementArchCosts();
+    }
+}
+
+// ========== 地域係数関連の関数ここまで ==========
 
 
 
