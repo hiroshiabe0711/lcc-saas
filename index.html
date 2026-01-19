@@ -2590,18 +2590,36 @@ function setupEventListeners() {
         const gradeElement = document.getElementById('grade');
         if (gradeElement) {
             gradeElement.addEventListener('change', function() {
+                
+                                
+                        // 温泉設備タブ
                 if (typeof updateOnsenBathArchCosts === 'function') {
                     updateOnsenBathArchCosts();
                 }
+                
+                // レストランタブ
                 if (typeof updateRestaurantArchCosts === 'function') {
                     updateRestaurantArchCosts();
                 }
+                
+                // ラウンジタブ
                 if (typeof updateLoungeArchCosts === 'function') {
                     updateLoungeArchCosts();
                 }
+                
+                // 通路タブ
                 if (typeof updateHallwayArchCosts === 'function') {
                     updateHallwayArchCosts();
                 }
+                
+                // アミューズメントタブ
+                if (typeof updateAmusementArchCosts === 'function') {
+                    updateAmusementArchCosts();
+                }
+                
+                // 将来的に追加される他のタブ用
+                // 客室タブなど、建築項目を持つ他のタブが追加された場合はここに追加
+
             });
         }
     }
