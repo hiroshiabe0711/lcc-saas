@@ -4043,9 +4043,11 @@ function setupEventListeners() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("隔て板");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('men_partition_cost').value = Math.round(cost).toLocaleString();
-                    menProcessText += `\n[隔て板]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    menProcessText += `\n[隔て板]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('men_partition_cost').value = '0';
@@ -4060,9 +4062,11 @@ function setupEventListeners() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("洗い場照明");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('men_wash_lighting_cost').value = Math.round(cost).toLocaleString();
-                    menProcessText += `\n[照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    menProcessText += `\n[照明]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('men_wash_lighting_cost').value = '0';
@@ -4077,9 +4081,11 @@ function setupEventListeners() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("シャワー水栓");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('men_shower_faucet_cost').value = Math.round(cost).toLocaleString();
-                    menProcessText += `\n[シャワー水栓]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    menProcessText += `\n[シャワー水栓]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('men_shower_faucet_cost').value = '0';
@@ -4099,9 +4105,11 @@ function setupEventListeners() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("隔て板");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('women_partition_cost').value = Math.round(cost).toLocaleString();
-                    womenProcessText += `\n[隔て板]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    womenProcessText += `\n[隔て板]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('women_partition_cost').value = '0';
@@ -4116,9 +4124,11 @@ function setupEventListeners() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("洗い場照明");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('women_wash_lighting_cost').value = Math.round(cost).toLocaleString();
-                    womenProcessText += `\n[照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    womenProcessText += `\n[照明]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('women_wash_lighting_cost').value = '0';
@@ -4133,9 +4143,11 @@ function setupEventListeners() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("シャワー水栓");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('women_shower_faucet_cost').value = Math.round(cost).toLocaleString();
-                    womenProcessText += `\n[シャワー水栓]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    womenProcessText += `\n[シャワー水栓]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('women_shower_faucet_cost').value = '0';
@@ -4759,9 +4771,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("共用部エアコン");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_mech_ac_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[共用部エアコン]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[共用部エアコン]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_mech_ac_cost').value = '0';
@@ -4770,15 +4784,17 @@ function updateRestaurantArchCosts() {
             document.getElementById('restaurant_mech_ac_cost').value = '0';
         }
         
-        // スプリンクラー
+        // スプリンクラーヘッド
         try {
             const count = parseFloat(document.getElementById('restaurant_mech_sprinkler_count').value) || 0;
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スプリンクラー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_mech_sprinkler_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[スプリンクラー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[スプリンクラーヘッド]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_mech_sprinkler_cost').value = '0';
@@ -4793,9 +4809,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("消火栓箱");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_mech_fire_hose_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[消火栓箱]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[消火栓箱]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_mech_fire_hose_cost').value = '0';
@@ -4810,9 +4828,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("フード");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_mech_hood_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[フード]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[フード]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 } else {
                     document.getElementById('restaurant_mech_hood_cost').value = '0';
                     mechProcessText += "\n[フード]\n  ※設備機器単価設定に「フード」を追加してください\n";
@@ -4830,9 +4850,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("レストランLED");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_elec_led_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[LED照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[LED照明]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_elec_led_cost').value = '0';
@@ -4847,9 +4869,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("煙感知器");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_elec_smoke_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[煙感知器]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[煙感知器]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_elec_smoke_cost').value = '0';
@@ -4864,9 +4888,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("誘導灯");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_elec_exit_light_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[誘導灯]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[誘導灯]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_elec_exit_light_cost').value = '0';
@@ -4881,9 +4907,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スピーカー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_elec_speaker_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[スピーカー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[スピーカー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_elec_speaker_cost').value = '0';
@@ -4898,9 +4926,11 @@ function updateRestaurantArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("コンセント");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('restaurant_elec_outlet_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[コンセント]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[コンセント]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('restaurant_elec_outlet_cost').value = '0';
@@ -5435,9 +5465,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("共用部エアコン");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_mech_ac_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[共用部エアコン]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[共用部エアコン]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_mech_ac_cost').value = '0';
@@ -5452,9 +5484,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スプリンクラー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_mech_sprinkler_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[スプリンクラー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[スプリンクラー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_mech_sprinkler_cost').value = '0';
@@ -5469,9 +5503,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("消火栓箱");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_mech_fire_hose_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[消火栓箱]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[消火栓箱]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_mech_fire_hose_cost').value = '0';
@@ -5486,9 +5522,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("エントランスLED");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_elec_led_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[LED照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[LED照明]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_elec_led_cost').value = '0';
@@ -5503,9 +5541,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("煙感知器");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_elec_smoke_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[煙感知器]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[煙感知器]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_elec_smoke_cost').value = '0';
@@ -5520,9 +5560,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("誘導灯");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_elec_exit_light_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[誘導灯]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[誘導灯]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_elec_exit_light_cost').value = '0';
@@ -5537,9 +5579,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スピーカー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_elec_speaker_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[スピーカー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[スピーカー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_elec_speaker_cost').value = '0';
@@ -5554,9 +5598,11 @@ function updateLoungeArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("コンセント");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('lounge_elec_outlet_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[コンセント]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[コンセント]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('lounge_elec_outlet_cost').value = '0';
@@ -6005,9 +6051,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("共用部エアコン");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_mech_ac_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[共用部エアコン]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[共用部エアコン]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_mech_ac_cost').value = '0';
@@ -6022,9 +6070,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スプリンクラー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_mech_sprinkler_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[スプリンクラー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[スプリンクラー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_mech_sprinkler_cost').value = '0';
@@ -6039,9 +6089,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("消火栓箱");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_mech_fire_hose_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[消火栓箱]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[消火栓箱]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_mech_fire_hose_cost').value = '0';
@@ -6056,9 +6108,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("通路LED");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_elec_led_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[LED照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[LED照明]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_elec_led_cost').value = '0';
@@ -6073,9 +6127,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("煙感知器");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_elec_smoke_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[煙感知器]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[煙感知器]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_elec_smoke_cost').value = '0';
@@ -6090,9 +6146,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("誘導灯");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_elec_exit_light_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[誘導灯]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[誘導灯]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_elec_exit_light_cost').value = '0';
@@ -6107,9 +6165,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スピーカー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_elec_speaker_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[スピーカー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[スピーカー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_elec_speaker_cost').value = '0';
@@ -6124,9 +6184,11 @@ function updateHallwayArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("コンセント");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('hallway_elec_outlet_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[コンセント]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[コンセント]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('hallway_elec_outlet_cost').value = '0';
@@ -6452,15 +6514,17 @@ function updateAmusementArchCosts() {
         let mechProcessText = "【機械設備の計算】\n";
         let elecProcessText = "【電気設備の計算】\n";
         
-        // 共用部エアコン
+        // エアコン
         try {
             const count = parseFloat(document.getElementById('amusement_mech_ac_count').value) || 0;
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("共用部エアコン");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_mech_ac_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[共用部エアコン]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[エアコン]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_mech_ac_cost').value = '0';
@@ -6469,15 +6533,17 @@ function updateAmusementArchCosts() {
             document.getElementById('amusement_mech_ac_cost').value = '0';
         }
         
-        // スプリンクラー
+        // スプリンクラーヘッド
         try {
             const count = parseFloat(document.getElementById('amusement_mech_sprinkler_count').value) || 0;
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スプリンクラー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_mech_sprinkler_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[スプリンクラー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[スプリンクラーヘッド]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_mech_sprinkler_cost').value = '0';
@@ -6492,9 +6558,11 @@ function updateAmusementArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("消火栓箱");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_mech_fire_hose_cost').value = Math.round(cost).toLocaleString();
-                    mechProcessText += `\n[消火栓箱]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    mechProcessText += `\n[消火栓箱]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_mech_fire_hose_cost').value = '0';
@@ -6509,9 +6577,11 @@ function updateAmusementArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("エントランスLED");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_elec_led_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[LED照明]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[LED照明]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_elec_led_cost').value = '0';
@@ -6526,9 +6596,11 @@ function updateAmusementArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("煙感知器");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_elec_smoke_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[煙感知器]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[煙感知器]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_elec_smoke_cost').value = '0';
@@ -6543,9 +6615,11 @@ function updateAmusementArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("誘導灯");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_elec_exit_light_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[誘導灯]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[誘導灯]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_elec_exit_light_cost').value = '0';
@@ -6560,9 +6634,11 @@ function updateAmusementArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("スピーカー");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_elec_speaker_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[スピーカー]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[スピーカー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_elec_speaker_cost').value = '0';
@@ -6577,9 +6653,11 @@ function updateAmusementArchCosts() {
             if (count > 0) {
                 const data = getEquipmentDataByAbbrev("コンセント");
                 if (data) {
-                    const cost = (data.installHours * data.laborCost + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
                     document.getElementById('amusement_elec_outlet_cost').value = Math.round(cost).toLocaleString();
-                    elecProcessText += `\n[コンセント]\n  金額 = (${data.installHours}×${data.laborCost.toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                    elecProcessText += `\n[コンセント]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
                 }
             } else {
                 document.getElementById('amusement_elec_outlet_cost').value = '0';
