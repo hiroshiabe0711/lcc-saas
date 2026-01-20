@@ -2602,20 +2602,13 @@ function setupEventListeners() {
         // 建築地域変更時の処理
         const regionElement = document.getElementById('region');
         if (regionElement) {
-            regionElement.addEventListener('change', function() {
-                updateRegionRateDisplay();
-                recalculateAllArchCosts(); // 建築工事を再計算
-                recalculateAllEquipmentCosts(); // 機械設備・電気設備を再計算
-            });
+            regionElement.addEventListener('change', onRegionChange);
         }
         
         // 地域係数適用チェックボックス変更時の処理
         const applyRegionRateCheckbox = document.getElementById('apply_region_rate');
         if (applyRegionRateCheckbox) {
-            applyRegionRateCheckbox.addEventListener('change', function() {
-                recalculateAllArchCosts(); // 建築工事を再計算
-                recalculateAllEquipmentCosts(); // 機械設備・電気設備を再計算
-            });
+            applyRegionRateCheckbox.addEventListener('change', onRegionChange);
         }
         
         // 初期表示
@@ -6772,12 +6765,9 @@ function recalculateAllArchCosts() {
 
 // 全タブの機械設備・電気設備を再計算
 function recalculateAllEquipmentCosts() {
-    // 温泉設備タブ（男性用・女性用）
-    if (typeof updateMenWashEquipmentCosts === 'function') {
-        updateMenWashEquipmentCosts();
-    }
-    if (typeof updateWomenWashEquipmentCosts === 'function') {
-        updateWomenWashEquipmentCosts();
+    // 温泉設備タブ（洗い場設備：男性用・女性用両方を含む）
+    if (typeof updateWashEquipmentCosts === 'function') {
+        updateWashEquipmentCosts();
     }
     
     // レストランタブ
@@ -6807,6 +6797,7 @@ function onRegionChange() {
     recalculateAllArchCosts(); // 建築項目を再計算
     recalculateAllEquipmentCosts(); // 機械設備・電気設備を再計算
 }
+
 
 // ========== 地域係数関連の関数ここまで ==========
 
