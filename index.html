@@ -353,7 +353,7 @@
     <button class="tab-btn" onclick="openTab('lounge')">ラウンジ</button>
     <button class="tab-btn" onclick="openTab('hallway')">通路</button>
     <button class="tab-btn" onclick="openTab('amusement')">アミューズメント</button>
-    <button class="tab-btn" onclick="openTab('guest_room')">客室</button>
+    <button class="tab-btn" onclick="openTab('guestroom')">客室</button>
     <button class="tab-btn" onclick="openTab('arch_initial')">建築初期設定</button>
     <button class="tab-btn" onclick="openTab('equipment')">設備設定</button>
     <button class="tab-btn" onclick="openTab('furniture')">家具</button>
@@ -2025,10 +2025,187 @@
     </div>
 </div>
 
-    <div id="guest_room" class="tab-pane">
-        <div style="padding: 20px;">
-            <div class="section-title">客室</div>
-            <p>客室の詳細設定</p>
+
+
+
+
+    <!-- 客室タブ -->
+    <div id="guestroom" class="tab-content">
+        <div class="section-title">客室詳細設定</div>
+        <p style="text-align: right; font-size: 11px; color: #666; margin-bottom: 15px;">
+            面積を入力すると金額が表示されます。計上金額に含める場合は、項目に☑を入れてください。
+        </p>
+        
+        <!-- 小計表示 -->
+        <div style="margin-bottom: 20px; padding: 10px; background-color: #f0f8ff; border-radius: 5px;">
+            <span style="font-weight: bold; font-size: 14px;">小計:</span>
+            <input type="text" id="guestroom_subtotal" readonly style="width: 150px; text-align: right; font-weight: bold; font-size: 14px; margin-left: 10px;">
+            <span style="font-weight: bold; font-size: 14px;"> 円</span>
+        </div>
+        
+        <!-- ①建築フレーム -->
+        <div class="equipment-frame" style="margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #8B4513; font-size: 15px; border-bottom: 2px solid #D2691E; padding-bottom: 8px;">建築</h3>
+            
+            <!-- 和室(10-15J) -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_arch_japanese_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">和室(10-15J)</label>
+                <input type="number" id="guestroom_arch_japanese_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
+                <span>㎡</span>
+                <span id="guestroom_japanese_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
+                <input type="text" id="guestroom_arch_japanese_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- 和室・洋室 -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_arch_japanese_western_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">和室・洋室</label>
+                <input type="number" id="guestroom_arch_japanese_western_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
+                <span>㎡</span>
+                <span id="guestroom_japanese_western_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
+                <input type="text" id="guestroom_arch_japanese_western_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- 和ベッド -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_arch_japanese_bed_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">和ベッド</label>
+                <input type="number" id="guestroom_arch_japanese_bed_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
+                <span>㎡</span>
+                <span id="guestroom_japanese_bed_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
+                <input type="text" id="guestroom_arch_japanese_bed_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- 洋室 -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_arch_western_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">洋室</label>
+                <input type="number" id="guestroom_arch_western_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
+                <span>㎡</span>
+                <span id="guestroom_western_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
+                <input type="text" id="guestroom_arch_western_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+        </div>
+        
+        <!-- 建築項目の計算過程 -->
+        <div class="calculation-process" style="margin-bottom: 20px;">
+            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #8B4513;">建築項目の計算過程</p>
+            <pre id="guestroom_arch_process" style="background-color: #fffef0; padding: 10px; border-radius: 5px; font-size: 11px; color: #8B4513; white-space: pre-wrap; overflow-x: auto;"></pre>
+        </div>
+        
+        <!-- ②機械設備フレーム -->
+        <div class="equipment-frame" style="margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #2e7d32; font-size: 15px; border-bottom: 2px solid #4caf50; padding-bottom: 8px;">機械設備</h3>
+            
+            <!-- 個別エアコン -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_mech_ac_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">個別エアコン</label>
+                <input type="number" id="guestroom_mech_ac_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>台</span>
+                <span id="guestroom_mech_ac_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_mech_ac_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- 洗面器 -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_mech_wash_basin_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">洗面器</label>
+                <input type="number" id="guestroom_mech_wash_basin_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>個</span>
+                <span id="guestroom_mech_wash_basin_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_mech_wash_basin_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- スプリンクラー -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_mech_sprinkler_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">スプリンクラー</label>
+                <input type="number" id="guestroom_mech_sprinkler_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>個</span>
+                <span id="guestroom_mech_sprinkler_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_mech_sprinkler_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+        </div>
+        
+        <!-- 機械設備の計算過程 -->
+        <div class="calculation-process" style="margin-bottom: 20px;">
+            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #2e7d32;">機械設備の計算過程</p>
+            <pre id="guestroom_mech_process" style="background-color: #f0fff0; padding: 10px; border-radius: 5px; font-size: 11px; color: #2e7d32; white-space: pre-wrap; overflow-x: auto;"></pre>
+        </div>
+        
+        <!-- ③電気設備フレーム -->
+        <div class="equipment-frame" style="margin-bottom: 20px;">
+            <h3 style="margin-top: 0; color: #1565c0; font-size: 15px; border-bottom: 2px solid #42a5f5; padding-bottom: 8px;">電気設備</h3>
+            
+            <!-- 主室照明 -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_elec_main_light_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">主室照明</label>
+                <input type="number" id="guestroom_elec_main_light_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>個</span>
+                <span id="guestroom_elec_main_light_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_elec_main_light_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- 煙感知器 -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_elec_smoke_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">煙感知器</label>
+                <input type="number" id="guestroom_elec_smoke_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>個</span>
+                <span id="guestroom_elec_smoke_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_elec_smoke_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- 熱感知器 -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_elec_heat_detector_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">熱感知器</label>
+                <input type="number" id="guestroom_elec_heat_detector_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>個</span>
+                <span id="guestroom_elec_heat_detector_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_elec_heat_detector_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- スピーカー -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_elec_speaker_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">スピーカー</label>
+                <input type="number" id="guestroom_elec_speaker_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>個</span>
+                <span id="guestroom_elec_speaker_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_elec_speaker_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+            
+            <!-- コンセント -->
+            <div class="equipment-row">
+                <input type="checkbox" id="guestroom_elec_outlet_check" onchange="updateGuestroomSubtotal()">
+                <label style="min-width: 120px;">コンセント</label>
+                <input type="number" id="guestroom_elec_outlet_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
+                <span>個</span>
+                <span id="guestroom_elec_outlet_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
+                <input type="text" id="guestroom_elec_outlet_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
+                <span>円</span>
+            </div>
+        </div>
+        
+        <!-- 電気設備の計算過程 -->
+        <div class="calculation-process" style="margin-bottom: 20px;">
+            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #1565c0;">電気設備の計算過程</p>
+            <pre id="guestroom_elec_process" style="background-color: #e3f2fd; padding: 10px; border-radius: 5px; font-size: 11px; color: #1565c0; white-space: pre-wrap; overflow-x: auto;"></pre>
         </div>
     </div>
 
@@ -6714,6 +6891,524 @@ function updateAmusementArchCosts() {
     }
     
     // ========== アミューズメントタブの関数ここまで ==========
+
+
+    // ========== 客室タブの関数 ==========
+    
+    // 客室タブの建築項目の金額を自動計算
+    function updateGuestroomArchCosts() {
+        let processText = "";
+        
+        // 和室(10-15J)
+        try {
+            const area = parseFloat(document.getElementById('guestroom_arch_japanese_area').value) || 0;
+            const roomCount = parseInt(document.getElementById('room_japanese').value) || 0;
+            
+            // 部屋数表示を更新
+            document.getElementById('guestroom_japanese_room_count').textContent = `(${roomCount}室)`;
+            
+            if (area > 0 && roomCount > 0) {
+                const unitCosts = getUnitCosts("和室(10-15J)");
+                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                    const regionRate = getRegionRate();
+                    const floorCostWithRate = unitCosts.floor * regionRate;
+                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
+                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const totalCost = costPerRoom * roomCount;
+                    
+                    document.getElementById('guestroom_arch_japanese_cost').value = Math.round(totalCost).toLocaleString();
+                    
+                    processText += `【和室(10-15J) - ${unitCosts.grade}】\n`;
+                    processText += `地域係数: ${regionRate.toFixed(2)}\n`;
+                    processText += `1部屋あたりの金額:\n`;
+                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
+                    processText += `\n【部屋数を反映】\n`;
+                    processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
+                } else {
+                    document.getElementById('guestroom_arch_japanese_cost').value = '0';
+                    processText += `【和室(10-15J)】単価情報が取得できません\n\n`;
+                }
+            } else {
+                document.getElementById('guestroom_arch_japanese_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_arch_japanese_cost').value = '0';
+        }
+        
+        // 和室・洋室
+        try {
+            const area = parseFloat(document.getElementById('guestroom_arch_japanese_western_area').value) || 0;
+            const roomCount = parseInt(document.getElementById('room_japanese_western').value) || 0;
+            
+            document.getElementById('guestroom_japanese_western_room_count').textContent = `(${roomCount}室)`;
+            
+            if (area > 0 && roomCount > 0) {
+                const unitCosts = getUnitCosts("和室・洋室");
+                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                    const regionRate = getRegionRate();
+                    const floorCostWithRate = unitCosts.floor * regionRate;
+                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
+                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const totalCost = costPerRoom * roomCount;
+                    
+                    document.getElementById('guestroom_arch_japanese_western_cost').value = Math.round(totalCost).toLocaleString();
+                    
+                    processText += `【和室・洋室 - ${unitCosts.grade}】\n`;
+                    processText += `地域係数: ${regionRate.toFixed(2)}\n`;
+                    processText += `1部屋あたりの金額:\n`;
+                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
+                    processText += `\n【部屋数を反映】\n`;
+                    processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
+                } else {
+                    document.getElementById('guestroom_arch_japanese_western_cost').value = '0';
+                    processText += `【和室・洋室】単価情報が取得できません\n\n`;
+                }
+            } else {
+                document.getElementById('guestroom_arch_japanese_western_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_arch_japanese_western_cost').value = '0';
+        }
+        
+        // 和ベッド
+        try {
+            const area = parseFloat(document.getElementById('guestroom_arch_japanese_bed_area').value) || 0;
+            const roomCount = parseInt(document.getElementById('room_japanese_bed').value) || 0;
+            
+            document.getElementById('guestroom_japanese_bed_room_count').textContent = `(${roomCount}室)`;
+            
+            if (area > 0 && roomCount > 0) {
+                const unitCosts = getUnitCosts("和ベッド");
+                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                    const regionRate = getRegionRate();
+                    const floorCostWithRate = unitCosts.floor * regionRate;
+                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
+                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const totalCost = costPerRoom * roomCount;
+                    
+                    document.getElementById('guestroom_arch_japanese_bed_cost').value = Math.round(totalCost).toLocaleString();
+                    
+                    processText += `【和ベッド - ${unitCosts.grade}】\n`;
+                    processText += `地域係数: ${regionRate.toFixed(2)}\n`;
+                    processText += `1部屋あたりの金額:\n`;
+                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
+                    processText += `\n【部屋数を反映】\n`;
+                    processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
+                } else {
+                    document.getElementById('guestroom_arch_japanese_bed_cost').value = '0';
+                    processText += `【和ベッド】単価情報が取得できません\n\n`;
+                }
+            } else {
+                document.getElementById('guestroom_arch_japanese_bed_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_arch_japanese_bed_cost').value = '0';
+        }
+        
+        // 洋室
+        try {
+            const area = parseFloat(document.getElementById('guestroom_arch_western_area').value) || 0;
+            const roomCount = parseInt(document.getElementById('room_western').value) || 0;
+            
+            document.getElementById('guestroom_western_room_count').textContent = `(${roomCount}室)`;
+            
+            if (area > 0 && roomCount > 0) {
+                const unitCosts = getUnitCosts("洋室");
+                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                    const regionRate = getRegionRate();
+                    const floorCostWithRate = unitCosts.floor * regionRate;
+                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
+                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const totalCost = costPerRoom * roomCount;
+                    
+                    document.getElementById('guestroom_arch_western_cost').value = Math.round(totalCost).toLocaleString();
+                    
+                    processText += `【洋室 - ${unitCosts.grade}】\n`;
+                    processText += `地域係数: ${regionRate.toFixed(2)}\n`;
+                    processText += `1部屋あたりの金額:\n`;
+                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
+                    processText += `\n【部屋数を反映】\n`;
+                    processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
+                } else {
+                    document.getElementById('guestroom_arch_western_cost').value = '0';
+                    processText += `【洋室】単価情報が取得できません\n\n`;
+                }
+            } else {
+                document.getElementById('guestroom_arch_western_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_arch_western_cost').value = '0';
+        }
+        
+        document.getElementById('guestroom_arch_process').textContent = processText;
+        
+        updateGuestroomRecommendedCounts();
+        updateGuestroomSubtotal();
+    }
+    
+    // 客室の機械設備・電気設備の推奨個数を計算
+    function updateGuestroomRecommendedCounts() {
+        try {
+            // 各部屋タイプの面積を取得
+            const japaneseArea = parseFloat(document.getElementById('guestroom_arch_japanese_area').value) || 0;
+            const japaneseWesternArea = parseFloat(document.getElementById('guestroom_arch_japanese_western_area').value) || 0;
+            const japaneseBedArea = parseFloat(document.getElementById('guestroom_arch_japanese_bed_area').value) || 0;
+            const westernArea = parseFloat(document.getElementById('guestroom_arch_western_area').value) || 0;
+            
+            // 各部屋タイプの客室数を取得
+            const japaneseCount = parseInt(document.getElementById('room_japanese').value) || 0;
+            const japaneseWesternCount = parseInt(document.getElementById('room_japanese_western').value) || 0;
+            const japaneseBedCount = parseInt(document.getElementById('room_japanese_bed').value) || 0;
+            const westernCount = parseInt(document.getElementById('room_western').value) || 0;
+            
+            // 総面積 = 各部屋タイプの面積 × 客室数の合計
+            const totalArea = (japaneseArea * japaneseCount +
+                              japaneseWesternArea * japaneseWesternCount +
+                              japaneseBedArea * japaneseBedCount +
+                              westernArea * westernCount);
+            
+            if (totalArea > 0) {
+                // 個別エアコン
+                const acData = getEquipmentDataByAbbrev("個別エアコン");
+                if (acData && acData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * acData.areaRatio);
+                    document.getElementById('guestroom_mech_ac_recommended').textContent = `推奨: ${recommended}台`;
+                } else {
+                    document.getElementById('guestroom_mech_ac_recommended').textContent = '';
+                }
+                
+                // 洗面器
+                const washBasinData = getEquipmentDataByAbbrev("洗面器");
+                if (washBasinData && washBasinData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * washBasinData.areaRatio);
+                    document.getElementById('guestroom_mech_wash_basin_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('guestroom_mech_wash_basin_recommended').textContent = '';
+                }
+                
+                // スプリンクラー
+                const sprinklerData = getEquipmentDataByAbbrev("スプリンクラー");
+                if (sprinklerData && sprinklerData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * sprinklerData.areaRatio);
+                    document.getElementById('guestroom_mech_sprinkler_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('guestroom_mech_sprinkler_recommended').textContent = '';
+                }
+                
+                // 主室照明
+                const mainLightData = getEquipmentDataByAbbrev("主室照明");
+                if (mainLightData && mainLightData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * mainLightData.areaRatio);
+                    document.getElementById('guestroom_elec_main_light_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('guestroom_elec_main_light_recommended').textContent = '';
+                }
+                
+                // 煙感知器
+                const smokeData = getEquipmentDataByAbbrev("煙感知器");
+                if (smokeData && smokeData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * smokeData.areaRatio);
+                    document.getElementById('guestroom_elec_smoke_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('guestroom_elec_smoke_recommended').textContent = '';
+                }
+                
+                // 熱感知器
+                const heatDetectorData = getEquipmentDataByAbbrev("熱感知器");
+                if (heatDetectorData && heatDetectorData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * heatDetectorData.areaRatio);
+                    document.getElementById('guestroom_elec_heat_detector_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('guestroom_elec_heat_detector_recommended').textContent = '';
+                }
+                
+                // スピーカー
+                const speakerData = getEquipmentDataByAbbrev("スピーカー");
+                if (speakerData && speakerData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * speakerData.areaRatio);
+                    document.getElementById('guestroom_elec_speaker_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('guestroom_elec_speaker_recommended').textContent = '';
+                }
+                
+                // コンセント
+                const outletData = getEquipmentDataByAbbrev("コンセント");
+                if (outletData && outletData.areaRatio) {
+                    const recommended = Math.ceil(totalArea * outletData.areaRatio);
+                    document.getElementById('guestroom_elec_outlet_recommended').textContent = `推奨: ${recommended}個`;
+                } else {
+                    document.getElementById('guestroom_elec_outlet_recommended').textContent = '';
+                }
+            } else {
+                document.getElementById('guestroom_mech_ac_recommended').textContent = '';
+                document.getElementById('guestroom_mech_wash_basin_recommended').textContent = '';
+                document.getElementById('guestroom_mech_sprinkler_recommended').textContent = '';
+                document.getElementById('guestroom_elec_main_light_recommended').textContent = '';
+                document.getElementById('guestroom_elec_smoke_recommended').textContent = '';
+                document.getElementById('guestroom_elec_heat_detector_recommended').textContent = '';
+                document.getElementById('guestroom_elec_speaker_recommended').textContent = '';
+                document.getElementById('guestroom_elec_outlet_recommended').textContent = '';
+            }
+        } catch (error) {
+            console.error('客室推奨個数計算エラー:', error);
+        }
+    }
+    
+    // 客室の機械設備・電気設備の金額を計算
+    function updateGuestroomEquipmentCosts() {
+        let mechProcessText = "【機械設備の計算】\n";
+        let elecProcessText = "【電気設備の計算】\n";
+        
+        // 個別エアコン
+        try {
+            const count = parseFloat(document.getElementById('guestroom_mech_ac_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("個別エアコン");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_mech_ac_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[個別エアコン]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_mech_ac_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_mech_ac_cost').value = '0';
+        }
+        
+        // 洗面器
+        try {
+            const count = parseFloat(document.getElementById('guestroom_mech_wash_basin_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("洗面器");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_mech_wash_basin_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[洗面器]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_mech_wash_basin_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_mech_wash_basin_cost').value = '0';
+        }
+        
+        // スプリンクラー
+        try {
+            const count = parseFloat(document.getElementById('guestroom_mech_sprinkler_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("スプリンクラー");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_mech_sprinkler_cost').value = Math.round(cost).toLocaleString();
+                    mechProcessText += `\n[スプリンクラー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_mech_sprinkler_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_mech_sprinkler_cost').value = '0';
+        }
+        
+        // 主室照明
+        try {
+            const count = parseFloat(document.getElementById('guestroom_elec_main_light_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("主室照明");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_elec_main_light_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[主室照明]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_elec_main_light_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_elec_main_light_cost').value = '0';
+        }
+        
+        // 煙感知器
+        try {
+            const count = parseFloat(document.getElementById('guestroom_elec_smoke_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("煙感知器");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_elec_smoke_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[煙感知器]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_elec_smoke_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_elec_smoke_cost').value = '0';
+        }
+        
+        // 熱感知器
+        try {
+            const count = parseFloat(document.getElementById('guestroom_elec_heat_detector_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("熱感知器");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_elec_heat_detector_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[熱感知器]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_elec_heat_detector_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_elec_heat_detector_cost').value = '0';
+        }
+        
+        // スピーカー
+        try {
+            const count = parseFloat(document.getElementById('guestroom_elec_speaker_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("スピーカー");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_elec_speaker_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[スピーカー]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_elec_speaker_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_elec_speaker_cost').value = '0';
+        }
+        
+        // コンセント
+        try {
+            const count = parseFloat(document.getElementById('guestroom_elec_outlet_count').value) || 0;
+            if (count > 0) {
+                const data = getEquipmentDataByAbbrev("コンセント");
+                if (data) {
+                    const regionRate = getRegionRate(); // 地域係数を取得
+                    const laborCostWithRate = data.installHours * data.laborCost * regionRate; // 労務費に地域係数を適用
+                    const cost = (laborCostWithRate + data.newEquipmentCost + data.miscMaterial) / 0.8 * count;
+                    document.getElementById('guestroom_elec_outlet_cost').value = Math.round(cost).toLocaleString();
+                    elecProcessText += `\n[コンセント]\n  労務費 = ${data.installHours}×${data.laborCost.toLocaleString()}×${regionRate.toFixed(2)} = ${Math.round(laborCostWithRate).toLocaleString()}円\n  金額 = (${Math.round(laborCostWithRate).toLocaleString()} + ${data.newEquipmentCost.toLocaleString()} + ${data.miscMaterial.toLocaleString()}) ÷ 0.8 × ${count}\n       = ${Math.round(cost).toLocaleString()}円\n`;
+                }
+            } else {
+                document.getElementById('guestroom_elec_outlet_cost').value = '0';
+            }
+        } catch (error) {
+            document.getElementById('guestroom_elec_outlet_cost').value = '0';
+        }
+        
+        document.getElementById('guestroom_mech_process').textContent = mechProcessText;
+        document.getElementById('guestroom_elec_process').textContent = elecProcessText;
+        
+        updateGuestroomSubtotal();
+    }
+    
+    // 客室小計を計算
+    function updateGuestroomSubtotal() {
+        let total = 0;
+        
+        // 建築項目
+        const archItems = [
+            { check: 'guestroom_arch_japanese_check', cost: 'guestroom_arch_japanese_cost' },
+            { check: 'guestroom_arch_japanese_western_check', cost: 'guestroom_arch_japanese_western_cost' },
+            { check: 'guestroom_arch_japanese_bed_check', cost: 'guestroom_arch_japanese_bed_cost' },
+            { check: 'guestroom_arch_western_check', cost: 'guestroom_arch_western_cost' }
+        ];
+        
+        archItems.forEach(item => {
+            if (document.getElementById(item.check).checked) {
+                try {
+                    const value = document.getElementById(item.cost).value.replace(/,/g, '');
+                    total += parseFloat(value) || 0;
+                } catch (error) {}
+            }
+        });
+        
+        // 機械設備項目
+        const mechItems = [
+            { check: 'guestroom_mech_ac_check', cost: 'guestroom_mech_ac_cost' },
+            { check: 'guestroom_mech_wash_basin_check', cost: 'guestroom_mech_wash_basin_cost' },
+            { check: 'guestroom_mech_sprinkler_check', cost: 'guestroom_mech_sprinkler_cost' }
+        ];
+        
+        mechItems.forEach(item => {
+            if (document.getElementById(item.check).checked) {
+                try {
+                    const value = document.getElementById(item.cost).value.replace(/,/g, '');
+                    total += parseFloat(value) || 0;
+                } catch (error) {}
+            }
+        });
+        
+        // 電気設備項目
+        const elecItems = [
+            { check: 'guestroom_elec_main_light_check', cost: 'guestroom_elec_main_light_cost' },
+            { check: 'guestroom_elec_smoke_check', cost: 'guestroom_elec_smoke_cost' },
+            { check: 'guestroom_elec_heat_detector_check', cost: 'guestroom_elec_heat_detector_cost' },
+            { check: 'guestroom_elec_speaker_check', cost: 'guestroom_elec_speaker_cost' },
+            { check: 'guestroom_elec_outlet_check', cost: 'guestroom_elec_outlet_cost' }
+        ];
+        
+        elecItems.forEach(item => {
+            if (document.getElementById(item.check).checked) {
+                try {
+                    const value = document.getElementById(item.cost).value.replace(/,/g, '');
+                    total += parseFloat(value) || 0;
+                } catch (error) {}
+            }
+        });
+        
+        document.getElementById('guestroom_subtotal').value = Math.round(total).toLocaleString();
+        // コストサマリの小計も更新
+        const sumGuestElement = document.getElementById('sum_guest');
+        if (sumGuestElement) {
+            sumGuestElement.textContent = Math.round(total).toLocaleString() + ' 円';
+        }
+    }
+    
+    // ========== 客室タブの関数ここまで ==========
+
+
+
+
+
+
+
+
     // ========== 地域係数関連の関数 ==========
 
 // 地域係数の表示を更新
@@ -6761,6 +7456,10 @@ function recalculateAllArchCosts() {
     if (typeof updateAmusementArchCosts === 'function') {
         updateAmusementArchCosts();
     }
+    // 客室タブ
+    if (typeof updateGuestroomArchCosts === 'function') {
+        updateGuestroomArchCosts();
+    }
 }
 
 // 全タブの機械設備・電気設備を再計算
@@ -6788,6 +7487,10 @@ function recalculateAllEquipmentCosts() {
     // アミューズメントタブ
     if (typeof updateAmusementEquipmentCosts === 'function') {
         updateAmusementEquipmentCosts();
+    }
+    // 客室タブ
+    if (typeof updateGuestroomEquipmentCosts === 'function') {
+        updateGuestroomEquipmentCosts();
     }
 }
 
