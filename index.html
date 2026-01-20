@@ -6770,6 +6770,44 @@ function recalculateAllArchCosts() {
     }
 }
 
+// 全タブの機械設備・電気設備を再計算
+function recalculateAllEquipmentCosts() {
+    // 温泉設備タブ（男性用・女性用）
+    if (typeof updateMenWashEquipmentCosts === 'function') {
+        updateMenWashEquipmentCosts();
+    }
+    if (typeof updateWomenWashEquipmentCosts === 'function') {
+        updateWomenWashEquipmentCosts();
+    }
+    
+    // レストランタブ
+    if (typeof updateRestaurantEquipmentCosts === 'function') {
+        updateRestaurantEquipmentCosts();
+    }
+    
+    // ラウンジタブ
+    if (typeof updateLoungeEquipmentCosts === 'function') {
+        updateLoungeEquipmentCosts();
+    }
+    
+    // 通路タブ
+    if (typeof updateHallwayEquipmentCosts === 'function') {
+        updateHallwayEquipmentCosts();
+    }
+    
+    // アミューズメントタブ
+    if (typeof updateAmusementEquipmentCosts === 'function') {
+        updateAmusementEquipmentCosts();
+    }
+}
+
+// 地域変更時に全ての項目を再計算
+function onRegionChange() {
+    updateRegionRateDisplay(); // 地域係数の表示を更新
+    recalculateAllArchCosts(); // 建築項目を再計算
+    recalculateAllEquipmentCosts(); // 機械設備・電気設備を再計算
+}
+
 // ========== 地域係数関連の関数ここまで ==========
 
 
