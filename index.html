@@ -2043,169 +2043,277 @@
             <span style="font-weight: bold; font-size: 14px;"> 円</span>
         </div>
         
-        <!-- ①建築フレーム -->
-        <div class="equipment-frame" style="margin-bottom: 20px;">
-            <h3 style="margin-top: 0; color: #8B4513; font-size: 15px; border-bottom: 2px solid #D2691E; padding-bottom: 8px;">建築</h3>
-            
-            <!-- 和室(10-15J) -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_arch_japanese_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">和室(10-15J)</label>
-                <input type="number" id="guestroom_arch_japanese_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
-                <span>㎡</span>
-                <span id="guestroom_japanese_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
-                <input type="text" id="guestroom_arch_japanese_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- 和室・洋室 -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_arch_japanese_western_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">和室・洋室</label>
-                <input type="number" id="guestroom_arch_japanese_western_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
-                <span>㎡</span>
-                <span id="guestroom_japanese_western_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
-                <input type="text" id="guestroom_arch_japanese_western_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- 和ベッド -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_arch_japanese_bed_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">和ベッド</label>
-                <input type="number" id="guestroom_arch_japanese_bed_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
-                <span>㎡</span>
-                <span id="guestroom_japanese_bed_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
-                <input type="text" id="guestroom_arch_japanese_bed_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- 洋室 -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_arch_western_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">洋室</label>
-                <input type="number" id="guestroom_arch_western_area" placeholder="面積" style="width: 80px;" oninput="updateGuestroomArchCosts()">
-                <span>㎡</span>
-                <span id="guestroom_western_room_count" style="color: blue; margin-left: 10px;">(0室)</span>
-                <input type="text" id="guestroom_arch_western_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
+        <!-- ①建築項目 -->
+        <div class="cost-category">
+            <div class="category-header">建築</div>
+            <table class="cost-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">選択</th>
+                        <th style="width: 150px;">項目</th>
+                        <th style="width: 100px;">面積</th>
+                        <th style="width: 80px;">客室数</th>
+                        <th style="width: 150px;">金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 和室(10-15J) -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_arch_japanese_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>和室(10-15J)</td>
+                        <td>
+                            <input type="number" id="guestroom_arch_japanese_area" placeholder="面積" style="width: 90%; text-align: right;" step="0.01" oninput="updateGuestroomArchCosts()">
+                            <span style="margin-left: 3px;">㎡</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_japanese_room_count" style="color: blue; font-weight: bold;">(0室)</span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_arch_japanese_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- 和室・洋室 -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_arch_japanese_western_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>和室・洋室</td>
+                        <td>
+                            <input type="number" id="guestroom_arch_japanese_western_area" placeholder="面積" style="width: 90%; text-align: right;" step="0.01" oninput="updateGuestroomArchCosts()">
+                            <span style="margin-left: 3px;">㎡</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_japanese_western_room_count" style="color: blue; font-weight: bold;">(0室)</span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_arch_japanese_western_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- 和ベッド -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_arch_japanese_bed_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>和ベッド</td>
+                        <td>
+                            <input type="number" id="guestroom_arch_japanese_bed_area" placeholder="面積" style="width: 90%; text-align: right;" step="0.01" oninput="updateGuestroomArchCosts()">
+                            <span style="margin-left: 3px;">㎡</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_japanese_bed_room_count" style="color: blue; font-weight: bold;">(0室)</span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_arch_japanese_bed_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- 洋室 -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_arch_western_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>洋室</td>
+                        <td>
+                            <input type="number" id="guestroom_arch_western_area" placeholder="面積" style="width: 90%; text-align: right;" step="0.01" oninput="updateGuestroomArchCosts()">
+                            <span style="margin-left: 3px;">㎡</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_western_room_count" style="color: blue; font-weight: bold;">(0室)</span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_arch_western_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         
         <!-- 建築項目の計算過程 -->
-        <div class="calculation-process" style="margin-bottom: 20px;">
-            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #8B4513;">建築項目の計算過程</p>
-            <pre id="guestroom_arch_process" style="background-color: #fffef0; padding: 10px; border-radius: 5px; font-size: 11px; color: #8B4513; white-space: pre-wrap; overflow-x: auto;"></pre>
+        <div class="calculation-process">
+            <p style="font-weight: bold; margin-bottom: 5px;">建築項目の計算過程</p>
+            <pre id="guestroom_arch_process" style="white-space: pre-wrap; font-size: 11px;"></pre>
         </div>
         
-        <!-- ②機械設備フレーム -->
-        <div class="equipment-frame" style="margin-bottom: 20px;">
-            <h3 style="margin-top: 0; color: #2e7d32; font-size: 15px; border-bottom: 2px solid #4caf50; padding-bottom: 8px;">機械設備</h3>
-            
-            <!-- 個別エアコン -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_mech_ac_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">個別エアコン</label>
-                <input type="number" id="guestroom_mech_ac_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>台</span>
-                <span id="guestroom_mech_ac_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_mech_ac_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- 洗面器 -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_mech_wash_basin_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">洗面器</label>
-                <input type="number" id="guestroom_mech_wash_basin_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>個</span>
-                <span id="guestroom_mech_wash_basin_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_mech_wash_basin_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- スプリンクラー -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_mech_sprinkler_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">スプリンクラー</label>
-                <input type="number" id="guestroom_mech_sprinkler_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>個</span>
-                <span id="guestroom_mech_sprinkler_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_mech_sprinkler_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
+        <!-- ②機械設備 -->
+        <div class="cost-category">
+            <div class="category-header">機械設備</div>
+            <table class="cost-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">選択</th>
+                        <th style="width: 150px;">項目</th>
+                        <th style="width: 100px;">個数</th>
+                        <th style="width: 120px;">推奨個数</th>
+                        <th style="width: 150px;">金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 個別エアコン -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_mech_ac_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>個別エアコン</td>
+                        <td>
+                            <input type="number" id="guestroom_mech_ac_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">台</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_mech_ac_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_mech_ac_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- 洗面器 -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_mech_wash_basin_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>洗面器</td>
+                        <td>
+                            <input type="number" id="guestroom_mech_wash_basin_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">個</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_mech_wash_basin_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_mech_wash_basin_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- スプリンクラー -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_mech_sprinkler_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>スプリンクラー</td>
+                        <td>
+                            <input type="number" id="guestroom_mech_sprinkler_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">個</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_mech_sprinkler_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_mech_sprinkler_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         
         <!-- 機械設備の計算過程 -->
-        <div class="calculation-process" style="margin-bottom: 20px;">
-            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #2e7d32;">機械設備の計算過程</p>
-            <pre id="guestroom_mech_process" style="background-color: #f0fff0; padding: 10px; border-radius: 5px; font-size: 11px; color: #2e7d32; white-space: pre-wrap; overflow-x: auto;"></pre>
+        <div class="calculation-process">
+            <p style="font-weight: bold; margin-bottom: 5px;">機械設備の計算過程</p>
+            <pre id="guestroom_mech_process" style="white-space: pre-wrap; font-size: 11px;"></pre>
         </div>
         
-        <!-- ③電気設備フレーム -->
-        <div class="equipment-frame" style="margin-bottom: 20px;">
-            <h3 style="margin-top: 0; color: #1565c0; font-size: 15px; border-bottom: 2px solid #42a5f5; padding-bottom: 8px;">電気設備</h3>
-            
-            <!-- 主室照明 -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_elec_main_light_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">主室照明</label>
-                <input type="number" id="guestroom_elec_main_light_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>個</span>
-                <span id="guestroom_elec_main_light_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_elec_main_light_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- 煙感知器 -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_elec_smoke_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">煙感知器</label>
-                <input type="number" id="guestroom_elec_smoke_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>個</span>
-                <span id="guestroom_elec_smoke_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_elec_smoke_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- 熱感知器 -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_elec_heat_detector_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">熱感知器</label>
-                <input type="number" id="guestroom_elec_heat_detector_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>個</span>
-                <span id="guestroom_elec_heat_detector_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_elec_heat_detector_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- スピーカー -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_elec_speaker_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">スピーカー</label>
-                <input type="number" id="guestroom_elec_speaker_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>個</span>
-                <span id="guestroom_elec_speaker_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_elec_speaker_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
-            
-            <!-- コンセント -->
-            <div class="equipment-row">
-                <input type="checkbox" id="guestroom_elec_outlet_check" onchange="updateGuestroomSubtotal()">
-                <label style="min-width: 120px;">コンセント</label>
-                <input type="number" id="guestroom_elec_outlet_count" placeholder="数量" style="width: 80px;" oninput="updateGuestroomEquipmentCosts()">
-                <span>個</span>
-                <span id="guestroom_elec_outlet_recommended" style="color: #666; font-size: 11px; margin-left: 10px;"></span>
-                <input type="text" id="guestroom_elec_outlet_cost" readonly style="width: 120px; text-align: right; margin-left: 10px;">
-                <span>円</span>
-            </div>
+        <!-- ③電気設備 -->
+        <div class="cost-category">
+            <div class="category-header">電気設備</div>
+            <table class="cost-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">選択</th>
+                        <th style="width: 150px;">項目</th>
+                        <th style="width: 100px;">個数</th>
+                        <th style="width: 120px;">推奨個数</th>
+                        <th style="width: 150px;">金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 主室照明 -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_elec_main_light_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>主室照明</td>
+                        <td>
+                            <input type="number" id="guestroom_elec_main_light_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">個</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_elec_main_light_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_elec_main_light_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- 煙感知器 -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_elec_smoke_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>煙感知器</td>
+                        <td>
+                            <input type="number" id="guestroom_elec_smoke_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">個</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_elec_smoke_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_elec_smoke_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- 熱感知器 -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_elec_heat_detector_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>熱感知器</td>
+                        <td>
+                            <input type="number" id="guestroom_elec_heat_detector_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">個</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_elec_heat_detector_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_elec_heat_detector_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- スピーカー -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_elec_speaker_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>スピーカー</td>
+                        <td>
+                            <input type="number" id="guestroom_elec_speaker_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">個</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_elec_speaker_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_elec_speaker_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- コンセント -->
+                    <tr>
+                        <td><input type="checkbox" id="guestroom_elec_outlet_check" onchange="updateGuestroomSubtotal()"></td>
+                        <td>コンセント</td>
+                        <td>
+                            <input type="number" id="guestroom_elec_outlet_count" placeholder="個数" style="width: 90%; text-align: right;" step="1" oninput="updateGuestroomEquipmentCosts()">
+                            <span style="margin-left: 3px;">個</span>
+                        </td>
+                        <td>
+                            <span id="guestroom_elec_outlet_recommended" style="color: #666; font-size: 11px;"></span>
+                        </td>
+                        <td>
+                            <input type="text" id="guestroom_elec_outlet_cost" readonly style="width: 90%; text-align: right;">
+                            <span style="margin-left: 3px;">円</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         
         <!-- 電気設備の計算過程 -->
-        <div class="calculation-process" style="margin-bottom: 20px;">
-            <p style="font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #1565c0;">電気設備の計算過程</p>
-            <pre id="guestroom_elec_process" style="background-color: #e3f2fd; padding: 10px; border-radius: 5px; font-size: 11px; color: #1565c0; white-space: pre-wrap; overflow-x: auto;"></pre>
+        <div class="calculation-process">
+            <p style="font-weight: bold; margin-bottom: 5px;">電気設備の計算過程</p>
+            <pre id="guestroom_elec_process" style="white-space: pre-wrap; font-size: 11px;"></pre>
         </div>
     </div>
 
@@ -6908,30 +7016,30 @@ function updateAmusementArchCosts() {
             document.getElementById('guestroom_japanese_room_count').textContent = `(${roomCount}室)`;
             
             if (area > 0 && roomCount > 0) {
-                const unitCosts = getUnitCosts("和室(10-15J)");
-                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                const costs = getArchInitialCosts("和室(10-15J)");
+                if (costs) {
                     const regionRate = getRegionRate();
-                    const floorCostWithRate = unitCosts.floor * regionRate;
-                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
-                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    const floorCostWithRate = costs.floorCost * regionRate;
+                    const ceilingCostWithRate = costs.ceilingCost * regionRate;
+                    const wallCostWithRate = costs.wallCost * regionRate;
                     
-                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * costs.height * wallCostWithRate;
                     const totalCost = costPerRoom * roomCount;
                     
                     document.getElementById('guestroom_arch_japanese_cost').value = Math.round(totalCost).toLocaleString();
                     
-                    processText += `【和室(10-15J) - ${unitCosts.grade}】\n`;
+                    processText += `【和室(10-15J)】\n`;
                     processText += `地域係数: ${regionRate.toFixed(2)}\n`;
                     processText += `1部屋あたりの金額:\n`;
-                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
-                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
-                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  床: ${area}㎡ × ${costs.floorCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${costs.ceilingCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${costs.height}m × ${costs.wallCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * costs.height * wallCostWithRate).toLocaleString()}円\n`;
                     processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
                     processText += `\n【部屋数を反映】\n`;
                     processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
                 } else {
                     document.getElementById('guestroom_arch_japanese_cost').value = '0';
-                    processText += `【和室(10-15J)】単価情報が取得できません\n\n`;
+                    processText += `【和室(10-15J)】建築初期設定から単価情報が取得できません\n\n`;
                 }
             } else {
                 document.getElementById('guestroom_arch_japanese_cost').value = '0';
@@ -6948,30 +7056,30 @@ function updateAmusementArchCosts() {
             document.getElementById('guestroom_japanese_western_room_count').textContent = `(${roomCount}室)`;
             
             if (area > 0 && roomCount > 0) {
-                const unitCosts = getUnitCosts("和室・洋室");
-                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                const costs = getArchInitialCosts("和室・洋室");
+                if (costs) {
                     const regionRate = getRegionRate();
-                    const floorCostWithRate = unitCosts.floor * regionRate;
-                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
-                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    const floorCostWithRate = costs.floorCost * regionRate;
+                    const ceilingCostWithRate = costs.ceilingCost * regionRate;
+                    const wallCostWithRate = costs.wallCost * regionRate;
                     
-                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * costs.height * wallCostWithRate;
                     const totalCost = costPerRoom * roomCount;
                     
                     document.getElementById('guestroom_arch_japanese_western_cost').value = Math.round(totalCost).toLocaleString();
                     
-                    processText += `【和室・洋室 - ${unitCosts.grade}】\n`;
+                    processText += `【和室・洋室】\n`;
                     processText += `地域係数: ${regionRate.toFixed(2)}\n`;
                     processText += `1部屋あたりの金額:\n`;
-                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
-                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
-                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  床: ${area}㎡ × ${costs.floorCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${costs.ceilingCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${costs.height}m × ${costs.wallCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * costs.height * wallCostWithRate).toLocaleString()}円\n`;
                     processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
                     processText += `\n【部屋数を反映】\n`;
                     processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
                 } else {
                     document.getElementById('guestroom_arch_japanese_western_cost').value = '0';
-                    processText += `【和室・洋室】単価情報が取得できません\n\n`;
+                    processText += `【和室・洋室】建築初期設定から単価情報が取得できません\n\n`;
                 }
             } else {
                 document.getElementById('guestroom_arch_japanese_western_cost').value = '0';
@@ -6988,30 +7096,30 @@ function updateAmusementArchCosts() {
             document.getElementById('guestroom_japanese_bed_room_count').textContent = `(${roomCount}室)`;
             
             if (area > 0 && roomCount > 0) {
-                const unitCosts = getUnitCosts("和ベッド");
-                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                const costs = getArchInitialCosts("和ベッド");
+                if (costs) {
                     const regionRate = getRegionRate();
-                    const floorCostWithRate = unitCosts.floor * regionRate;
-                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
-                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    const floorCostWithRate = costs.floorCost * regionRate;
+                    const ceilingCostWithRate = costs.ceilingCost * regionRate;
+                    const wallCostWithRate = costs.wallCost * regionRate;
                     
-                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * costs.height * wallCostWithRate;
                     const totalCost = costPerRoom * roomCount;
                     
                     document.getElementById('guestroom_arch_japanese_bed_cost').value = Math.round(totalCost).toLocaleString();
                     
-                    processText += `【和ベッド - ${unitCosts.grade}】\n`;
+                    processText += `【和ベッド】\n`;
                     processText += `地域係数: ${regionRate.toFixed(2)}\n`;
                     processText += `1部屋あたりの金額:\n`;
-                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
-                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
-                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  床: ${area}㎡ × ${costs.floorCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${costs.ceilingCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${costs.height}m × ${costs.wallCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * costs.height * wallCostWithRate).toLocaleString()}円\n`;
                     processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
                     processText += `\n【部屋数を反映】\n`;
                     processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
                 } else {
                     document.getElementById('guestroom_arch_japanese_bed_cost').value = '0';
-                    processText += `【和ベッド】単価情報が取得できません\n\n`;
+                    processText += `【和ベッド】建築初期設定から単価情報が取得できません\n\n`;
                 }
             } else {
                 document.getElementById('guestroom_arch_japanese_bed_cost').value = '0';
@@ -7028,30 +7136,30 @@ function updateAmusementArchCosts() {
             document.getElementById('guestroom_western_room_count').textContent = `(${roomCount}室)`;
             
             if (area > 0 && roomCount > 0) {
-                const unitCosts = getUnitCosts("洋室");
-                if (unitCosts.height && unitCosts.floor && unitCosts.ceiling && unitCosts.wall) {
+                const costs = getArchInitialCosts("洋室");
+                if (costs) {
                     const regionRate = getRegionRate();
-                    const floorCostWithRate = unitCosts.floor * regionRate;
-                    const ceilingCostWithRate = unitCosts.ceiling * regionRate;
-                    const wallCostWithRate = unitCosts.wall * regionRate;
+                    const floorCostWithRate = costs.floorCost * regionRate;
+                    const ceilingCostWithRate = costs.ceilingCost * regionRate;
+                    const wallCostWithRate = costs.wallCost * regionRate;
                     
-                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate;
+                    const costPerRoom = area * floorCostWithRate + area * ceilingCostWithRate + Math.sqrt(area) * 4 * costs.height * wallCostWithRate;
                     const totalCost = costPerRoom * roomCount;
                     
                     document.getElementById('guestroom_arch_western_cost').value = Math.round(totalCost).toLocaleString();
                     
-                    processText += `【洋室 - ${unitCosts.grade}】\n`;
+                    processText += `【洋室】\n`;
                     processText += `地域係数: ${regionRate.toFixed(2)}\n`;
                     processText += `1部屋あたりの金額:\n`;
-                    processText += `  床: ${area}㎡ × ${unitCosts.floor.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
-                    processText += `  天井: ${area}㎡ × ${unitCosts.ceiling.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
-                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${unitCosts.height}m × ${unitCosts.wall.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * unitCosts.height * wallCostWithRate).toLocaleString()}円\n`;
+                    processText += `  床: ${area}㎡ × ${costs.floorCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * floorCostWithRate).toLocaleString()}円\n`;
+                    processText += `  天井: ${area}㎡ × ${costs.ceilingCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(area * ceilingCostWithRate).toLocaleString()}円\n`;
+                    processText += `  壁: ${area.toFixed(2)}^0.5 × 4 × ${costs.height}m × ${costs.wallCost.toLocaleString()}円/㎡ × ${regionRate.toFixed(2)} = ${Math.round(Math.sqrt(area) * 4 * costs.height * wallCostWithRate).toLocaleString()}円\n`;
                     processText += `  1部屋合計 = ${Math.round(costPerRoom).toLocaleString()}円\n`;
                     processText += `\n【部屋数を反映】\n`;
                     processText += `  ${Math.round(costPerRoom).toLocaleString()}円 × ${roomCount}室 = ${Math.round(totalCost).toLocaleString()}円\n\n`;
                 } else {
                     document.getElementById('guestroom_arch_western_cost').value = '0';
-                    processText += `【洋室】単価情報が取得できません\n\n`;
+                    processText += `【洋室】建築初期設定から単価情報が取得できません\n\n`;
                 }
             } else {
                 document.getElementById('guestroom_arch_western_cost').value = '0';
@@ -7065,6 +7173,7 @@ function updateAmusementArchCosts() {
         updateGuestroomRecommendedCounts();
         updateGuestroomSubtotal();
     }
+    
     
     // 客室の機械設備・電気設備の推奨個数を計算
     function updateGuestroomRecommendedCounts() {
