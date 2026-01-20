@@ -2604,9 +2604,8 @@ function setupEventListeners() {
         if (regionElement) {
             regionElement.addEventListener('change', function() {
                 updateRegionRateDisplay();
-                if (document.getElementById('apply_region_rate').checked) {
-                    recalculateAllArchCosts();
-                }
+                recalculateAllArchCosts(); // 建築工事を再計算
+                recalculateAllEquipmentCosts(); // 機械設備・電気設備を再計算
             });
         }
         
@@ -2614,7 +2613,8 @@ function setupEventListeners() {
         const applyRegionRateCheckbox = document.getElementById('apply_region_rate');
         if (applyRegionRateCheckbox) {
             applyRegionRateCheckbox.addEventListener('change', function() {
-                recalculateAllArchCosts();
+                recalculateAllArchCosts(); // 建築工事を再計算
+                recalculateAllEquipmentCosts(); // 機械設備・電気設備を再計算
             });
         }
         
