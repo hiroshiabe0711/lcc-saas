@@ -2627,13 +2627,246 @@
         </div>
     </div>
 
+    <!-- LCC分析タブ -->
     <div id="lcc" class="tab-pane">
-        <div style="padding: 20px;">
-            <div class="section-title">LCC分析</div>
-            <p>ライフサイクルコスト分析</p>
+        <div style="padding: 20px; max-height: 800px; overflow-y: auto;">
+            <div class="section-title">ライフサイクルコスト分析</div>
+            <p style="font-size: 11px; color: #666; margin-bottom: 15px;">
+                建物の建設費用を詳細に計算し、ライフサイクル全体のコストを分析します。
+            </p>
+            
+            <!-- ========== セクション1: 基準単価と修繕費用 ========== -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333;">基準単価と修繕費用</h3>
+                
+                <div style="display: flex; gap: 30px;">
+                    <!-- 左側: 基準情報 -->
+                    <div style="flex: 1;">
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <!-- 再調達価格 -->
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label style="width: 150px; font-weight: bold;">再調達価格:</label>
+                                <input type="text" id="lcc_reconstruction_cost" readonly style="width: 150px; text-align: right; background-color: #e9ecef;">
+                                <span style="margin-left: 5px;">円</span>
+                            </div>
+                            
+                            <!-- 建築基準単価 -->
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label style="width: 150px; font-weight: bold;">建築基準単価:</label>
+                                <input type="text" id="lcc_unit_price" readonly style="width: 150px; text-align: right; background-color: #e9ecef;">
+                                <span style="margin-left: 5px;">円/㎡</span>
+                                <span id="lcc_region_rate_display" style="margin-left: 15px; font-size: 11px; color: #666;"></span>
+                            </div>
+                            
+                            <!-- 建物延床面積 -->
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label style="width: 150px; font-weight: bold;">建物延床面積:</label>
+                                <input type="text" id="lcc_building_area" readonly style="width: 150px; text-align: right; background-color: #e9ecef;">
+                                <span style="margin-left: 5px;">㎡</span>
+                            </div>
+                            
+                            <!-- 仕様グレード -->
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <label style="width: 150px; font-weight: bold;">仕様グレード:</label>
+                                <input type="text" id="lcc_spec_grade" readonly style="width: 150px; text-align: right; background-color: #e9ecef;">
+                            </div>
+                            
+                            <!-- 建物構造 -->
+                            <div style="display: flex; align-items: center;">
+                                <label style="width: 150px; font-weight: bold;">建物構造:</label>
+                                <input type="text" id="lcc_structure_type" readonly style="width: 150px; text-align: right; background-color: #e9ecef;">
+                            </div>
+                        </div>
+                        
+                        <!-- 再調達価格と各経費率 -->
+                        <div style="background-color: #fff9e6; padding: 15px; border-radius: 8px;">
+                            <h4 style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #856404;">再調達価格と各経費率</h4>
+                            
+                            <!-- 直接工事費 -->
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 120px;">直接工事費:</label>
+                                <input type="text" id="lcc_direct_rate" readonly style="width: 80px; text-align: right; background-color: #fff;">
+                                <span style="margin-left: 3px; margin-right: 15px;">%</span>
+                                <input type="text" id="lcc_direct_amount" readonly style="width: 120px; text-align: right; background-color: #fff;">
+                                <span style="margin-left: 3px;">円</span>
+                            </div>
+                            
+                            <!-- 純工事費 -->
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 120px;">純工事費:</label>
+                                <input type="text" id="lcc_net_rate" readonly value="80.37" style="width: 80px; text-align: right; background-color: #fff;">
+                                <span style="margin-left: 3px; margin-right: 15px;">%</span>
+                                <input type="text" id="lcc_net_amount" readonly style="width: 120px; text-align: right; background-color: #fff;">
+                                <span style="margin-left: 3px;">円</span>
+                            </div>
+                            
+                            <!-- 現場管理費 -->
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 120px;">現場管理費:</label>
+                                <input type="number" id="lcc_site_management_rate" value="7" style="width: 80px; text-align: right;" step="0.01">
+                                <span style="margin-left: 3px; margin-right: 15px;">%</span>
+                                <input type="text" id="lcc_site_management_amount" readonly style="width: 120px; text-align: right; background-color: #fff;">
+                                <span style="margin-left: 3px;">円</span>
+                            </div>
+                            
+                            <!-- 共通仮設費 -->
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 120px;">共通仮設費:</label>
+                                <input type="number" id="lcc_common_temp_rate" value="4" style="width: 80px; text-align: right;" step="0.01">
+                                <span style="margin-left: 3px; margin-right: 15px;">%</span>
+                                <input type="text" id="lcc_common_temp_amount" readonly style="width: 120px; text-align: right; background-color: #fff;">
+                                <span style="margin-left: 3px;">円</span>
+                            </div>
+                            
+                            <!-- 一般管理費等 -->
+                            <div style="display: flex; align-items: center;">
+                                <label style="width: 120px;">一般管理費等:</label>
+                                <input type="number" id="lcc_general_admin_rate" value="12" style="width: 80px; text-align: right;" step="0.01">
+                                <span style="margin-left: 3px; margin-right: 15px;">%</span>
+                                <input type="text" id="lcc_general_admin_amount" readonly style="width: 120px; text-align: right; background-color: #fff;">
+                                <span style="margin-left: 3px;">円</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右側: 円グラフエリア（第5段階で実装） -->
+                    <div style="flex: 1;">
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                            <h4 style="font-size: 14px; font-weight: bold; margin-bottom: 15px;">LCCコスト構成</h4>
+                            <canvas id="lcc_pie_chart" width="300" height="300" style="background-color: white; border-radius: 5px;"></canvas>
+                            <div style="margin-top: 15px; text-align: left; font-size: 12px;">
+                                <div id="lcc_legend_1" style="margin-bottom: 5px;">■ 再調達価格: 0円</div>
+                                <div id="lcc_legend_2" style="margin-bottom: 5px;">■ 修繕工事費: 0円</div>
+                                <div id="lcc_legend_3" style="margin-bottom: 5px;">■ 運用費: 0円</div>
+                                <div id="lcc_legend_4" style="margin-bottom: 5px;">■ 一般管理費: 0円</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ========== セクション2: LCC修繕計画表（第2段階で実装） ========== -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333;">LCC修繕計画表</h3>
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; color: #666;">
+                    <p>修繕計画表は第2段階で実装予定です</p>
+                    <p style="font-size: 12px; margin-top: 10px;">45行×19列のテーブルを作成します</p>
+                </div>
+            </div>
+            
+            <!-- ========== セクション3: LCC分析設定 ========== -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333;">LCC分析設定</h3>
+                
+                <div style="display: flex; gap: 30px;">
+                    <!-- 左列: 分析パラメータ -->
+                    <div style="flex: 1;">
+                        <div style="background-color: #e7f3ff; padding: 15px; border-radius: 8px;">
+                            <h4 style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #004085;">分析パラメータ</h4>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">分析期間:</label>
+                                <input type="number" id="lcc_analysis_years" value="75" style="width: 100px; text-align: right;">
+                                <span style="margin-left: 5px;">年</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">割引率:</label>
+                                <input type="number" id="lcc_discount_rate" value="4" style="width: 100px; text-align: right;" step="0.1">
+                                <span style="margin-left: 5px;">%</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">年間維持管理費率:</label>
+                                <input type="number" id="lcc_maintenance_rate" value="0.5" style="width: 100px; text-align: right;" step="0.1">
+                                <span style="margin-left: 5px;">% (再調達価格比)</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">大規模修繕費率:</label>
+                                <input type="number" id="lcc_major_repair_rate" value="10" style="width: 100px; text-align: right;" step="0.1">
+                                <span style="margin-left: 5px;">% (再調達価格比)</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">大規模修繕周期:</label>
+                                <input type="number" id="lcc_major_repair_interval" value="15" style="width: 100px; text-align: right;">
+                                <span style="margin-left: 5px;">年ごと</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">エネルギー単価:</label>
+                                <input type="number" id="lcc_energy_unit_cost" value="300" style="width: 100px; text-align: right;">
+                                <span style="margin-left: 5px;">円/㎡/月</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">水道単価:</label>
+                                <input type="number" id="lcc_water_unit_cost" value="100" style="width: 100px; text-align: right;">
+                                <span style="margin-left: 5px;">円/㎡/月</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 180px;">保険料率:</label>
+                                <input type="number" id="lcc_insurance_rate" value="0.1" style="width: 100px; text-align: right;" step="0.01">
+                                <span style="margin-left: 5px;">% (年間)</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center;">
+                                <label style="width: 180px;">固定資産税率:</label>
+                                <input type="number" id="lcc_tax_rate" value="1.4" style="width: 100px; text-align: right;" step="0.01">
+                                <span style="margin-left: 5px;">% (年間)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右列: 運営費 -->
+                    <div style="flex: 1;">
+                        <div style="background-color: #d4edda; padding: 15px; border-radius: 8px;">
+                            <h4 style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #155724;">運営費</h4>
+                            
+                            <!-- 運営費合計（読取専用） -->
+                            <div style="display: flex; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #155724;">
+                                <label style="width: 150px; font-weight: bold; font-size: 14px;">運営費合計:</label>
+                                <input type="text" id="lcc_operation_total" readonly value="0" style="width: 120px; text-align: right; background-color: #fff; font-weight: bold;">
+                                <span style="margin-left: 5px; font-weight: bold;">円/月</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 150px; padding-left: 15px;">人件費:</label>
+                                <input type="number" id="lcc_personnel_cost" value="0" style="width: 120px; text-align: right;">
+                                <span style="margin-left: 5px;">円/月</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 150px; padding-left: 15px;">アメニティ費:</label>
+                                <input type="number" id="lcc_amenity_cost" value="0" style="width: 120px; text-align: right;">
+                                <span style="margin-left: 5px;">円/月</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 150px; padding-left: 15px;">OTA・広告費:</label>
+                                <input type="number" id="lcc_ota_ad_cost" value="0" style="width: 120px; text-align: right;">
+                                <span style="margin-left: 5px;">円/月</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <label style="width: 150px; padding-left: 15px;">食材費:</label>
+                                <input type="number" id="lcc_food_cost" value="0" style="width: 120px; text-align: right;">
+                                <span style="margin-left: 5px;">円/月</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center;">
+                                <label style="width: 150px; padding-left: 15px;">リネン費:</label>
+                                <input type="number" id="lcc_linen_cost" value="0" style="width: 120px; text-align: right;">
+                                <span style="margin-left: 5px;">円/月</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
 <script>
     let properties = {};
