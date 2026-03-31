@@ -3076,6 +3076,7 @@
         initializeLoungeTab(); 
         initializeHallwayTab(); 
         initializeAmusementTab(); // ← この行を追加
+        setupLCCEventListeners(); // ← LCC分析タブのイベントリスナー設定
 
 
     });
@@ -3089,6 +3090,11 @@
         
         document.getElementById(tabName).classList.add('active');
         event.target.classList.add('active');
+        
+        // LCC分析タブが選択された場合は初期化
+        if (tabName === 'lcc') {
+            initializeLCCTab();
+        }
     }
 
 function setupEventListeners() {
@@ -7853,7 +7859,158 @@ function onRegionChange() {
 
 // ========== 地域係数関連の関数ここまで ==========
 
+// ========== LCC分析タブの関数 ==========
 
+// LCC分析タブの初期化とデータ取得
+function initializeLCCTab() {
+    try {
+        // コストサマリから再調達価格を取得
+        const reconstructionCost = parseFloat(document.getElementById('total_construction_cost').value.replace(/,/g, '')) || 0;
+        document.getElementById('lcc_reconstruction_cost').value = reconstructionCost.toLocaleString();
+        
+        // 建物延床面積を取得
+        const buildingArea = parseFloat(document.getElementById('total_area').value.replace(/,/g, '')) || 0;
+        document.getElementById('lcc_building_area').value = buildingArea.toLocaleString();
+        
+        // 仕様グレードを取得
+        const specGrade = document.getElementById('grade').value || '';
+        document.getElementById('lcc_spec_grade').value = specGrade;
+        
+        // 建物構造を取得
+        const structureType = document.getElementById('structure').value || '';
+        document.getElementById('lcc_structure_type').value = structureType;
+        
+        // 建築基準単価を計算
+        if (buildingArea > 0) {
+            const unitPrice = Math.round(reconstructionCost / buildingArea);
+            document.getElementById('lcc_unit_price').value = unitPrice.toLocaleString();
+            
+            // 地域係数を表示
+            const regionRate = getRegionRate();
+            document.getElementById('lcc_region_rate_display').textContent = `建設地域係数: ${regionRate.toFixed(2)}`;
+        } else {
+            document.getElementById('lcc_unit_price').value = '0';
+            document.getElementById('lcc_region_rate_display').textContent = '';
+        }
+        
+        // 各経費率の計算を実行
+        calculateLCCCostRates();
+        
+    } catch (error) {
+        console.error('LCC初期化エラー:', error);
+    }
+}
+
+// 各経費率の金額計算
+function calculateLCCCostRates() {
+    try {
+        // 再調達価格を取得
+        const baseCost = parseFloat(document.getElementById('lcc_reconstruction_cost').value.replace(/,/g, '')) || 0;
+        
+        if (baseCost <= 0) {
+            // 再調達価格が0の場合は全て0に設定
+            document.getElementById('lcc_direct_rate').value = '0.00';
+            document.getElementById('lcc_direct_amount').value = '0';
+            document.getElementById('lcc_net_amount').value = '0';
+            document.getElementById('lcc_site_management_amount').value = '0';
+            document.getElementById('lcc_common_temp_amount').value = '0';
+            document.getElementById('lcc_general_admin_amount').value = '0';
+            return;
+        }
+        
+        // 現場管理費率を取得
+        const siteManagementRate = parseFloat(document.getElementById('lcc_site_management_rate').value) || 0;
+        
+        // 共通仮設費率を取得
+        const commonTempRate = parseFloat(document.getElementById('lcc_common_temp_rate').value) || 0;
+        
+        // 一般管理費等率を取得
+        const generalAdminRate = parseFloat(document.getElementById('lcc_general_admin_rate').value) || 0;
+        
+        // 直接工事費率 = 100 - 現場管理費率 - 共通仮設費率 - 一般管理費等率
+        const directRate = 100 - siteManagementRate - commonTempRate - generalAdminRate;
+        document.getElementById('lcc_direct_rate').value = directRate.toFixed(2);
+        
+        // 純工事費率 = 直接工事費率 + 共通仮設費率
+        const netRate = directRate + commonTempRate;
+        document.getElementById('lcc_net_rate').value = netRate.toFixed(2);
+        
+        // 各金額を計算
+        const directAmount = baseCost * (directRate / 100);
+        document.getElementById('lcc_direct_amount').value = Math.round(directAmount).toLocaleString();
+        
+        const netAmount = baseCost * (netRate / 100);
+        document.getElementById('lcc_net_amount').value = Math.round(netAmount).toLocaleString();
+        
+        const siteManagementAmount = baseCost * (siteManagementRate / 100);
+        document.getElementById('lcc_site_management_amount').value = Math.round(siteManagementAmount).toLocaleString();
+        
+        const commonTempAmount = baseCost * (commonTempRate / 100);
+        document.getElementById('lcc_common_temp_amount').value = Math.round(commonTempAmount).toLocaleString();
+        
+        const generalAdminAmount = baseCost * (generalAdminRate / 100);
+        document.getElementById('lcc_general_admin_amount').value = Math.round(generalAdminAmount).toLocaleString();
+        
+    } catch (error) {
+        console.error('経費率計算エラー:', error);
+    }
+}
+
+// 運営費合計の計算
+function calculateLCCOperationTotal() {
+    try {
+        // 各内訳を取得
+        const personnelCost = parseFloat(document.getElementById('lcc_personnel_cost').value) || 0;
+        const amenityCost = parseFloat(document.getElementById('lcc_amenity_cost').value) || 0;
+        const otaAdCost = parseFloat(document.getElementById('lcc_ota_ad_cost').value) || 0;
+        const foodCost = parseFloat(document.getElementById('lcc_food_cost').value) || 0;
+        const linenCost = parseFloat(document.getElementById('lcc_linen_cost').value) || 0;
+        
+        // 合計を計算
+        const total = personnelCost + amenityCost + otaAdCost + foodCost + linenCost;
+        
+        // 運営費合計に設定
+        document.getElementById('lcc_operation_total').value = Math.round(total).toLocaleString();
+        
+    } catch (error) {
+        console.error('運営費合計計算エラー:', error);
+    }
+}
+
+// イベントリスナーの設定
+function setupLCCEventListeners() {
+    // 経費率の変更を監視
+    const rateInputs = [
+        'lcc_site_management_rate',
+        'lcc_common_temp_rate',
+        'lcc_general_admin_rate'
+    ];
+    
+    rateInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', calculateLCCCostRates);
+        }
+    });
+    
+    // 運営費内訳の変更を監視
+    const operationInputs = [
+        'lcc_personnel_cost',
+        'lcc_amenity_cost',
+        'lcc_ota_ad_cost',
+        'lcc_food_cost',
+        'lcc_linen_cost'
+    ];
+    
+    operationInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', calculateLCCOperationTotal);
+        }
+    });
+}
+
+// ========== LCC分析タブの関数ここまで ==========
 
 </script>
 
