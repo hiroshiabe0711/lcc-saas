@@ -3454,6 +3454,8 @@ function setupEventListeners() {
         
         // 小計を表示
         document.getElementById('sum_equipment').textContent = total.toLocaleString() + ' 円';
+        // 総工事費を更新
+        calculateTotalConstructionCost();
     }
 
     // 階ごとの面積入力フィールドを更新
@@ -5005,6 +5007,8 @@ function updateOnsenBathArchCosts() {
         if (sumOnsenElement) {
             sumOnsenElement.textContent = Math.round(total).toLocaleString() + ' 円';
         }
+        // 総工事費を更新
+        calculateTotalConstructionCost();
     }
     
     // ========== 温泉設備タブの関数ここまで ==========
@@ -5712,6 +5716,8 @@ function updateRestaurantArchCosts() {
         if (sumRestaurantElement) {
             sumRestaurantElement.textContent = Math.round(total).toLocaleString() + ' 円';
         }
+        // 総工事費を更新
+        calculateTotalConstructionCost();
     }
     
     // ========== レストランタブの関数ここまで ==========
@@ -6214,6 +6220,8 @@ function updateLoungeArchCosts() {
         if (sumLoungeElement) {
             sumLoungeElement.textContent = Math.round(total).toLocaleString() + ' 円';
         }
+        // 総工事費を更新
+        calculateTotalConstructionCost();
     }
     
     // ========== ラウンジタブの関数ここまで ==========
@@ -6801,6 +6809,8 @@ function updateHallwayArchCosts() {
         if (sumHallwayElement) {
             sumHallwayElement.textContent = Math.round(total).toLocaleString() + ' 円';
         }
+        // 総工事費を更新
+        calculateTotalConstructionCost();
     }
     
     // ========== 通路タブの関数ここまで ==========
@@ -7269,6 +7279,8 @@ function updateAmusementArchCosts() {
         if (sumAmusementElement) {
             sumAmusementElement.textContent = Math.round(total).toLocaleString() + ' 円';
         }
+        // 総工事費を更新
+        calculateTotalConstructionCost();
     }
     
     // ========== アミューズメントタブの関数ここまで ==========
@@ -7784,6 +7796,8 @@ function updateAmusementArchCosts() {
         if (sumGuestElement) {
             sumGuestElement.textContent = Math.round(total).toLocaleString() + ' 円';
         }
+        // 総工事費を更新
+        calculateTotalConstructionCost();
     }
     
     // ========== 客室タブの関数ここまで ==========
@@ -7895,8 +7909,9 @@ function onRegionChange() {
 // LCC分析タブの初期化とデータ取得
 function initializeLCCTab() {
     try {
-        // コストサマリから再調達価格を取得
-        const reconstructionCost = parseFloat(document.getElementById('total_construction_cost').value.replace(/,/g, '')) || 0;
+        // コストサマリから再調達価格を取得（textContentを使用）
+        const reconstructionCostText = document.getElementById('total_construction_cost').textContent || '0';
+        const reconstructionCost = parseFloat(reconstructionCostText.replace(/[^0-9]/g, '')) || 0;
         document.getElementById('lcc_reconstruction_cost').value = reconstructionCost.toLocaleString();
         
         // 建物延床面積を取得
