@@ -7909,6 +7909,7 @@ function onRegionChange() {
 // LCC分析タブの初期化とデータ取得
 function initializeLCCTab() {
     try {
+        console.log('=== LCC初期化開始 ===');
         // コストサマリから再調達価格を取得（textContentを使用）
         const reconstructionCostText = document.getElementById('total_construction_cost').textContent || '0';
         const reconstructionCost = parseFloat(reconstructionCostText.replace(/[^0-9]/g, '')) || 0;
