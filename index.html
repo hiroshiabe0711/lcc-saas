@@ -7915,8 +7915,10 @@ function initializeLCCTab() {
         const reconstructionCost = parseFloat(reconstructionCostText.replace(/[^0-9]/g, '')) || 0;
         document.getElementById('lcc_reconstruction_cost').value = reconstructionCost.toLocaleString();
         
-        // 建物延床面積を取得
-        const buildingArea = parseFloat(document.getElementById('total_area').value.replace(/,/g, '')) || 0;
+        // 建物延床面積を取得（totalAreaDisplayから取得）
+        const totalAreaDisplayText = document.getElementById('totalAreaDisplay')?.textContent || '合計: 0 ㎡';
+        const buildingArea = parseFloat(totalAreaDisplayText.replace(/[^0-9.]/g, '')) || 0;
+        console.log('建物延床面積:', buildingArea);
         document.getElementById('lcc_building_area').value = buildingArea.toLocaleString();
         
         // 仕様グレードを取得
