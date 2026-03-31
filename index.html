@@ -610,6 +610,10 @@
                         <span>付加設備小計:</span>
                         <span id="sum_equipment">0 円</span>
                     </div>
+                    <div class="summary-row" style="border-top: 2px solid #333; margin-top: 10px; padding-top: 10px;">
+                        <span style="font-weight: bold; font-size: 16px;">総工事費:</span>
+                        <span id="total_construction_cost" style="font-weight: bold; font-size: 16px; color: #d32f2f;">0 円</span>
+                    </div>
                 </div>
             </div>
             
@@ -3207,6 +3211,32 @@ function setupEventListeners() {
     function calculateAll() {
         updateAdditionalEquipmentCosts();
         alert('全体コスト計算を実行しました');
+    }
+    
+    // 総工事費を計算
+    function calculateTotalConstructionCost() {
+        try {
+            let totalCost = 0;
+            
+            // 各小計を取得
+            const sumOnsen = parseFloat(document.getElementById('sum_onsen').textContent.replace(/[^0-9]/g, '')) || 0;
+            const sumRestaurant = parseFloat(document.getElementById('sum_restaurant').textContent.replace(/[^0-9]/g, '')) || 0;
+            const sumLounge = parseFloat(document.getElementById('sum_lounge').textContent.replace(/[^0-9]/g, '')) || 0;
+            const sumHallway = parseFloat(document.getElementById('sum_hallway').textContent.replace(/[^0-9]/g, '')) || 0;
+            const sumAmusement = parseFloat(document.getElementById('sum_amusement').textContent.replace(/[^0-9]/g, '')) || 0;
+            const sumGuest = parseFloat(document.getElementById('sum_guest').textContent.replace(/[^0-9]/g, '')) || 0;
+            const sumEquipment = parseFloat(document.getElementById('sum_equipment').textContent.replace(/[^0-9]/g, '')) || 0;
+            
+            // 合計を計算
+            totalCost = sumOnsen + sumRestaurant + sumLounge + sumHallway + sumAmusement + sumGuest + sumEquipment;
+            
+            // 総工事費を表示
+            document.getElementById('total_construction_cost').textContent = totalCost.toLocaleString() + ' 円';
+            
+        } catch (error) {
+            console.error('総工事費計算エラー:', error);
+            document.getElementById('total_construction_cost').textContent = '0 円';
+        }
     }
     
     // ========== その他設備情報の計算 ==========
