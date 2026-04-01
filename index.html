@@ -9312,12 +9312,14 @@ function calculateMaintenanceAndRepair() {
                 if (isMaintenance) {
                     const maintenanceCost = amount * (maintenanceRate / 100) * 5; // 5年分
                     cost += maintenanceCost;
+                    console.log(`行${row}, 列${col}: 維持管理 ${Math.round(maintenanceCost)}円`);
                 }
                 
                 // 大規模修繕費用
                 if (isRepair && repairColumns.includes(col)) {
                     const repairCost = amount * (repairRate / 100);
                     cost += repairCost;
+                    console.log(`行${row}, 列${col}: 大規模修繕 ${Math.round(repairCost)}円`);
                 }
                 
                 // 年度列に設定（カンマなし）
