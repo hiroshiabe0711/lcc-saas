@@ -2806,8 +2806,8 @@
                         <thead>
                             <tr>
                                 <th style="width: 150px;">工種</th>
-                                <th style="width: 60px;">比率<br>(%)</th>
-                                <th style="width: 120px;">項目別<br>再調達価格<br>(円)</th>
+                                <th style="width: 50px;">比率<br>(%)</th>
+                                <th style="width: 140px;">項目別<br>再調達価格<br>(円)</th>
                                 <th style="width: 70px;">0-5年</th>
                                 <th style="width: 70px;">6-10年</th>
                                 <th style="width: 70px;">11-15年</th>
@@ -9019,7 +9019,7 @@ function calculateLCCCostRates() {
 
         // 修繕計画表も更新
         calculateLCCRepairPrices();
-        
+
     } catch (error) {
         console.error('経費率計算エラー:', error);
     }
@@ -9046,6 +9046,7 @@ function calculateLCCOperationTotal() {
     }
 }
 
+// LCC修繕計画表の項目別再調達価格を計算
 // LCC修繕計画表の項目別再調達価格を計算
 function calculateLCCRepairPrices() {
     try {
@@ -9092,30 +9093,67 @@ function calculateLCCRepairPrices() {
                     calculateLCCSubtotal(39, 40, 41);
                 } else if (row === 42) {
                     // 直接工事計（9, 18, 30, 38, 41の合計）
-                    const arch = parseFloat(document.getElementById('lcc_price_9').value) || 0;
-                    const hvac = parseFloat(document.getElementById('lcc_price_18').value) || 0;
-                    const sanitary = parseFloat(document.getElementById('lcc_price_30').value) || 0;
-                    const electrical = parseFloat(document.getElementById('lcc_price_38').value) || 0;
-                    const elevator = parseFloat(document.getElementById('lcc_price_41').value) || 0;
+                    const arch = parseFloat(document.getElementById('lcc_price_9').value.replace(/,/g, '')) || 0;
+                    const hvac = parseFloat(document.getElementById('lcc_price_18').value.replace(/,/g, '')) || 0;
+                    const sanitary = parseFloat(document.getElementById('lcc_price_30').value.replace(/,/g, '')) || 0;
+                    const electrical = parseFloat(document.getElementById('lcc_price_38').value.replace(/,/g, '')) || 0;
+                    const elevator = parseFloat(document.getElementById('lcc_price_41').value.replace(/,/g, '')) || 0;
                     
                     const totalDirect = arch + hvac + sanitary + electrical + elevator;
-                    priceElement.value = Math.round(totalDirect);
+                    priceElement.value = Math.round(totalDirect).toLocaleString();
                 } else if (row === 43) {
                     // 運用費（後で実装）
-                    priceElement.value = 0;
+                    priceElement.value = '0';
                 } else if (row === 44) {
                     // 一般管理費（後で実装）
-                    priceElement.value = 0;
+                    priceElement.value = '0';
                 } else {
                     // 通常の工種行：項目別再調達価格 = 直接工事費 × 比率 / 100
                     const itemPrice = directCost * (ratio / 100);
-                    priceElement.value = Math.round(itemPrice);
+                    priceElement.value = Math.round(itemPrice).toLocaleString();
                 }
             }
         }
         
     } catch (error) {
         console.error('LCC修繕計画表計算エラー:', error);
+    }
+}
+
+// 小計行を計算（指定範囲の合計）
+function calculateLCCSubtotal(startRow, endRow, subtotalRow) {
+    try {
+        let total = 0;
+        
+        // 指定範囲の項目別再調達価格を合計
+        for (let row = startRow; row <= endRow; row++) {
+            const priceElement = document.getElementById(`lcc_price_${row}`);
+            if (priceElement) {
+                const price = parseFloat(priceElement.value.replace(/,/g, '')) || 0;
+                total += price;
+            }
+        }
+        
+        // 小計行に設定（カンマ区切り）
+        const subtotalPriceElement = document.getElementById(`lcc_price_${subtotalRow}`);
+        if (subtotalPriceElement) {
+            subtotalPriceElement.value = Math.round(total).toLocaleString();
+        }
+        
+        // 小計行の比率も更新（全体に対する比率）
+        const reconstructionCostText = document.getElementById('lcc_reconstruction_cost').value.replace(/,/g, '');
+        const reconstructionCost = parseFloat(reconstructionCostText) || 0;
+        
+        if (reconstructionCost > 0) {
+            const subtotalRatio = (total / reconstructionCost) * 100;
+            const subtotalRatioElement = document.getElementById(`lcc_ratio_${subtotalRow}`);
+            if (subtotalRatioElement) {
+                subtotalRatioElement.value = subtotalRatio.toFixed(2);
+            }
+        }
+        
+    } catch (error) {
+        console.error('小計計算エラー:', error);
     }
 }
 
