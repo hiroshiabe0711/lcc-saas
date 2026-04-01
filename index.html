@@ -9268,14 +9268,20 @@ function calculateMaintenanceAndRepair() {
         
         // 大規模修繕を行う列を計算
         const repairColumns = [];
-        for (let col = 1; col <= 15; col++) {
-            const [startYear, endYear] = YEAR_RANGES[col];
-            
-            // 期間内に修繕周期の倍数の年が含まれているかチェック
-            for (let year = startYear; year <= endYear; year++) {
-                if (year > 0 && year % repairInterval === 0) {
-                    repairColumns.push(col);
-                    break; // この列は修繕対象なので次の列へ
+        if (repairInterval > 0) {
+            for (let col = 1; col <= 15; col++) {
+                const [startYear, endYear] = YEAR_RANGES[col];
+                
+                // 周期の倍数が範囲内に含まれるかチェック
+                let multiple = repairInterval;
+                while (multiple <= endYear) {
+                    if (startYear <= multiple && multiple <= endYear) {
+                        if (!repairColumns.includes(col)) {
+                            repairColumns.push(col);
+                        }
+                        break; // この列には1回だけカウント
+                    }
+                    multiple += repairInterval;
                 }
             }
         }
