@@ -9320,19 +9320,19 @@ function calculateMaintenanceAndRepair() {
                     cost += repairCost;
                 }
                 
-                // 年度列に設定
+                // 年度列に設定（カンマなし）
                 const yearElement = document.getElementById(`lcc_year_${row}_${col}`);
                 if (yearElement) {
-                    yearElement.value = cost > 0 ? Math.round(cost).toLocaleString() : '0';
+                    yearElement.value = cost > 0 ? Math.round(cost) : 0;
                 }
                 
                 rowTotal += cost;
             }
             
-            // 計列に設定
+            // 計列に設定（カンマなし）
             const totalElement = document.getElementById(`lcc_total_${row}`);
             if (totalElement) {
-                totalElement.value = Math.round(rowTotal).toLocaleString();
+                totalElement.value = Math.round(rowTotal);
             }
         });
         
@@ -9375,7 +9375,7 @@ function calculateLCCPeriodTotals() {
             
             const directTotalElement = document.getElementById(`lcc_year_42_${col}`);
             if (directTotalElement) {
-                directTotalElement.value = total > 0 ? Math.round(total).toLocaleString() : '0';
+                directTotalElement.value = total > 0 ? Math.round(total) : 0;
             }
         }
         
@@ -9389,7 +9389,7 @@ function calculateLCCPeriodTotals() {
         }
         const directTotalElement = document.getElementById('lcc_total_42');
         if (directTotalElement) {
-            directTotalElement.value = Math.round(directGrandTotal).toLocaleString();
+            directTotalElement.value = Math.round(directGrandTotal);
         }
         
     } catch (error) {
@@ -9411,7 +9411,7 @@ function calculateRowPeriodTotal(startRow, endRow, totalRow) {
             
             const totalElement = document.getElementById(`lcc_year_${totalRow}_${col}`);
             if (totalElement) {
-                totalElement.value = total > 0 ? Math.round(total).toLocaleString() : '0';
+                totalElement.value = total > 0 ? Math.round(total) : 0;
             }
         }
         
@@ -9426,7 +9426,7 @@ function calculateRowPeriodTotal(startRow, endRow, totalRow) {
         
         const grandTotalElement = document.getElementById(`lcc_total_${totalRow}`);
         if (grandTotalElement) {
-            grandTotalElement.value = Math.round(rowTotal).toLocaleString();
+            grandTotalElement.value = Math.round(rowTotal);
         }
         
     } catch (error) {
