@@ -9113,6 +9113,7 @@ function calculateLCCRepairPrices() {
                     // 通常の工種行：項目別再調達価格 = 直接工事費 × 比率 / 100
                     const itemPrice = directCost * (ratio / 100);
                     priceElement.value = Math.round(itemPrice).toLocaleString();
+                    console.log(`行${row}: 比率=${ratio}%, 金額=${Math.round(itemPrice).toLocaleString()}円`);
                 }
             }
         }
