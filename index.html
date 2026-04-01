@@ -9270,11 +9270,13 @@ function calculateMaintenanceAndRepair() {
         const repairColumns = [];
         for (let col = 1; col <= 15; col++) {
             const [startYear, endYear] = YEAR_RANGES[col];
-            const midYear = Math.floor((startYear + endYear) / 2);
             
-            // 修繕周期の倍数かチェック
-            if (midYear > 0 && midYear % repairInterval === 0) {
-                repairColumns.push(col);
+            // 期間内に修繕周期の倍数の年が含まれているかチェック
+            for (let year = startYear; year <= endYear; year++) {
+                if (year > 0 && year % repairInterval === 0) {
+                    repairColumns.push(col);
+                    break; // この列は修繕対象なので次の列へ
+                }
             }
         }
         
