@@ -9102,7 +9102,7 @@ function calculateLCCRepairPrices() {
                     const elevator = parseFloat(document.getElementById('lcc_price_41').value.replace(/,/g, '')) || 0;
                     
                     const totalDirect = arch + hvac + sanitary + electrical + elevator;
-                    priceElement.value = Math.round(totalDirect).toLocaleString();
+                    priceElement.value = Math.round(totalDirect); // カンマなし
                 } else if (row === 43) {
                     // 運用費（後で実装）
                     priceElement.value = '0';
@@ -9112,7 +9112,7 @@ function calculateLCCRepairPrices() {
                 } else {
                     // 通常の工種行：項目別再調達価格 = 直接工事費 × 比率 / 100
                     const itemPrice = directCost * (ratio / 100);
-                    priceElement.value = Math.round(itemPrice).toLocaleString();
+                    priceElement.value = Math.round(itemPrice); // カンマなし
                     console.log(`行${row}: 比率=${ratio}%, 金額=${Math.round(itemPrice).toLocaleString()}円`);
                 }
             }
@@ -9137,10 +9137,10 @@ function calculateLCCSubtotal(startRow, endRow, subtotalRow) {
             }
         }
         
-        // 小計行に設定（カンマ区切り）
+        // 小計行に設定（カンマなし）
         const subtotalPriceElement = document.getElementById(`lcc_price_${subtotalRow}`);
         if (subtotalPriceElement) {
-            subtotalPriceElement.value = Math.round(total).toLocaleString();
+            subtotalPriceElement.value = Math.round(total); // カンマなし
         }
         
         // 小計行の比率も更新（全体に対する比率）
