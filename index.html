@@ -2811,6 +2811,12 @@
                     .lcc-bg-plum { background-color: #dda0dd; }
                     .lcc-bg-lightgray { background-color: #f0f0f0; }
                     .lcc-bg-lightcyan { background-color: #e0ffff; }
+                    /* 工種列（1列目）を固定幅に */
+                    .lcc-table th:first-child,
+                    .lcc-table td:first-child {
+                        min-width: 150px;
+                        width: 150px;
+                    }
                     #lcc_marker_row th {
                         color: red;
                         font-size: 16px;
