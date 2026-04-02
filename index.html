@@ -2787,6 +2787,19 @@
                         padding: 2px 4px;
                         font-size: 11px;
                     }
+                    /* 列ごとのinput幅を調整 */
+                    .lcc-table td:nth-child(2) input {
+                        width: 45px;
+                    }
+                    .lcc-table td:nth-child(3) input {
+                        width: 135px;
+                    }
+                    .lcc-table td:nth-child(n+4):nth-child(-n+18) input {
+                        width: 65px;
+                    }
+                    .lcc-table td:nth-child(19) input {
+                        width: 95px;
+                    }
                     .lcc-table input[readonly] {
                         background-color: #f5f5f5;
                         color: #666;
