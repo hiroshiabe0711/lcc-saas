@@ -9028,6 +9028,8 @@ function initializeLCCTab() {
         calculateMaintenanceAndRepair();
         // 経過年数を計算してマーカーを表示
         calculateElapsedYears();
+        // 運用費・一般管理費を計算
+        calculateOperationCost();
         
     } catch (error) {
         console.error('LCC初期化エラーー:', error);
@@ -9107,6 +9109,12 @@ function calculateLCCOperationTotal() {
         
         // 運営費合計に設定
         document.getElementById('lcc_operation_total').value = Math.round(total).toLocaleString();
+        
+        // 運営費月額も設定（カンマなし）
+        document.getElementById('lcc_operation_monthly').value = total;
+        
+        // 運用費を再計算
+        calculateOperationCost();
         
     } catch (error) {
         console.error('運営費合計計算エラー:', error);
@@ -9636,6 +9644,117 @@ function calculateElapsedYears() {
 }
 
 // ========== 第5段階ここまで ==========
+
+
+// ========== 第6段階：運用費・一般管理費 ==========
+
+// 運用費を計算（43行目）
+function calculateOperationCost() {
+    try {
+        // 運営費月額を取得（運営費内訳の合計）
+        const operationMonthly = parseFloat(document.getElementById('lcc_operation_monthly').value) || 0;
+        
+        // 運用費 = 運営費月額 × 60ヶ月（5年分）
+        const operationCostPerPeriod = operationMonthly * 60;
+        
+        // 100万円単位に変換
+        const operationCostMillion = operationCostPerPeriod / 1000000;
+        
+        // 43行目の全列に設定
+        let totalOperation = 0;
+        for (let col = 1; col <= 15; col++) {
+            const element = document.getElementById(`lcc_year_43_${col}`);
+            if (element) {
+                element.value = operationCostMillion.toFixed(2);
+                totalOperation += operationCostMillion;
+            }
+        }
+        
+        // 計列に設定
+        const totalElement = document.getElementById('lcc_total_43');
+        if (totalElement) {
+            totalElement.value = totalOperation.toFixed(2);
+        }
+        
+        console.log(`運用費計算完了: ${operationCostMillion.toFixed(2)}百万円/期間`);
+        
+        // 一般管理費も再計算
+        calculateAdminCost();
+        
+    } catch (error) {
+        console.error('運用費計算エラー:', error);
+    }
+}
+
+// 一般管理費を計算（44行目）
+function calculateAdminCost() {
+    try {
+        // 運営費月額を取得
+        const operationMonthly = parseFloat(document.getElementById('lcc_operation_monthly').value) || 0;
+        const operationCostPerPeriod = (operationMonthly * 60) / 1000000; // 100万円単位
+        
+        // 再調達価格を取得
+        const reconstructionCost = parseFloat(document.getElementById('lcc_price_42').value) || 0;
+        
+        // 税率・保険料率を取得
+        const taxRate = parseFloat(document.getElementById('lcc_property_tax_rate').value) / 100 || 0;
+        const insuranceRate = parseFloat(document.getElementById('lcc_insurance_rate').value) / 100 || 0;
+        
+        console.log('一般管理費計算開始');
+        console.log(`再調達価格: ${reconstructionCost}円`);
+        console.log(`固定資産税率: ${taxRate * 100}%`);
+        console.log(`保険料率: ${insuranceRate * 100}%`);
+        
+        let totalAdmin = 0;
+        
+        for (let col = 1; col <= 15; col++) {
+            const [startYear, endYear] = YEAR_RANGES[col];
+            const midYear = Math.floor((startYear + endYear) / 2);
+            
+            // 経年減価補正率を取得
+            const depreciationRate = DEPRECIATION_RATES[midYear] || 0.2000;
+            
+            // 固定資産税（5年分）
+            const propertyTax = reconstructionCost * depreciationRate * taxRate * 5;
+            const propertyTaxMillion = propertyTax / 1000000;
+            
+            // 保険料（5年分）
+            const insurance = reconstructionCost * depreciationRate * insuranceRate * 5;
+            const insuranceMillion = insurance / 1000000;
+            
+            // 一般管理費 = 運用費 + 固定資産税 + 保険料
+            const adminCostMillion = operationCostPerPeriod + propertyTaxMillion + insuranceMillion;
+            
+            const element = document.getElementById(`lcc_year_44_${col}`);
+            if (element) {
+                element.value = adminCostMillion.toFixed(2);
+                totalAdmin += adminCostMillion;
+            }
+            
+            console.log(`列${col} (${startYear}-${endYear}年, 中央${midYear}年):`);
+            console.log(`  経年減価補正率: ${depreciationRate.toFixed(4)}`);
+            console.log(`  運用費: ${operationCostPerPeriod.toFixed(2)}百万円`);
+            console.log(`  固定資産税: ${propertyTaxMillion.toFixed(2)}百万円`);
+            console.log(`  保険料: ${insuranceMillion.toFixed(2)}百万円`);
+            console.log(`  一般管理費合計: ${adminCostMillion.toFixed(2)}百万円`);
+        }
+        
+        // 計列に設定
+        const totalElement = document.getElementById('lcc_total_44');
+        if (totalElement) {
+            totalElement.value = totalAdmin.toFixed(2);
+        }
+        
+        console.log(`一般管理費計算完了: 総計 ${totalAdmin.toFixed(2)}百万円`);
+        
+    } catch (error) {
+        console.error('一般管理費計算エラー:', error);
+    }
+}
+
+// ========== 第6段階ここまで ==========
+
+
 // イベントリスナーの設定
 function setupLCCEventListeners() {
     // 修繕計画表のイベントリスナーを設定
@@ -9688,6 +9807,18 @@ function setupLCCEventListeners() {
     
     if (completionDateElement) {
         completionDateElement.addEventListener('change', calculateElapsedYears);
+    }
+    
+    // 固定資産税率・保険料率の変更を監視
+    const propertyTaxRateElement = document.getElementById('lcc_property_tax_rate');
+    const insuranceRateElement = document.getElementById('lcc_insurance_rate');
+    
+    if (propertyTaxRateElement) {
+        propertyTaxRateElement.addEventListener('input', calculateAdminCost);
+    }
+    
+    if (insuranceRateElement) {
+        insuranceRateElement.addEventListener('input', calculateAdminCost);
     }
 }
 
