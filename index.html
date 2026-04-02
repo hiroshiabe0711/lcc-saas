@@ -9004,8 +9004,8 @@ function initializeLCCTab() {
         calculateLCCRepairPrices();
         // 維持管理費・大規模修繕費を計算
         calculateMaintenanceAndRepair();
-        // 経過年数マーカーを表示
-        updateLCCYearMarker();
+        // 経過年数を計算してマーカーを表示
+        calculateElapsedYears();
         
     } catch (error) {
         console.error('LCC初期化エラーー:', error);
@@ -9562,6 +9562,51 @@ function getAdjustedPeriodYears(col) {
 
 // ========== 第5段階ここまで ==========
 
+// 基準日と竣工年月日から経過年数を計算
+function calculateElapsedYears() {
+    try {
+        // 基準日を取得
+        const completionDateInput = document.getElementById('completion_date');
+        // 竣工年月日を取得
+        const constructionStartInput = document.getElementById('construction_start_date');
+        
+        if (!completionDateInput || !constructionStartInput) {
+            console.log('日付入力欄が見つかりません');
+            return;
+        }
+        
+        const completionDate = completionDateInput.value;
+        const constructionStart = constructionStartInput.value;
+        
+        if (!completionDate || !constructionStart) {
+            console.log('日付が入力されていません');
+            return;
+        }
+        
+        // 日付オブジェクトに変換
+        const completion = new Date(completionDate);
+        const construction = new Date(constructionStart);
+        
+        // 差分を計算（ミリ秒）
+        const diffMilliseconds = completion - construction;
+        
+        // 年数に変換（1年 = 365.25日で計算）
+        const diffYears = diffMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
+        
+        // 経過年数入力欄に設定（小数点1桁）
+        const elapsedYearsInput = document.getElementById('lcc_elapsed_years');
+        if (elapsedYearsInput) {
+            elapsedYearsInput.value = Math.max(0, diffYears).toFixed(1);
+            console.log(`経過年数を計算: ${diffYears.toFixed(1)}年`);
+            
+            // マーカーを更新
+            updateLCCYearMarker();
+        }
+        
+    } catch (error) {
+        console.error('経過年数計算エラー:', error);
+    }
+}
 // イベントリスナーの設定
 function setupLCCEventListeners() {
     // 修繕計画表のイベントリスナーを設定
@@ -9603,6 +9648,17 @@ function setupLCCEventListeners() {
             // 経過年数が変更されたら再計算
             calculateMaintenanceAndRepair();
         });
+    }
+    // 基準日と竣工年月日の変更を監視
+    const completionDateElement = document.getElementById('completion_date');
+    const constructionStartElement = document.getElementById('construction_start_date');
+    
+    if (completionDateElement) {
+        completionDateElement.addEventListener('change', calculateElapsedYears);
+    }
+    
+    if (constructionStartElement) {
+        constructionStartElement.addEventListener('change', calculateElapsedYears);
     }
 }
 
