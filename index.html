@@ -9565,30 +9565,30 @@ function getAdjustedPeriodYears(col) {
 // 基準日と竣工年月日から経過年数を計算
 function calculateElapsedYears() {
     try {
-        // 基準日を取得
+        // 基準日を取得（birth_date）
+        const birthDateInput = document.getElementById('birth_date');
+        // 建物竣工年を取得（completion_date）
         const completionDateInput = document.getElementById('completion_date');
-        // 竣工年月日を取得
-        const constructionStartInput = document.getElementById('construction_start_date');
         
-        if (!completionDateInput || !constructionStartInput) {
+        if (!birthDateInput || !completionDateInput) {
             console.log('日付入力欄が見つかりません');
             return;
         }
         
+        const birthDate = birthDateInput.value;
         const completionDate = completionDateInput.value;
-        const constructionStart = constructionStartInput.value;
         
-        if (!completionDate || !constructionStart) {
+        if (!birthDate || !completionDate) {
             console.log('日付が入力されていません');
             return;
         }
         
         // 日付オブジェクトに変換
+        const birth = new Date(birthDate);
         const completion = new Date(completionDate);
-        const construction = new Date(constructionStart);
         
-        // 差分を計算（ミリ秒）
-        const diffMilliseconds = completion - construction;
+        // 差分を計算（ミリ秒）基準日 - 竣工年
+        const diffMilliseconds = birth - completion;
         
         // 年数に変換（1年 = 365.25日で計算）
         const diffYears = diffMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
@@ -9607,6 +9607,8 @@ function calculateElapsedYears() {
         console.error('経過年数計算エラー:', error);
     }
 }
+
+// ========== 第5段階ここまで ==========
 // イベントリスナーの設定
 function setupLCCEventListeners() {
     // 修繕計画表のイベントリスナーを設定
@@ -9649,16 +9651,16 @@ function setupLCCEventListeners() {
             calculateMaintenanceAndRepair();
         });
     }
-    // 基準日と竣工年月日の変更を監視
+    // 基準日と建物竣工年の変更を監視
+    const birthDateElement = document.getElementById('birth_date');
     const completionDateElement = document.getElementById('completion_date');
-    const constructionStartElement = document.getElementById('construction_start_date');
+    
+    if (birthDateElement) {
+        birthDateElement.addEventListener('change', calculateElapsedYears);
+    }
     
     if (completionDateElement) {
         completionDateElement.addEventListener('change', calculateElapsedYears);
-    }
-    
-    if (constructionStartElement) {
-        constructionStartElement.addEventListener('change', calculateElapsedYears);
     }
 }
 
