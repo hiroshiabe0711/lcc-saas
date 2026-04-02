@@ -3830,6 +3830,33 @@
                 </div>
             </div>
             
+            <!-- ========== 円グラフ：LCCコスト構成 ========== -->
+            <div style="margin-bottom: 30px; margin-top: 20px;">
+                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333;">LCCコスト構成</h3>
+                <div style="display: flex; gap: 30px; align-items: center;">
+                    <!-- 円グラフ -->
+                    <div style="width: 400px; height: 400px;">
+                        <canvas id="lcc_pie_chart"></canvas>
+                    </div>
+                    
+                    <!-- 凡例 -->
+                    <div style="flex: 1;">
+                        <div id="lcc_legend_1" style="margin-bottom: 10px; font-size: 14px; color: #4472C4;">
+                            ■ 再調達価格: 0円 (0.0%)
+                        </div>
+                        <div id="lcc_legend_2" style="margin-bottom: 10px; font-size: 14px; color: #ED7D31;">
+                            ■ 修繕工事費: 0円 (0.0%)
+                        </div>
+                        <div id="lcc_legend_3" style="margin-bottom: 10px; font-size: 14px; color: #A5A5A5;">
+                            ■ 運用費: 0円 (0.0%)
+                        </div>
+                        <div id="lcc_legend_4" style="margin-bottom: 10px; font-size: 14px; color: #FFC000;">
+                            ■ 一般管理費: 0円 (0.0%)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- ========== セクション3: LCC分析設定 ========== -->
             <div style="margin-bottom: 30px;">
                 <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333;">LCC分析設定</h3>
@@ -9033,6 +9060,8 @@ function initializeLCCTab() {
         calculateElapsedYears();
         // 運用費・一般管理費を計算
         calculateOperationCost();
+        // 円グラフを更新
+        updateLCCPieChart();
         
     } catch (error) {
         console.error('LCC初期化エラーー:', error);
@@ -9421,6 +9450,8 @@ function calculateMaintenanceAndRepair() {
         
         // 小計行と合計行の計算
         calculateLCCPeriodTotals();
+         // 円グラフを更新
+        updateLCCPieChart();
         
     } catch (error) {
         console.error('維持管理・大規模修繕費計算エラー:', error);
@@ -9756,6 +9787,9 @@ function calculateAdminCost() {
         
         console.log(`一般管理費計算完了: 総計 ${totalAdmin.toFixed(2)}百万円`);
         
+        // 円グラフを更新
+        updateLCCPieChart();
+        
     } catch (error) {
         console.error('一般管理費計算エラー:', error);
     }
@@ -9763,6 +9797,120 @@ function calculateAdminCost() {
 
 // ========== 第6段階ここまで ==========
 
+// ========== 第7段階：円グラフ ==========
+
+let lccPieChart = null; // Chart.jsのインスタンスを保持
+
+// 円グラフを更新
+function updateLCCPieChart() {
+    try {
+        // データを取得
+        // 1. 再調達価格
+        const reconstructionCostStr = document.getElementById('new_construction_cost').value.replace(/,/g, '').trim();
+        const reconstructionCost = parseFloat(reconstructionCostStr) || 0;
+        
+        // 2. 修繕工事費（直接工事計の合計、100万円単位）
+        const repairCostMillion = parseFloat(document.getElementById('lcc_total_42').value) || 0;
+        const repairCost = repairCostMillion * 1000000; // 円に変換
+        
+        // 3. 運用費（43行目の合計、100万円単位）
+        const operationCostMillion = parseFloat(document.getElementById('lcc_total_43').value) || 0;
+        const operationCost = operationCostMillion * 1000000; // 円に変換
+        
+        // 4. 一般管理費（44行目の合計、100万円単位）
+        const adminCostMillion = parseFloat(document.getElementById('lcc_total_44').value) || 0;
+        const adminCost = adminCostMillion * 1000000; // 円に変換
+        
+        // 合計を計算
+        const totalCost = reconstructionCost + repairCost + operationCost + adminCost;
+        
+        console.log('=== 円グラフデータ ===');
+        console.log(`再調達価格: ${reconstructionCost.toLocaleString()}円`);
+        console.log(`修繕工事費: ${repairCost.toLocaleString()}円`);
+        console.log(`運用費: ${operationCost.toLocaleString()}円`);
+        console.log(`一般管理費: ${adminCost.toLocaleString()}円`);
+        console.log(`合計: ${totalCost.toLocaleString()}円`);
+        
+        // 凡例を更新
+        if (totalCost > 0) {
+            const reconstructionPct = (reconstructionCost / totalCost * 100).toFixed(1);
+            const repairPct = (repairCost / totalCost * 100).toFixed(1);
+            const operationPct = (operationCost / totalCost * 100).toFixed(1);
+            const adminPct = (adminCost / totalCost * 100).toFixed(1);
+            
+            document.getElementById('lcc_legend_1').textContent = 
+                `■ 再調達価格: ${reconstructionCost.toLocaleString()}円 (${reconstructionPct}%)`;
+            document.getElementById('lcc_legend_2').textContent = 
+                `■ 修繕工事費: ${repairCost.toLocaleString()}円 (${repairPct}%)`;
+            document.getElementById('lcc_legend_3').textContent = 
+                `■ 運用費: ${operationCost.toLocaleString()}円 (${operationPct}%)`;
+            document.getElementById('lcc_legend_4').textContent = 
+                `■ 一般管理費: ${adminCost.toLocaleString()}円 (${adminPct}%)`;
+        } else {
+            document.getElementById('lcc_legend_1').textContent = '■ 再調達価格: 0円 (0.0%)';
+            document.getElementById('lcc_legend_2').textContent = '■ 修繕工事費: 0円 (0.0%)';
+            document.getElementById('lcc_legend_3').textContent = '■ 運用費: 0円 (0.0%)';
+            document.getElementById('lcc_legend_4').textContent = '■ 一般管理費: 0円 (0.0%)';
+        }
+        
+        // Chart.jsで円グラフを描画
+        const ctx = document.getElementById('lcc_pie_chart');
+        if (!ctx) {
+            console.error('円グラフのcanvas要素が見つかりません');
+            return;
+        }
+        
+        // 既存のチャートを破棄
+        if (lccPieChart) {
+            lccPieChart.destroy();
+        }
+        
+        // 新しいチャートを作成
+        lccPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['再調達価格', '修繕工事費', '運用費', '一般管理費'],
+                datasets: [{
+                    data: [reconstructionCost, repairCost, operationCost, adminCost],
+                    backgroundColor: [
+                        '#4472C4', // 青
+                        '#ED7D31', // オレンジ
+                        '#A5A5A5', // グレー
+                        '#FFC000'  // 黄色
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false // 凡例は別で表示するため非表示
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const percentage = totalCost > 0 ? (value / totalCost * 100).toFixed(1) : 0;
+                                return `${label}: ${value.toLocaleString()}円 (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('=== 円グラフ更新完了 ===');
+        
+    } catch (error) {
+        console.error('円グラフ更新エラー:', error);
+    }
+}
+
+// ========== 第7段階ここまで ==========
 
 // イベントリスナーの設定
 function setupLCCEventListeners() {
