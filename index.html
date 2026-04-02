@@ -2798,12 +2798,45 @@
                     .lcc-bg-plum { background-color: #dda0dd; }
                     .lcc-bg-lightgray { background-color: #f0f0f0; }
                     .lcc-bg-lightcyan { background-color: #e0ffff; }
+                    #lcc_marker_row th {
+                        color: red;
+                        font-size: 16px;
+                        font-weight: bold;
+                        text-align: center;
+                        padding: 2px;
+                        height: 25px;
+                    }
                 </style>
+                
+                
                 
                 <div style="overflow-x: auto; max-height: 600px; overflow-y: auto; border: 2px solid #ddd; border-radius: 8px;">
                     <table class="lcc-table" id="lcc_repair_table">
                         <!-- ヘッダー行 -->
                         <thead>
+                            <!-- マーカー行 -->
+                            <tr id="lcc_marker_row">
+                                <th style="width: 150px;"></th>
+                                <th style="width: 50px;"></th>
+                                <th style="width: 140px;"></th>
+                                <th style="width: 70px;" id="lcc_marker_1"></th>
+                                <th style="width: 70px;" id="lcc_marker_2"></th>
+                                <th style="width: 70px;" id="lcc_marker_3"></th>
+                                <th style="width: 70px;" id="lcc_marker_4"></th>
+                                <th style="width: 70px;" id="lcc_marker_5"></th>
+                                <th style="width: 70px;" id="lcc_marker_6"></th>
+                                <th style="width: 70px;" id="lcc_marker_7"></th>
+                                <th style="width: 70px;" id="lcc_marker_8"></th>
+                                <th style="width: 70px;" id="lcc_marker_9"></th>
+                                <th style="width: 70px;" id="lcc_marker_10"></th>
+                                <th style="width: 70px;" id="lcc_marker_11"></th>
+                                <th style="width: 70px;" id="lcc_marker_12"></th>
+                                <th style="width: 70px;" id="lcc_marker_13"></th>
+                                <th style="width: 70px;" id="lcc_marker_14"></th>
+                                <th style="width: 70px;" id="lcc_marker_15"></th>
+                                <th style="width: 100px;">100万円<br>単位</th>
+                            </tr>
+                            <!-- ヘッダー行 -->
                             <tr>
                                 <th style="width: 150px;">工種</th>
                                 <th style="width: 50px;">比率<br>(%)</th>
@@ -3835,6 +3868,12 @@
                                 <label style="width: 180px;">固定資産税率:</label>
                                 <input type="number" id="lcc_tax_rate" value="1.4" style="width: 100px; text-align: right;" step="0.01">
                                 <span style="margin-left: 5px;">% (年間)</span>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-top: 8px;">
+                                <label style="width: 180px;">経過年数:</label>
+                                <input type="number" id="lcc_elapsed_years" value="0" style="width: 100px; text-align: right;" step="0.1" min="0" max="75">
+                                <span style="margin-left: 5px;">年</span>
                             </div>
                         </div>
                     </div>
