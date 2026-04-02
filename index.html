@@ -9699,6 +9699,12 @@ function calculateAdminCost() {
         // 再調達価格を取得
         const reconstructionCost = parseFloat(document.getElementById('lcc_price_42').value) || 0;
         
+        // 再調達価格が0の場合はスキップ
+        if (reconstructionCost === 0) {
+            console.log('一般管理費計算スキップ: 再調達価格が0です');
+            return;
+        }
+        
         // 税率・保険料率を取得
         const taxRate = parseFloat(document.getElementById('lcc_property_tax_rate').value) / 100 || 0;
         const insuranceRate = parseFloat(document.getElementById('lcc_insurance_rate').value) / 100 || 0;
