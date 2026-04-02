@@ -9004,6 +9004,8 @@ function initializeLCCTab() {
         calculateLCCRepairPrices();
         // 維持管理費・大規模修繕費を計算
         calculateMaintenanceAndRepair();
+        // 経過年数マーカーを表示
+        updateLCCYearMarker();
         
     } catch (error) {
         console.error('LCC初期化エラーー:', error);
@@ -9479,6 +9481,87 @@ function calculateRowPeriodTotal(startRow, endRow, totalRow) {
 
 // ========== 第4段階ここまで ==========
 
+// ========== 第5段階：経過年数対応 ==========
+
+// 経過年数に応じて▼マーカーを表示
+function updateLCCYearMarker() {
+    try {
+        // 経過年数を取得
+        const elapsedYears = parseFloat(document.getElementById('lcc_elapsed_years').value) || 0;
+        
+        console.log('経過年数:', elapsedYears, '年');
+        
+        // すべてのマーカーをクリア
+        for (let col = 1; col <= 15; col++) {
+            const markerElement = document.getElementById(`lcc_marker_${col}`);
+            if (markerElement) {
+                markerElement.textContent = '';
+            }
+        }
+        
+        // 経過年数が0以下の場合は何も表示しない
+        if (elapsedYears <= 0) {
+            return;
+        }
+        
+        // 経過年数を切り捨て
+        const elapsedYearsInt = Math.floor(elapsedYears);
+        
+        // 該当する列を検索
+        let targetCol = null;
+        for (let col = 1; col <= 15; col++) {
+            const [startYear, endYear] = YEAR_RANGES[col];
+            if (startYear <= elapsedYearsInt && elapsedYearsInt <= endYear) {
+                targetCol = col;
+                break;
+            }
+        }
+        
+        // 該当列が見つかった場合、▼を表示
+        if (targetCol !== null) {
+            const markerElement = document.getElementById(`lcc_marker_${targetCol}`);
+            if (markerElement) {
+                markerElement.textContent = '▼';
+            }
+            console.log(`経過年数 ${elapsedYearsInt}年 → 列${targetCol}に▼を表示`);
+        } else {
+            console.log(`経過年数 ${elapsedYearsInt}年は表示範囲外です（0-75年）`);
+        }
+        
+    } catch (error) {
+        console.error('経過年数マーカー更新エラー:', error);
+    }
+}
+
+// 経過年数を考慮した期間の年数を計算
+function getAdjustedPeriodYears(col) {
+    const elapsedYears = parseFloat(document.getElementById('lcc_elapsed_years').value) || 0;
+    
+    if (elapsedYears <= 0) {
+        // 経過年数が0の場合は通常の5年間
+        return col === 1 ? 6 : 5; // 0-5年は6年間、それ以外は5年間
+    }
+    
+    const elapsedYearsInt = Math.floor(elapsedYears);
+    const [startYear, endYear] = YEAR_RANGES[col];
+    
+    // この列が経過年数より前の場合
+    if (endYear < elapsedYearsInt) {
+        return 0; // 0年分（計上しない）
+    }
+    
+    // この列が経過年数を含む場合
+    if (startYear <= elapsedYearsInt && elapsedYearsInt <= endYear) {
+        // 残り年数を計算
+        return endYear - elapsedYearsInt;
+    }
+    
+    // この列が経過年数より後の場合
+    return endYear - startYear; // 通常の期間年数（5年）
+}
+
+// ========== 第5段階ここまで ==========
+
 // イベントリスナーの設定
 function setupLCCEventListeners() {
     // 修繕計画表のイベントリスナーを設定
@@ -9512,6 +9595,15 @@ function setupLCCEventListeners() {
             element.addEventListener('input', calculateLCCOperationTotal);
         }
     });
+    // 経過年数の変更を監視
+    const elapsedYearsElement = document.getElementById('lcc_elapsed_years');
+    if (elapsedYearsElement) {
+        elapsedYearsElement.addEventListener('input', () => {
+            updateLCCYearMarker();
+            // 経過年数が変更されたら再計算
+            calculateMaintenanceAndRepair();
+        });
+    }
 }
 
 // ========== LCC分析タブの関数ここまで ==========
