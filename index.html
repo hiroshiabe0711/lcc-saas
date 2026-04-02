@@ -2805,8 +2805,11 @@
                         text-align: center;
                         padding: 2px;
                         height: 25px;
-                        background-color: transparent;
-                        border: none;
+                        background-color: white;
+                        border: 1px solid #ddd;
+                        position: sticky;
+                        top: 0;
+                        z-index: 11;
                     }
                 </style>
                 
@@ -9365,19 +9368,24 @@ function calculateMaintenanceAndRepair() {
                     console.log(`行${row}, 列${col}: 大規模修繕 ${Math.round(repairCost)}円`);
                 }
                 
-                // 年度列に設定（カンマなし）
+                // 年度列に設定（100万円単位）
                 const yearElement = document.getElementById(`lcc_year_${row}_${col}`);
                 if (yearElement) {
-                    yearElement.value = cost > 0 ? Math.round(cost) : 0;
+                    const costMillion = cost / 1000000;
+                    yearElement.value = costMillion > 0 ? costMillion.toFixed(2) : 0;
+                    console.log(`行${row}, 列${col}: 値設定 ${costMillion.toFixed(2)}百万円`);
+                } else {
+                    console.log(`❌ 行${row}, 列${col}: 要素が見つかりません (lcc_year_${row}_${col})`);
                 }
                 
                 rowTotal += cost;
             }
             
-            // 計列に設定（カンマなし）
+            // 計列に設定（100万円単位）
             const totalElement = document.getElementById(`lcc_total_${row}`);
             if (totalElement) {
-                totalElement.value = Math.round(rowTotal);
+                const totalMillion = rowTotal / 1000000;
+                totalElement.value = totalMillion.toFixed(2);
             }
         });
         
@@ -9420,7 +9428,7 @@ function calculateLCCPeriodTotals() {
             
             const directTotalElement = document.getElementById(`lcc_year_42_${col}`);
             if (directTotalElement) {
-                directTotalElement.value = total > 0 ? Math.round(total) : 0;
+                directTotalElement.value = total > 0 ? total.toFixed(2) : 0;
             }
         }
         
@@ -9429,12 +9437,12 @@ function calculateLCCPeriodTotals() {
         for (let col = 1; col <= 15; col++) {
             const element = document.getElementById(`lcc_year_42_${col}`);
             if (element) {
-                directGrandTotal += parseFloat(element.value.replace(/,/g, '')) || 0;
+                directGrandTotal += parseFloat(element.value) || 0;
             }
         }
         const directTotalElement = document.getElementById('lcc_total_42');
         if (directTotalElement) {
-            directTotalElement.value = Math.round(directGrandTotal);
+            directTotalElement.value = directGrandTotal.toFixed(2);
         }
         
     } catch (error) {
@@ -9456,7 +9464,7 @@ function calculateRowPeriodTotal(startRow, endRow, totalRow) {
             
             const totalElement = document.getElementById(`lcc_year_${totalRow}_${col}`);
             if (totalElement) {
-                totalElement.value = total > 0 ? Math.round(total) : 0;
+                totalElement.value = total > 0 ? total.toFixed(2) : 0;
             }
         }
         
@@ -9465,13 +9473,13 @@ function calculateRowPeriodTotal(startRow, endRow, totalRow) {
         for (let col = 1; col <= 15; col++) {
             const element = document.getElementById(`lcc_year_${totalRow}_${col}`);
             if (element) {
-                rowTotal += parseFloat(element.value.replace(/,/g, '')) || 0;
+                rowTotal += parseFloat(element.value) || 0;
             }
         }
         
         const grandTotalElement = document.getElementById(`lcc_total_${totalRow}`);
         if (grandTotalElement) {
-            grandTotalElement.value = Math.round(rowTotal);
+            grandTotalElement.value = rowTotal.toFixed(2);
         }
         
     } catch (error) {
