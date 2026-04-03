@@ -2741,12 +2741,12 @@
                     <div style="flex: 1;">
                         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
                             <h4 style="font-size: 14px; font-weight: bold; margin-bottom: 15px;">LCCコスト構成</h4>
-                            <canvas id="lcc_pie_chart" width="200" height="200" style="background-color: white; border-radius: 5px;"></canvas>
+                            <canvas id="lcc_pie_chart" width="400" height="400" style="background-color: white; border-radius: 5px;"></canvas>
                             <div style="margin-top: 15px; text-align: left; font-size: 12px;">
-                                <div id="lcc_legend_1" style="margin-bottom: 8px;">■ 再調達価格: 0円</div>
-                                <div id="lcc_legend_2" style="margin-bottom: 8px;">■ 修繕工事費: 0円</div>
-                                <div id="lcc_legend_3" style="margin-bottom: 8px;">■ 運用費: 0円</div>
-                                <div id="lcc_legend_4" style="margin-bottom: 8px;">■ 一般管理費: 0円</div>
+                                <div id="lcc_legend_1" style="margin-bottom: 12px;">■ 再調達価格: 0円</div>
+                                <div id="lcc_legend_2" style="margin-bottom: 12px;">■ 修繕工事費: 0円</div>
+                                <div id="lcc_legend_3" style="margin-bottom: 12px;">■ 運用費: 0円</div>
+                                <div id="lcc_legend_4" style="margin-bottom: 12px;">■ 一般管理費: 0円</div>
                             </div>
                         </div>
                     </div>
@@ -9882,7 +9882,7 @@ function updateLCCPieChart() {
                         color: 'white',
                         font: {
                             weight: 'bold',
-                            size: 9
+                            size: 12
                         },
                         formatter: function(value, context) {
                             const label = context.chart.data.labels[context.dataIndex];
