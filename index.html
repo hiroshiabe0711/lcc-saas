@@ -4181,7 +4181,7 @@
     });
 
     function openTab(tabName) {
-        const panes = document.querySelectorAll('.tab-pane');
+        const panes = document.querySelectorAll('.tab-pane, .tab-content');
         const btns = document.querySelectorAll('.tab-btn');
         
         panes.forEach(p => p.classList.remove('active'));
