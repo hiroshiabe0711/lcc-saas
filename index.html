@@ -9844,10 +9844,9 @@ function updateLCCPieChart() {
         }
         
         // 新しいチャートを作成
-        // Datalabelsプラグインを登録
-        Chart.register(ChartDataLabels);
         lccPieChart = new Chart(ctx, {
             type: 'pie',
+            plugins: [ChartDataLabels], // プラグインを直接登録
             data: {
                 labels: ['再調達価格', '修繕工事費', '運用費', '一般管理費'],
                 datasets: [{
