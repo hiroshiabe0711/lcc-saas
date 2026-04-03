@@ -67,6 +67,15 @@
         }
         .tab-pane.active { display: flex; }
 
+        .tab-pane.active { display: flex; }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            overflow-y: auto;
+        }
+        .tab-content.active { display: block; }
+
         .summary-layout {
             display: flex;
             width: 100%;
@@ -2034,7 +2043,7 @@
 </div>
 
 <!-- 客室タブ -->
-    <div id="guestroom" class="tab-pane" style="max-height: 800px; overflow-y: auto;">
+    <div id="guestroom" class="tab-content" style="max-height: 800px; overflow-y: auto;">
         <div class="section-title">客室詳細設定</div>
         <p style="text-align: right; font-size: 11px; color: #666; margin-bottom: 15px;">
             面積を入力すると金額が表示されます。計上金額に含める場合は、項目に☑を入れてください。
