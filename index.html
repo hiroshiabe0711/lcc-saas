@@ -6,6 +6,8 @@
     <title>建物コスト算出システム</title>
     <!-- Chart.js ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -3832,32 +3834,6 @@
                 </div>
             </div>
             
-            <!-- ========== 円グラフ：LCCコスト構成 ========== -->
-            <div style="margin-bottom: 30px; margin-top: 20px;">
-                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333;">LCCコスト構成</h3>
-                <div style="display: flex; gap: 30px; align-items: center;">
-                    <!-- 円グラフ -->
-                    <div style="width: 400px; height: 400px;">
-                        <canvas id="lcc_pie_chart"></canvas>
-                    </div>
-                    
-                    <!-- 凡例 -->
-                    <div style="flex: 1;">
-                        <div id="lcc_legend_1" style="margin-bottom: 10px; font-size: 14px; color: #4472C4;">
-                            ■ 再調達価格: 0円 (0.0%)
-                        </div>
-                        <div id="lcc_legend_2" style="margin-bottom: 10px; font-size: 14px; color: #ED7D31;">
-                            ■ 修繕工事費: 0円 (0.0%)
-                        </div>
-                        <div id="lcc_legend_3" style="margin-bottom: 10px; font-size: 14px; color: #A5A5A5;">
-                            ■ 運用費: 0円 (0.0%)
-                        </div>
-                        <div id="lcc_legend_4" style="margin-bottom: 10px; font-size: 14px; color: #FFC000;">
-                            ■ 一般管理費: 0円 (0.0%)
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- ========== セクション3: LCC分析設定 ========== -->
             <div style="margin-bottom: 30px;">
@@ -9899,6 +9875,21 @@ function updateLCCPieChart() {
                                 const percentage = totalCost > 0 ? (value / totalCost * 100).toFixed(1) : 0;
                                 return `${label}: ${value.toLocaleString()}円 (${percentage}%)`;
                             }
+                        }
+                    },
+                    datalabels: {
+                        color: 'white',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        },
+                        formatter: function(value, context) {
+                            const label = context.chart.data.labels[context.dataIndex];
+                            const percentage = totalCost > 0 ? (value / totalCost * 100).toFixed(1) : 0;
+                            if (percentage >= 5) {
+                                return `${label}\n${percentage}%`;
+                            }
+                            return '';
                         }
                     }
                 }
