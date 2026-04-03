@@ -2741,7 +2741,7 @@
                     <div style="flex: 1;">
                         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
                             <h4 style="font-size: 14px; font-weight: bold; margin-bottom: 15px;">LCCコスト構成</h4>
-                            <canvas id="lcc_pie_chart" width="300" height="300" style="background-color: white; border-radius: 5px;"></canvas>
+                            <canvas id="lcc_pie_chart" width="150" height="150" style="background-color: white; border-radius: 5px;"></canvas>
                             <div style="margin-top: 15px; text-align: left; font-size: 12px;">
                                 <div id="lcc_legend_1" style="margin-bottom: 5px;">■ 再調達価格: 0円</div>
                                 <div id="lcc_legend_2" style="margin-bottom: 5px;">■ 修繕工事費: 0円</div>
@@ -9881,13 +9881,13 @@ function updateLCCPieChart() {
                         color: 'white',
                         font: {
                             weight: 'bold',
-                            size: 12
+                            size: 9
                         },
                         formatter: function(value, context) {
                             const label = context.chart.data.labels[context.dataIndex];
                             const percentage = totalCost > 0 ? (value / totalCost * 100).toFixed(1) : 0;
                             if (percentage >= 5) {
-                                return `${label}\n${percentage}%`;
+                                return `${label}\n${value.toLocaleString()}円\n(${percentage}%)`;
                             }
                             return '';
                         }
