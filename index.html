@@ -9805,8 +9805,8 @@ let lccPieChart = null; // Chart.jsのインスタンスを保持
 function updateLCCPieChart() {
     try {
         // データを取得
-        // 1. 再調達価格
-        const reconstructionCostStr = document.getElementById('new_construction_cost').value.replace(/,/g, '').trim();
+        // 1. 再調達価格（lcc_reconstruction_costから取得）
+        const reconstructionCostStr = document.getElementById('lcc_reconstruction_cost').value.replace(/,/g, '').trim();
         const reconstructionCost = parseFloat(reconstructionCostStr) || 0;
         
         // 2. 修繕工事費（直接工事計の合計、100万円単位）
