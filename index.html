@@ -9844,6 +9844,8 @@ function updateLCCPieChart() {
         }
         
         // 新しいチャートを作成
+        // Datalabelsプラグインを登録
+        Chart.register(ChartDataLabels);
         lccPieChart = new Chart(ctx, {
             type: 'pie',
             data: {
