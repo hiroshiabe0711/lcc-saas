@@ -378,6 +378,7 @@
     <div id="property" class="tab-pane">
         <div style="padding: 25px;">
             <div class="section-title">物件管理</div>
+            
             <div class="property-card property-list-container">
                 <div class="property-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-default" onclick="createNewProperty()">🆕 新規作成</button>
@@ -385,8 +386,12 @@
                     <button class="btn btn-success" onclick="savePropertyToFile()">💾 保存</button>
                     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllData(event)">
                 </div>
+                <!-- propertyList は JS から参照される（非表示で保持） -->
+                <select id="propertyList" style="display:none"></select>
             </div>
 
+
+            
             <div class="section-title">物件基本情報</div>
             <div class="property-card">
                 <div class="input-grid">
@@ -4807,6 +4812,7 @@ function setupEventListeners() {
 
     function updatePropertyList() {
         const list = document.getElementById('propertyList');
+        if (!list) return;
         list.innerHTML = '';
         Object.keys(properties).forEach(id => {
             const opt = document.createElement('option');
@@ -4915,7 +4921,7 @@ function setupEventListeners() {
                 if (el.type === 'checkbox') {
                     data[el.id] = el.checked;
                 } else {
-                    data[el.value] = el.value;
+                    data[el.id] = el.value;
                 }
             }
         });
