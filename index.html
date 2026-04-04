@@ -4964,7 +4964,22 @@ function setupEventListeners() {
         
         const link = document.createElement('a');
         link.href = url;
-        link.download = `建物コスト算出_${new Date().toISOString().split('T')[0]}.json`;
+        
+        // 現在の物件名を取得（物件が選択されていない場合は「未設定」）
+        let propertyName = '未設定';
+        if (currentPropertyId && properties[currentPropertyId]) {
+            propertyName = properties[currentPropertyId].name || '未設定';
+        } else {
+            const propNameInput = document.getElementById('prop_name');
+            if (propNameInput && propNameInput.value) {
+                propertyName = propNameInput.value;
+            }
+        }
+        
+        // ファイル名に使えない文字を置換
+        const safePropertyName = propertyName.replace(/[\\/:*?"<>|]/g, '_');
+        
+        link.download = `${safePropertyName}_${new Date().toISOString().split('T')[0]}.json`;
         link.click();
         
         URL.revokeObjectURL(url);
