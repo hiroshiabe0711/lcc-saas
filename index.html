@@ -4821,25 +4821,39 @@ function setupEventListeners() {
     }
 
     function createNewProperty() {
-        const id = 'prop_' + Date.now();
-        properties[id] = {
-            name: '新規物件',
-            address: '',
-            remarks: '',
-            data: {}
-        };
-        currentPropertyId = id;
-        updatePropertyList();
-        loadPropertyToForm(id);
-        alert('新規物件を作成しました');
+        // 現在の入力内容をクリア
+        currentPropertyId = null;
+        
+        // すべての入力欄をクリア
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            if (el.id && el.id !== 'propertyList' && el.id !== 'importFile') {
+                if (el.type === 'checkbox') {
+                    el.checked = false;
+                } else if (el.type !== 'button' && el.type !== 'submit') {
+                    el.value = '';
+                }
+            }
+        });
+        
+        alert('新規物件を作成します。データを入力後、保存してください。');
     }
 
     function saveProperty() {
+        // 初回保存時は物件名を入力
         if (!currentPropertyId) {
-            alert('物件を選択または新規作成してください');
-            return;
+            const propertyName = prompt('物件名を入力してください:', '新規物件');
+            if (!propertyName) {
+                return; // キャンセルされた場合
+            }
+            
+            // 新しいIDを生成
+            currentPropertyId = 'prop_' + Date.now();
+            
+            // 物件名を入力欄に反映
+            document.getElementById('prop_name').value = propertyName;
         }
         
+        // 物件データを保存
         properties[currentPropertyId] = {
             name: document.getElementById('prop_name').value,
             address: document.getElementById('prop_address').value,
