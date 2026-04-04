@@ -377,16 +377,12 @@
 <div class="main-content">
     <div id="property" class="tab-pane">
         <div style="padding: 25px;">
-            <div class="section-title">登録済み物件一覧</div>
+            <div class="section-title">物件管理</div>
             <div class="property-card property-list-container">
-                <select id="propertyList" size="5" style="flex:1; border:1px solid #aaa; border-radius:4px; padding:5px;"></select>
-                <div class="property-buttons">
-                    <button class="btn btn-primary" onclick="loadProperty()">📂 読み込み</button>
+                <div class="property-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn btn-default" onclick="createNewProperty()">🆕 新規作成</button>
-                    <button class="btn btn-success" onclick="saveProperty()">💾 保存</button>
-                    <button class="btn btn-danger" onclick="deleteProperty()">🗑️ 削除</button>
-                    <button class="btn btn-primary" onclick="exportAllData()" style="margin-top: 15px;">📥 エクスポート</button>
-                    <button class="btn btn-default" onclick="document.getElementById('importFile').click()">📤 インポート</button>
+                    <button class="btn btn-primary" onclick="document.getElementById('importFile').click()">📂 開く</button>
+                    <button class="btn btn-success" onclick="savePropertyToFile()">💾 保存</button>
                     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importAllData(event)">
                 </div>
             </div>
@@ -4821,15 +4817,21 @@ function setupEventListeners() {
     }
 
     function createNewProperty() {
-        // 現在の入力内容をクリア
-        currentPropertyId = null;
+        // 未保存のデータがある場合は確認
+        const propName = document.getElementById('prop_name').value;
+        if (propName) {
+            const confirmNew = confirm('現在のデータは保存されていません。\n新規作成すると現在のデータが失われます。\n\nよろしいですか？');
+            if (!confirmNew) {
+                return;
+            }
+        }
         
         // すべての入力欄をクリア
         document.querySelectorAll('input, select, textarea').forEach(el => {
-            if (el.id && el.id !== 'propertyList' && el.id !== 'importFile') {
+            if (el.id && el.id !== 'importFile') {
                 if (el.type === 'checkbox') {
                     el.checked = false;
-                } else if (el.type !== 'button' && el.type !== 'submit') {
+                } else if (el.type !== 'button' && el.type !== 'submit' && el.type !== 'file') {
                     el.value = '';
                 }
             }
@@ -4986,6 +4988,67 @@ function setupEventListeners() {
         alert('データをエクスポートしました');
     }
 
+    function savePropertyToFile() {
+        // 物件名を取得
+        const propNameInput = document.getElementById('prop_name');
+        let propertyName = propNameInput && propNameInput.value ? propNameInput.value : '未設定';
+        
+        // 物件名が未入力の場合は入力を促す
+        if (!propertyName || propertyName === '未設定' || propertyName.trim() === '') {
+            propertyName = prompt('物件名を入力してください:', '新規物件');
+            if (!propertyName) {
+                return; // キャンセルされた場合
+            }
+            propNameInput.value = propertyName;
+        }
+        
+        // ファイル名に使えない文字を置換
+        const safePropertyName = propertyName.replace(/[\\/:*?"<>|]/g, '_');
+        const fileName = `${safePropertyName}_${new Date().toISOString().split('T')[0]}.json`;
+        
+        // 上書き確認
+        const confirmSave = confirm(`「${fileName}」として保存します。\n\n※同名のファイルがある場合は上書きされます。\n\nよろしいですか？`);
+        if (!confirmSave) {
+            return;
+        }
+        
+        // 現在のデータを収集
+        const propertyData = {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            propertyName: propertyName,
+            address: document.getElementById('prop_address').value,
+            remarks: document.getElementById('prop_remarks').value,
+            data: gatherAllData(),
+            equipmentData: equipmentData,
+            heatSourceData: heatSourceData,
+            kitchenData: kitchenData,
+            structureData: structureData,
+            interiorData: interiorData,
+            furniture1Data: furniture1Data,
+            furniture2Data: furniture2Data,
+            regionRates: {
+                tokyo: document.getElementById('region_rate_tokyo').value,
+                kanto: document.getElementById('region_rate_kanto').value,
+                kansai: document.getElementById('region_rate_kansai').value,
+                city: document.getElementById('region_rate_city').value,
+                rural: document.getElementById('region_rate_rural').value
+            }
+        };
+        
+        // JSONファイルとしてダウンロード
+        const dataStr = JSON.stringify(propertyData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        alert('保存しました');
+    
     function importAllData(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -4995,9 +5058,29 @@ function setupEventListeners() {
             try {
                 const importData = JSON.parse(e.target.result);
                 
-                if (importData.properties) {
-                    properties = importData.properties;
-                    updatePropertyList();
+                // 物件基本情報を復元
+                if (importData.propertyName) {
+                    document.getElementById('prop_name').value = importData.propertyName;
+                }
+                if (importData.address) {
+                    document.getElementById('prop_address').value = importData.address;
+                }
+                if (importData.remarks) {
+                    document.getElementById('prop_remarks').value = importData.remarks;
+                }
+                
+                // データを復元
+                if (importData.data) {
+                    Object.keys(importData.data).forEach(key => {
+                        const el = document.getElementById(key);
+                        if (el) {
+                            if (el.type === 'checkbox') {
+                                el.checked = importData.data[key] === 'true' || importData.data[key] === true;
+                            } else {
+                                el.value = importData.data[key];
+                            }
+                        }
+                    });
                 }
                 
                 if (importData.equipmentData) {
@@ -5043,7 +5126,7 @@ function setupEventListeners() {
                     document.getElementById('region_rate_rural').value = importData.regionRates.rural || 75;
                 }
                 
-                alert(`データをインポートしました\n物件数: ${Object.keys(properties).length}`);
+                alert('ファイルを読み込みました');
             } catch (error) {
                 alert('ファイルの読み込みに失敗しました: ' + error.message);
             }
