@@ -5701,17 +5701,17 @@ function setupEventListeners() {
             const peakFactor = parseFloat(document.getElementById('peak_factor').value) || 1.5;
             const menRatio = parseFloat(document.getElementById('men_ratio').value) || 55;
             const womenRatio = parseFloat(document.getElementById('women_ratio').value) || 45;
-            const tubTime = parseFloat(document.getElementById('tub_time').value) || 15;
-            
+            const washTime = parseFloat(document.getElementById('wash_time').value) || 20; // 洗い場滞在時間(分)
+
             if (bathOpenHours > 0) {
-                // 男性用
-                const menRecommended = Math.ceil((menRatio / 100) * totalGuests / bathOpenHours * peakFactor / bathOpenHours * tubTime / 60);
+                // 男性用：洗い場の同時利用者数 = 男性人数 × ピーク係数 ÷ 営業時間(h) × (洗い場時間÷60)
+                const menRecommended = Math.ceil((menRatio / 100) * totalGuests * peakFactor / bathOpenHours * (washTime / 60));
                 document.getElementById('men_partition_recommended').textContent = `推奨: ${menRecommended}個`;
                 document.getElementById('men_wash_lighting_recommended').textContent = `推奨: ${menRecommended}個`;
                 document.getElementById('men_shower_faucet_recommended').textContent = `推奨: ${menRecommended}個`;
-                
-                // 女性用
-                const womenRecommended = Math.ceil((womenRatio / 100) * totalGuests / bathOpenHours * peakFactor / bathOpenHours * tubTime / 60);
+
+                // 女性用：洗い場の同時利用者数 = 女性人数 × ピーク係数 ÷ 営業時間(h) × (洗い場時間÷60)
+                const womenRecommended = Math.ceil((womenRatio / 100) * totalGuests * peakFactor / bathOpenHours * (washTime / 60));
                 document.getElementById('women_partition_recommended').textContent = `推奨: ${womenRecommended}個`;
                 document.getElementById('women_wash_lighting_recommended').textContent = `推奨: ${womenRecommended}個`;
                 document.getElementById('women_shower_faucet_recommended').textContent = `推奨: ${womenRecommended}個`;
