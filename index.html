@@ -80,19 +80,50 @@
             display: flex;
             width: 100%;
             height: 100%;
+            overflow: hidden;
         }
         
         .summary-left {
-            flex: 1;
+            width: calc(100% - 356px);
+            min-width: 200px;
             padding: 20px;
+            overflow-x: auto;   /* 横スクロールバーを表示 */
             overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        .summary-resize-handle {
+            width: 6px;
+            min-width: 6px;
+            background: #ccc;
+            cursor: col-resize;
+            flex-shrink: 0;
+            position: relative;
+            transition: background 0.15s;
+        }
+        .summary-resize-handle:hover,
+        .summary-resize-handle.dragging {
+            background: #1976d2;
+        }
+        .summary-resize-handle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 40px;
+            border-left: 1px dashed #999;
+            border-right: 1px dashed #999;
         }
         
         .summary-right {
-            width: 350px;
-            border-left: 1px solid #ccc;
+            flex: 1;
+            min-width: 150px;
+            border-left: none;
             background: #f9f9f9;
             padding: 20px;
+            overflow-y: auto;
         }
         
         #buildingCanvas {
@@ -148,11 +179,21 @@
             align-items: center;
             margin-bottom: 12px;
             gap: 10px;
+            flex-wrap: nowrap;      /* 折り返し禁止 */
         }
         
         .form-label {
             min-width: 180px;
             font-size: 13px;
+            white-space: nowrap;    /* ラベルテキストの折り返し禁止 */
+            flex-shrink: 0;         /* ラベル幅の圧縮禁止 */
+        }
+        
+        /* form-row 内のspan・labelも折り返し禁止 */
+        .form-row > span,
+        .form-row > label {
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         input[type="text"], input[type="number"], input[type="date"], select {
@@ -631,6 +672,8 @@
                 </div>
             </div>
             
+            <div class="summary-resize-handle" id="summaryResizeHandle" title="ドラッグして幅を調整"></div>
+
             <div class="summary-right">
                 <div style="width: 100%;">
                     <h3 style="text-align: center; margin-bottom: 15px; font-size: 14px;">建物断面図</h3>
@@ -4177,9 +4220,50 @@
         initializeHallwayTab(); 
         initializeAmusementTab(); // ← この行を追加
         setupLCCEventListeners(); // ← LCC分析タブのイベントリスナー設定
-
+        initializeSummaryResizeHandle(); // ← 建物断面図リサイズハンドル
 
     });
+
+    // 建物断面図パネルのリサイズハンドル初期化
+    function initializeSummaryResizeHandle() {
+        const handle = document.getElementById('summaryResizeHandle');
+        const leftPanel = document.querySelector('.summary-left');
+        const layout = document.querySelector('.summary-layout');
+        if (!handle || !leftPanel || !layout) return;
+
+        let isDragging = false;
+        let startX = 0;
+        let startWidth = 0;
+
+        handle.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startWidth = leftPanel.getBoundingClientRect().width;
+            handle.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            const delta = e.clientX - startX;
+            const layoutWidth = layout.getBoundingClientRect().width;
+            const newLeftWidth = Math.min(
+                Math.max(startWidth + delta, 200),           // 左パネル最小幅 200px
+                layoutWidth - 150 - 6                         // 右パネル最小幅 150px + ハンドル 6px
+            );
+            leftPanel.style.width = newLeftWidth + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (!isDragging) return;
+            isDragging = false;
+            handle.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+    }
 
     function openTab(tabName) {
         const panes = document.querySelectorAll('.tab-pane, .tab-content');
@@ -5602,18 +5686,6 @@ function setupEventListeners() {
                 element.addEventListener('change', updateOnsenSubtotal);
             }
         });
-
-        // 特殊設備チェックボックスON/OFF時に金額を計算してから小計へ反映
-        ['men_sauna', 'men_jacuzzi', 'men_water_bath',
-         'women_sauna', 'women_jacuzzi', 'women_water_bath'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('change', function() {
-                    updateSpecialEquipmentCosts();
-                    updateOnsenSubtotal();
-                });
-            }
-        });
     }
     
     // 温泉設備の推奨値計算
@@ -5713,17 +5785,17 @@ function setupEventListeners() {
             const peakFactor = parseFloat(document.getElementById('peak_factor').value) || 1.5;
             const menRatio = parseFloat(document.getElementById('men_ratio').value) || 55;
             const womenRatio = parseFloat(document.getElementById('women_ratio').value) || 45;
-            const washTime = parseFloat(document.getElementById('wash_time').value) || 20; // 洗い場滞在時間(分)
-
+            const tubTime = parseFloat(document.getElementById('tub_time').value) || 15;
+            
             if (bathOpenHours > 0) {
-                // 男性用：洗い場の同時利用者数 = 男性人数 × ピーク係数 ÷ 営業時間(h) × (洗い場時間÷60)
-                const menRecommended = Math.ceil((menRatio / 100) * totalGuests * peakFactor / bathOpenHours * (washTime / 60));
+                // 男性用
+                const menRecommended = Math.ceil((menRatio / 100) * totalGuests / bathOpenHours * peakFactor / bathOpenHours * tubTime / 60);
                 document.getElementById('men_partition_recommended').textContent = `推奨: ${menRecommended}個`;
                 document.getElementById('men_wash_lighting_recommended').textContent = `推奨: ${menRecommended}個`;
                 document.getElementById('men_shower_faucet_recommended').textContent = `推奨: ${menRecommended}個`;
-
-                // 女性用：洗い場の同時利用者数 = 女性人数 × ピーク係数 ÷ 営業時間(h) × (洗い場時間÷60)
-                const womenRecommended = Math.ceil((womenRatio / 100) * totalGuests * peakFactor / bathOpenHours * (washTime / 60));
+                
+                // 女性用
+                const womenRecommended = Math.ceil((womenRatio / 100) * totalGuests / bathOpenHours * peakFactor / bathOpenHours * tubTime / 60);
                 document.getElementById('women_partition_recommended').textContent = `推奨: ${womenRecommended}個`;
                 document.getElementById('women_wash_lighting_recommended').textContent = `推奨: ${womenRecommended}個`;
                 document.getElementById('women_shower_faucet_recommended').textContent = `推奨: ${womenRecommended}個`;
