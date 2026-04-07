@@ -5602,6 +5602,18 @@ function setupEventListeners() {
                 element.addEventListener('change', updateOnsenSubtotal);
             }
         });
+
+        // 特殊設備チェックボックスON/OFF時に金額を計算してから小計へ反映
+        ['men_sauna', 'men_jacuzzi', 'men_water_bath',
+         'women_sauna', 'women_jacuzzi', 'women_water_bath'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', function() {
+                    updateSpecialEquipmentCosts();
+                    updateOnsenSubtotal();
+                });
+            }
+        });
     }
     
     // 温泉設備の推奨値計算
